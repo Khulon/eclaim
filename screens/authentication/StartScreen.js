@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
 export default function StartScreen({ navigation }) {
+
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
@@ -14,6 +15,7 @@ export default function StartScreen({ navigation }) {
         />
         <Text style={styles.text}>Eng Kong Holdings</Text>
         <Text style={styles.text}>Pte Ltd</Text>
+
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
