@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
@@ -10,7 +10,7 @@ export default function LoginScreen({ navigation }) {
         <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
         <Image 
           style={{width: 120, height: 120}}
-          source={require('../assets/engkong_logo.png')}
+          source={require('../../assets/engkong_logo.png')}
           resizeMode={'contain'}  
         />
         <Text style={styles.text}>Eng Kong Holdings</Text>
