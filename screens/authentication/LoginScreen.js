@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
-export default function RegistrationScreen({ navigation }) {
+export default function LoginScreen({ navigation }) {
   return (
     <View style={styles.page}>
-        <Text >Registration page</Text>
+        <Text >Login page</Text>
         <Text onPress={() => navigation.goBack()}>Go Back</Text>
       </View>
   );
@@ -21,4 +21,3 @@ const styles = StyleSheet.create({
     },
   });
   
-
