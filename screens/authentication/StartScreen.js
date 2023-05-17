@@ -19,7 +19,7 @@ export default function StartScreen({ navigation }) {
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <TouchableOpacity onPress={() => navigation.navigate("RegistrationScreen")} style={styles.defaultButton} > Login </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")} style={styles.defaultButton} > Login </TouchableOpacity>
           <View style={{flexDirection: "row" , paddingTop: "10px"}}>
             <Text > Don't have an account?</Text>
             <Text style={styles.textLink} onPress={() => navigation.navigate("RegistrationScreen")}> Register Now!</Text>
