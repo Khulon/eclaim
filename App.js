@@ -1,6 +1,7 @@
 
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import mssql from 'react-native-mssql';
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     fontFamily: "Arial",
   },
+  
   pageLogin: {
     width: "80%",
     height: "80%",
@@ -85,3 +87,4 @@ const styles = StyleSheet.create({
   },
 
 });
+
