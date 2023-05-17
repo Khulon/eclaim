@@ -21,12 +21,12 @@ export default function App() {
 const Stack = createStackNavigator();
 
 export default function MyStack() {
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="StackNavigator" component={StackNavigator} options={{headerShown: false}}/> 
+        <Stack.Screen name="StackNavigator" component={StackNavigator} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
