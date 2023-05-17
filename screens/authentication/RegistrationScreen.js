@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
-export default function RegistrationScreen() {
+export default function RegistrationScreen({ navigation }) {
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
