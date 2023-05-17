@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -21,15 +20,13 @@ export default function App() {
 
 const Stack = createStackNavigator();
 
-function MyStack() {
+export default function MyStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <StackNavigator/> 
+        <Stack.Screen name="StackNavigator" component={StackNavigator} options={{headerShown: false}}/> 
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-export default MyStack;
 
