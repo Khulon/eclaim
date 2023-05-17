@@ -1,4 +1,3 @@
-
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
@@ -10,7 +9,7 @@ export default function RegistrationScreen() {
         <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
         <Image 
           style={{width: 120, height: 120}}
-          source={require('../assets/engkong_logo.png')}
+          source={require('../../assets/engkong_logo.png')}
           resizeMode={'contain'}  
         />
         <Text style={styles.text}>Registration page</Text>

@@ -1,7 +1,11 @@
 
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+
+
+import { StyleSheet} from 'react-native';
 import { useState, useEffect } from "react";
+import { NavigationContainer } from '@react-navigation/native';
+import StackNavigator from './navigation/StackNavigator';
+
 
 
 export default function App() {
@@ -14,31 +18,12 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.page}>
-      <View style={styles.pageLogin}>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <StackNavigator/> 
+      </Stack.Navigator>
+    </NavigationContainer>
 
-        <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
-        <Image 
-          style={{width: 120, height: 120}}
-          source={require('./assets/engkong_logo.png')}
-          resizeMode={'contain'}  
-        />
-        <Text style={styles.text}>Eng Kong Holdings</Text>
-        <Text style={styles.text}>Pte Ltd</Text>
-        </View>
-
-        <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <TouchableOpacity style={styles.defaultButton} onPress={() => alert('Not implemented yet!')}> Login </TouchableOpacity>
-          <View style={{flexDirection: "row" , paddingTop: "10px"}}>
-            <Text > Don't have an account?</Text>
-            <Text style={styles.textLink} href="https://www.w3schools.com/"> Register Now!</Text>
-          </View>
-          <StatusBar style="auto" />
-        </View>
-
-      </View>
-    </View>
-    
   );
 }
 
