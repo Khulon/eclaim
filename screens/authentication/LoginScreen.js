@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
-export default function LoginScreen() {
+export default function LoginScreen({navigation}) {
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
