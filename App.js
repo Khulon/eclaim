@@ -1,9 +1,18 @@
 
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import mssql from 'react-native-mssql';
+import React, { useState, useEffect } from "react";
+
 
 export default function App() {
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:8000/message")
+      .then((res) => res.json())
+      .then((data) => setMessage(data.message));
+  }, []);
+
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
@@ -16,6 +25,7 @@ export default function App() {
         />
         <Text style={styles.text}>Eng Kong Holdings</Text>
         <Text style={styles.text}>Pte Ltd</Text>
+        <Text>{message}</Text>
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
@@ -45,7 +55,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     fontFamily: "Arial",
   },
-  
+
   pageLogin: {
     width: "80%",
     height: "80%",
