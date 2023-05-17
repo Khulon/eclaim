@@ -35,7 +35,7 @@ app.get('/', function (req, res) {
         var request = new sql.Request();
            
         // query to the database and get the records
-        request.query('SELECT * from Employees', function (err, rows, fields) {
+        request.query('SELECT * from Employees', function (err, rows) {
             
             if (err) console.log(err)
 
