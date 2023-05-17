@@ -1,8 +1,8 @@
-
+import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
@@ -10,7 +10,7 @@ export default function LoginScreen() {
         <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
         <Image 
           style={{width: 120, height: 120}}
-          source={require('./assets/engkong_logo.png')}
+          source={require('../assets/engkong_logo.png')}
           resizeMode={'contain'}  
         />
         <Text style={styles.text}>Eng Kong Holdings</Text>
@@ -18,10 +18,10 @@ export default function LoginScreen() {
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <TouchableOpacity style={styles.defaultButton} onPress={() => alert('Not implemented yet!')}> Login </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Registration")} style={styles.defaultButton} > Login </TouchableOpacity>
           <View style={{flexDirection: "row" , paddingTop: "10px"}}>
             <Text > Don't have an account?</Text>
-            <Text style={styles.textLink} href="https://www.w3schools.com/"> Register Now!</Text>
+            <Text style={styles.textLink} onPress={() => navigation.navigate("RegistrationScreen")}> Register Now!</Text>
           </View>
           <StatusBar style="auto" />
         </View>
