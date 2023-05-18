@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
     fontFamily: "Arial",
   },
   pageLogin: {
-    width: "80%",
-    height: "80%",
+    width: "90%",
+    height: "90%",
     backgroundColor: '#fff',
     alignItems: 'center',
     flexDirection: "column",
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     fontSize: "16px",
     fontWeight: "700",
     
-    width: "80%",
+    width: "90%",
     maxWidth: "400px",
     height: "40px",
     borderRadius: "14px",
