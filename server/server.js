@@ -41,12 +41,10 @@ app.get('/', function (req, res) {
 
             // send records as a response
             res.send(rows.recordset);
-            
         });
     });
 });
 
 var server = app.listen(5000, function () {
-    console.log('Server is running..');
+    console.log('Server is running on port ' + server.address().port + '...');
 });
-
