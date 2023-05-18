@@ -1,7 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import React, { useState, useEffect } from "react";
+
 
 export default function StartScreen({ navigation }) {
+
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:5000")
+    .then((res) => res.json())
+    .then((data) => setMessage(data))
+
+  }, []);
+        
 
   return (
     <View style={styles.page}>
@@ -15,6 +27,15 @@ export default function StartScreen({ navigation }) {
         />
         <Text style={styles.text}>Eng Kong Holdings</Text>
         <Text style={styles.text}>Pte Ltd</Text>
+        
+        <div>
+          {message &&
+            message.map((msg) => (
+            <div>
+              Email:{msg.email} <div>Password:{msg.passwords}</div>
+          </div>
+          ))}
+        </div> 
 
         </View>
 
