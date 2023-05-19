@@ -15,44 +15,7 @@ export default function StartScreen({ navigation }) {
   }, []);
         
 
-  return (
-    <View style={styles.page}>
-      <View style={styles.pageLogin}>
-
-        <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
-        <Image 
-          style={{width: 120, height: 120}}
-          source={require('../../assets/engkong_logo.png')}
-          resizeMode={'contain'}  
-        />
-        <Text style={styles.text}>Eng Kong Holdings</Text>
-        <Text style={styles.text}>Pte Ltd</Text>
-        
-        <div>
-          {message &&
-            message.map((msg) => (
-            <div>
-              Email:{msg.email} <div>Password:{msg.passwords}</div>
-          </div>
-          ))}
-        </div> 
-
-        </View>
-
-        <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")} style={styles.defaultButton} > Login </TouchableOpacity>
-          <View style={{flexDirection: "row" , paddingTop: "10px"}}>
-            <Text > Don't have an account?</Text>
-            <Text style={styles.textLink} onPress={() => navigation.navigate("RegistrationScreen")}> Register Now!</Text>
-          </View>
-          <StatusBar style="auto" />
-        </View>
-
-      </View>
-    </View>
-    
-  );
-}
+  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
 
 
 
@@ -88,22 +51,62 @@ const styles = StyleSheet.create({
 
   defaultButton: {
     fontFamily: "inherit",
-    backgroundColor: "#E04F4F",
-    border: "none",
-
-    padding: "10px",
-    color: "white",
-    textAlign: "center",
-    textDecoration: "none",
-    fontSize: "16px",
-    fontWeight: "700",
+        backgroundColor: isLoginButtonHover? "#E35D5D" :"#E04F4F",
+        border: "none",
     
-    width: "90%",
-    maxWidth: "400px",
-    height: "40px",
-    borderRadius: "14px",
-
-    cursor: "pointer"
+        padding: isLoginButtonHover? "11px" :"10px",
+        color: "white",
+        textAlign: "center",
+        fontSize: "16px",
+        fontWeight: "700",
+        
+        width: "90%",
+        maxWidth: "400px",
+        height: "40px",
+        borderRadius: "14px",
+    
+        cursor: "pointer"
   },
 
 });
+
+
+  return (
+    <View style={styles.page}>
+      <View style={styles.pageLogin}>
+
+        <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
+        <Image 
+          style={{width: 120, height: 120}}
+          source={require('../../assets/engkong_logo.png')}
+          resizeMode={'contain'}  
+        />
+        <Text style={styles.text}>Eng Kong Holdings</Text>
+        <Text style={styles.text}>Pte Ltd</Text>
+        
+        <div>
+          {message &&
+            message.map((msg) => (
+            <div>
+              Email:{msg.email} <div>Password:{msg.passwords}</div>
+          </div>
+          ))}
+        </div> 
+
+        </View>
+
+        <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
+          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")} onMouseEnter={() => setIsLoginButtonHover(true)} onMouseLeave={() => setIsLoginButtonHover(false)} style={styles.defaultButton} > Login </TouchableOpacity>
+          <View style={{flexDirection: "row" , paddingTop: "10px"}}>
+            <Text > Don't have an account?</Text>
+            <Text style={styles.textLink} onPress={() => navigation.navigate("RegistrationScreen")}> Register Now!</Text>
+          </View>
+        </View>
+
+      </View>
+    </View>
+    
+  );
+}
+
+
