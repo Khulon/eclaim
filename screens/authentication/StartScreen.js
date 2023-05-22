@@ -1,9 +1,64 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated} from 'react-native';
+import React, { useRef, useState, useEffect } from "react";
+import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
 
 
 export default function StartScreen({ navigation }) {
+
+  const loginButtonHover = useRef(new Animated.Value(0)).current;
+
+
+
+  const styles = StyleSheet.create({
+    page: {
+      height: "100%",
+      width: "100%",
+      minWidth: "330px",
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: "Arial",
+    },
+    pageLogin: {
+      width: "90%",
+      height: "90%",
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      flexDirection: "column",
+      
+    },
+    text: {
+      fontSize: "17px",
+      fontWeight: "700",
+      fontFamily: "inherit",
+    },
+  
+    textLink: {
+      fontWeight: "700",
+      textDecorationLine: 'underline',
+      color: '#E04F4F'
+    },
+  
+    defaultButton: {
+      fontFamily: "inherit",
+          backgroundColor: "#E04F4F",
+          border: "none",
+      
+          padding: "10px",
+          color: "white",
+          textAlign: "center",
+          fontSize: "16px",
+          fontWeight: "700",
+          
+          width: "100%",
+          height: "40px",
+          borderRadius: "14px",
+      
+          cursor: "pointer",
+    },
+  
+  });
+
 
   const [message, setMessage] = useState("");
 
@@ -13,63 +68,6 @@ export default function StartScreen({ navigation }) {
     .then((data) => setMessage(data))
 
   }, []);
-        
-
-  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
-
-
-
-const styles = StyleSheet.create({
-  page: {
-    height: "100%",
-    width: "100%",
-    minWidth: "330px",
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: "Arial",
-  },
-  pageLogin: {
-    width: "90%",
-    height: "90%",
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    flexDirection: "column",
-    
-  },
-  text: {
-    fontSize: "17px",
-    fontWeight: "700",
-    fontFamily: "inherit",
-  },
-
-  textLink: {
-    fontWeight: "700",
-    textDecorationLine: 'underline',
-    color: '#E04F4F'
-  },
-
-  defaultButton: {
-    fontFamily: "inherit",
-        backgroundColor: isLoginButtonHover? "#E35D5D" :"#E04F4F",
-        border: "none",
-    
-        padding: isLoginButtonHover? "11px" :"10px",
-        color: "white",
-        textAlign: "center",
-        fontSize: "16px",
-        fontWeight: "700",
-        
-        width: "90%",
-        maxWidth: "400px",
-        height: "40px",
-        borderRadius: "14px",
-    
-        cursor: "pointer"
-  },
-
-});
-
 
   return (
     <View style={styles.page}>
@@ -96,7 +94,9 @@ const styles = StyleSheet.create({
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")} onMouseEnter={() => setIsLoginButtonHover(true)} onMouseLeave={() => setIsLoginButtonHover(false)} style={styles.defaultButton} > Login </TouchableOpacity>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
+          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}  style={styles.defaultButton} > Login </TouchableOpacity>
+          </Animated.View>
           <View style={{flexDirection: "row" , paddingTop: "10px"}}>
             <Text > Don't have an account?</Text>
             <Text style={styles.textLink} onPress={() => navigation.navigate("RegistrationScreen")}> Register Now!</Text>
