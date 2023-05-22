@@ -187,7 +187,7 @@ export default function RegistrationScreen({ navigation }) {
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(registerButtonHover)} onMouseLeave={() => MovePosAnimation(registerButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: registerButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} > Register </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress={createUser}> Register </TouchableOpacity>
         </Animated.View>
         </View>
       </View>
