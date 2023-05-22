@@ -173,21 +173,3 @@ export default function LoginScreen({ navigation }) {
   );
 }
 
-
-
-  /*
-  function checkContainerSize() {
-    var container = document.getElementById("container");
-    var content = document.getElementById("content");
-    
-    if (container.offsetHeight < content.offsetHeight || container.offsetWidth < content.offsetWidth) {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  }
-  */
- /*
-  checkContainerSize();
-  window.addEventListener("resize", checkContainerSize);
-  */
