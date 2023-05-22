@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput} from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput, Animated} from 'react-native';
+import React, { useRef, useState } from 'react';
 import { Ionicons } from "react-native-vector-icons";
+import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
 
 
 
@@ -8,7 +9,8 @@ import { Ionicons } from "react-native-vector-icons";
 export default function RegistrationScreen({ navigation }) {
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [isRegisterButtonHover, setIsRegisterButtonHover] = useState(false);
+
+  const registerButtonHover = useRef(new Animated.Value(0)).current;
 
   const styles = StyleSheet.create(
     {
@@ -92,17 +94,15 @@ export default function RegistrationScreen({ navigation }) {
       },
       defaultButton: {
         fontFamily: "inherit",
-        backgroundColor: isRegisterButtonHover? "#E35D5D" :"#E04F4F",
+        backgroundColor: "#E04F4F",
         border: "none",
     
-        padding: isRegisterButtonHover? "11px" :"10px",
+        padding: "10px",
         color: "white",
         textAlign: "center",
         fontSize: "16px",
         fontWeight: "700",
         
-        width: "90%",
-        maxWidth: "400px",
         height: "40px",
         borderRadius: "14px",
     
@@ -175,7 +175,9 @@ export default function RegistrationScreen({ navigation }) {
         </View>
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
-        <TouchableOpacity onMouseEnter={() => setIsRegisterButtonHover(true)} onMouseLeave={() => setIsRegisterButtonHover(false)} style={styles.defaultButton} > Register </TouchableOpacity>
+        <Animated.View onMouseEnter={() => MoveNegAnimation(registerButtonHover)} onMouseLeave={() => MovePosAnimation(registerButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: registerButtonHover }]}}>
+        <TouchableOpacity style={styles.defaultButton} > Register </TouchableOpacity>
+        </Animated.View>
         </View>
       </View>
 
@@ -185,19 +187,3 @@ export default function RegistrationScreen({ navigation }) {
 
 
 
-  /*
-  function checkContainerSize() {
-    var container = document.getElementById("container");
-    var content = document.getElementById("content");
-    
-    if (container.offsetHeight < content.offsetHeight || container.offsetWidth < content.offsetWidth) {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  }
-  */
- /*
-  checkContainerSize();
-  window.addEventListener("resize", checkContainerSize);
-  */
