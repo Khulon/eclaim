@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput} from 'react-native';
-import React, { useState } from 'react';
+import { Animated, StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput} from 'react-native';
+import React, { useRef, useState } from 'react';
 import { Ionicons } from "react-native-vector-icons";
+import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
 
 
 
@@ -8,7 +9,8 @@ import { Ionicons } from "react-native-vector-icons";
 export default function LoginScreen({ navigation }) {
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
+
+  const loginButtonHover = useRef(new Animated.Value(0)).current;
 
   const styles = StyleSheet.create(
     {
@@ -92,17 +94,15 @@ export default function LoginScreen({ navigation }) {
       },
       defaultButton: {
         fontFamily: "inherit",
-        backgroundColor: isLoginButtonHover? "#E35D5D" :"#E04F4F",
+        backgroundColor: "#E04F4F",
         border: "none",
     
-        padding: isLoginButtonHover? "11px" :"10px",
+        padding: "10px",
         color: "white",
         textAlign: "center",
         fontSize: "16px",
         fontWeight: "700",
         
-        width: "90%",
-        maxWidth: "400px",
         height: "40px",
         borderRadius: "14px",
     
@@ -163,7 +163,9 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
-        <TouchableOpacity onMouseEnter={() => setIsLoginButtonHover(true)} onMouseLeave={() => setIsLoginButtonHover(false)} style={styles.defaultButton}> Login </TouchableOpacity>
+        <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
+        <TouchableOpacity style={styles.defaultButton} > Login </TouchableOpacity>
+        </Animated.View>
         </View>
       </View>
 

@@ -1,13 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated} from 'react-native';
+import React, { useRef, useState, useEffect } from "react";
+import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
 
 
 export default function StartScreen({ navigation }) {
 
-  const [message, setMessage] = useState("");
+  const loginButtonHover = useRef(new Animated.Value(0)).current;
 
   /*
+  const [message, setMessage] = useState("");
+
+  
   useEffect(() => {
     fetch("http://localhost:5000")
     .then((res) => res.json())
@@ -80,7 +83,6 @@ const styles = StyleSheet.create({
 
 });
 
-
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
@@ -98,7 +100,9 @@ const styles = StyleSheet.create({
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")} onMouseEnter={() => setIsLoginButtonHover(true)} onMouseLeave={() => setIsLoginButtonHover(false)} style={styles.defaultButton} > Login </TouchableOpacity>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
+          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}  style={styles.defaultButton} > Login </TouchableOpacity>
+          </Animated.View>
           <View style={{flexDirection: "row" , paddingTop: "10px"}}>
             <Text > Don't have an account?</Text>
             <Text style={styles.textLink} onPress={() => navigation.navigate("RegistrationScreen")}> Register Now!</Text>
