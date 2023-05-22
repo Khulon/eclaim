@@ -7,12 +7,22 @@ export default function StartScreen({ navigation }) {
 
   const [message, setMessage] = useState("");
 
+  /*
   useEffect(() => {
     fetch("http://localhost:5000")
     .then((res) => res.json())
     .then((data) => setMessage(data))
 
   }, []);
+
+  <div>
+    {message &&
+      message.map((msg) => (
+      <div>
+        Email:{msg.email} <div>Password:{msg.passwords}</div>
+    </div>
+    ))}
+  </div> */
         
 
   const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
@@ -84,14 +94,6 @@ const styles = StyleSheet.create({
         <Text style={styles.text}>Eng Kong Holdings</Text>
         <Text style={styles.text}>Pte Ltd</Text>
         
-        <div>
-          {message &&
-            message.map((msg) => (
-            <div>
-              Email:{msg.email} <div>Password:{msg.passwords}</div>
-          </div>
-          ))}
-        </div> 
 
         </View>
 

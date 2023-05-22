@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput} from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from "react-native-vector-icons";
+import axios from "axios";
 
 
 
@@ -112,10 +113,21 @@ export default function RegistrationScreen({ navigation }) {
   
     });
 
-  const [companyEmail, setCompanyEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: '', confirmPassword: ''})
 
+  const createUser = () => {
+    console.log(loginDetails);
+    const header = { 'Content-Type': 'application/json' };
+    fetch('http://localhost:5000/register', {
+      method: 'POST',	
+      headers: header,
+      body: JSON.stringify(loginDetails)})
+      .then(function(response) {
+        console.log(response)
+        return response.json();
+      });
+    console.log("User created!");
+  }
 
   return (
     <View style={styles.page}>
@@ -143,8 +155,8 @@ export default function RegistrationScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Company Email</Text>
           <TextInput style={styles.textInput}
             placeholder="example@mail.com" 
-            value={companyEmail} 
-            onChangeText={(companyEmail) => setCompanyEmail(companyEmail)} 
+            value={loginDetails.companyEmail} 
+            onChangeText={(companyEmail) => setLoginDetails({...loginDetails, companyEmail: companyEmail})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -153,8 +165,8 @@ export default function RegistrationScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Password</Text>
           <TextInput style={styles.textInput}
             placeholder="......." 
-            value={password} 
-            onChangeText={(password) => setPassword(password)} 
+            value={loginDetails.password} 
+            onChangeText={(password) => setLoginDetails({...loginDetails, password: password})}
             autoCapitalize="none" 
             autoCorrect={false} 
             secureTextEntry={true}
@@ -164,8 +176,8 @@ export default function RegistrationScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Confirm Password</Text>
           <TextInput style={styles.textInput}
             placeholder="......." 
-            value={confirmPassword} 
-            onChangeText={(confirmPassword) => setConfirmPassword(confirmPassword)} 
+            value={loginDetails.confirmPassword} 
+            onChangeText={(confirmPassword) => setLoginDetails({...loginDetails, confirmPassword: confirmPassword})} 
             autoCapitalize="none" 
             autoCorrect={false} 
             secureTextEntry={true}
@@ -175,7 +187,7 @@ export default function RegistrationScreen({ navigation }) {
         </View>
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
-        <TouchableOpacity onMouseEnter={() => setIsRegisterButtonHover(true)} onMouseLeave={() => setIsRegisterButtonHover(false)} style={styles.defaultButton} > Register </TouchableOpacity>
+        <TouchableOpacity onMouseEnter={() => setIsRegisterButtonHover(true)} onMouseLeave={() => setIsRegisterButtonHover(false)} style={styles.defaultButton} onPress={createUser}> Register </TouchableOpacity>
         </View>
       </View>
 

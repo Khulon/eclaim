@@ -163,7 +163,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
-        <TouchableOpacity onMouseEnter={() => setIsLoginButtonHover(true)} onMouseLeave={() => setIsLoginButtonHover(false)} style={styles.defaultButton} > Login </TouchableOpacity>
+        <TouchableOpacity onMouseEnter={() => setIsLoginButtonHover(true)} onMouseLeave={() => setIsLoginButtonHover(false)} style={styles.defaultButton}> Login </TouchableOpacity>
         </View>
       </View>
 
