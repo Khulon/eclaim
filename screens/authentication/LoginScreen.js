@@ -2,7 +2,7 @@ import { Animated, StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextI
 import React, { useRef, useState } from 'react';
 import { Ionicons } from "react-native-vector-icons";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
-
+import {login} from '../../hooks/useAuth';
 
 
 
@@ -114,16 +114,7 @@ export default function LoginScreen({ navigation }) {
 
     const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: ''})
 
-    const login = () => {
-      const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-      let response = "";
-      fetch('http://localhost:5000/login', {
-        method: 'POST', 
-        headers: header,
-        body: JSON.stringify(loginDetails)})
-        .then((response) => response.json())
-        .then((resp) => console.log(resp));
-    };
+  
 
 
   return (
