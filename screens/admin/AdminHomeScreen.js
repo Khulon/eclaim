@@ -1,4 +1,4 @@
-import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList} from 'react-native';
+import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ImageBackgroundComponent} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 
@@ -29,29 +29,26 @@ export default function AdminHomeScreen({ navigation }) {
       position: 'employee'
     },
     {
-      id: 'a@gmail.com',
-      title: 'a',
+      id: 'e@gmail.com',
+      title: 'e',
       position: 'employee'
     },
     {
-      id: 'a@gmail.com',
-      title: 'a',
+      id: 'f@gmail.com',
+      title: 'f',
       position: 'employee'
     },
     {
-      id: 'a@gmail.com',
-      title: 'a',
+      id: 'g@gmail.com',
+      title: 'g',
       position: 'employee'
     },
     {
-      id: 'a@gmail.com',
-      title: 'a',
+      id: 'h@gmail.com',
+      title: 'h',
       position: 'employee'
     },
 
-
-    
-   
   ];
 
 
@@ -147,32 +144,35 @@ export default function AdminHomeScreen({ navigation }) {
       backgroundColor: 'white',
       height:"80px",
       padding: "10px",
-      borderBottomWidth: "1px",
+      borderBottomWidth: "0.5px",
+      borderTopWidth: "0.5px",
       borderColor: "#DADADA",
-
     },
 
   });
 
-  const Item = ({title, onMouseEnter, onMouseLeave, userCardHover}) => (
-    //onMouseEnter={() => MoveNegAnimation(userCardHover)} 
-     //   onMouseLeave={() => MovePosAnimation(userCardHover)} 
+  const Item = ({title, backgroundColor, transform, onMouseEnter, onMouseLeave}) => (
     <Animated.View>
-    <TouchableOpacity style={styles.userCard}>
+    <TouchableOpacity onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <Text style={styles.title}>{title}</Text>
     </TouchableOpacity>
     </Animated.View>
   );
 
+  const [selectedId, setSelectedId] = useState();
+  
   const renderItem = ({item}) => {
-    //const userCardHover = useRef(new Animated.Value(0)).current;
-     
+
+    const backgroundColor = item.id === selectedId ? '#EEEEEE' : 'white';
+    const transform = item.id === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
+    
     return (
       <Item 
         title={item.title} 
-        //onMouseEnter={() => MoveNegAnimation(userCardHover)} 
-        //onMouseLeave={() => MovePosAnimation(userCardHover)} 
-        //userCardHover={userCardHover}
+        onMouseEnter={() => setSelectedId(item.id)} 
+        onMouseLeave={() => setSelectedId(null)}
+        backgroundColor={backgroundColor}
+        transform={transform}
       />
     )
   }
