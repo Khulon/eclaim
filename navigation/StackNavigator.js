@@ -8,7 +8,7 @@ const Stack = createStackNavigator();
     
 
 export default function StackNavigator() {
-    const [user, setUser] = useState(true);
+    const [user, setUser] = useState(false);
     const [userType, setUserType] = useState(true);
 
     return (
