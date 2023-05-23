@@ -115,18 +115,14 @@ export default function RegistrationScreen({ navigation }) {
   const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: '', confirmPassword: ''})
 
   const createUser = () => {
-    console.log(loginDetails);
-    const header = { 'Content-Type': 'application/json' };
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     fetch('http://localhost:5000/register', {
       method: 'POST',	
       headers: header,
       body: JSON.stringify(loginDetails)})
-      .then(function(response) {
-        console.log(response)
-        return response.json();
-      });
-    console.log("User created!");
-  }
+      .then((response) => response.json())
+      .then((resp) => console.log(resp));
+  };
 
   return (
     <View style={styles.page}>
