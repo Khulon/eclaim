@@ -62,14 +62,26 @@ app.post('/register',(req, res) => {
     let email = {email: req.body.companyEmail};
     let password = {password: req.body.password};
     let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email.email+"' and password = '"+password.password+"'";
+    let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email.email+"' and password = '"+password.password+"'";
     var query = new sql.Request();
-    query.query(statement)
+    var adminQuery = new sql.Request();
+    adminQuery.query(checkAdmin)
     .then((result) => {
+
       let count = result.recordset[0].count;
       if(count == 1) {
-        res.json({message: "Login Successful!"});
+        res.send({user: "Admin", message: "Login Successful!"});	
       } else {
-        res.json({message: "Login Failed!"});
+        query.query(statement)
+        .then((result) => {
+
+          let count = result.recordset[0].count;
+          if(count == 1) {
+            res.send({user: "Normal", message: "Login Successful!"});
+          } else {
+            res.json({message: "Login Failed!"});
+          }
+        });
       }
     })
     .catch((err) => {

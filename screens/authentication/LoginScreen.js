@@ -4,9 +4,7 @@ import { Ionicons } from "react-native-vector-icons";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
 
 
-
-
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation}) {
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
 
@@ -113,17 +111,21 @@ export default function LoginScreen({ navigation }) {
     });
 
     const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: ''})
+    const [userType, setUserType] = useState({userType: ''});
 
-    const login = () => {
+    
+    const loginUser = async () => {
       const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-      let response = "";
-      fetch('http://localhost:5000/login', {
+      await fetch('http://localhost:5000/login', {
         method: 'POST', 
         headers: header,
         body: JSON.stringify(loginDetails)})
         .then((response) => response.json())
-        .then((resp) => console.log(resp));
-    };
+        .then((resp) => { 
+          console.log(resp);
+          setUserType({...userType, userType: resp.user});
+        });
+    }; 
 
 
   return (
@@ -174,7 +176,7 @@ export default function LoginScreen({ navigation }) {
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} onPress = {login}> Login </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress = {loginUser}> Login </TouchableOpacity>
         </Animated.View>
         </View>
       </View>
@@ -182,4 +184,3 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
-
