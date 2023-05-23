@@ -1,7 +1,7 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ImageBackgroundComponent} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
-
+import { Ionicons } from "react-native-vector-icons";
 
 
 export default function AdminHomeScreen({ navigation }) {        
@@ -9,46 +9,53 @@ export default function AdminHomeScreen({ navigation }) {
 
   const DATA = [
     {
-      id: 'a@gmail.com',
-      title: 'a',
-      position: 'employee'
+      id: 'karenlim@gmail.com',
+      name: 'Karen Lim',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'b@gmail.com',
-      title: 'b',
-      position: 'employee'
+      id: 'karentan@gmail.com',
+      name: 'Karen Tan',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'c@gmail.com',
-      title: 'c',
-      position: 'employee'
+      id: 'bobloh@gmail.com',
+      name: 'Bob Loh',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'd@gmail.com',
-      title: 'd',
-      position: 'employee'
+      id: 'desmondchan@gmail.com',
+      name: 'Desmon Chan',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'e@gmail.com',
-      title: 'e',
-      position: 'employee'
+      id: 'weijietan@gmail.com',
+      name: 'Tan Wei Jie',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'f@gmail.com',
-      title: 'f',
-      position: 'employee'
+      id: 'cleonchan@gmail.com',
+      name: 'Cleon Chan',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'g@gmail.com',
-      title: 'g',
-      position: 'employee'
+      id: 'williamtoh@gmail.com',
+      name: 'Willian Toh',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
     {
-      id: 'h@gmail.com',
-      title: 'h',
-      position: 'employee'
+      id: 'nicholaslim@gmail.com',
+      name: 'Nicholas Lim',
+      approver: 'john toh',
+      processor: 'ruben tan',
     },
-
   ];
 
 
@@ -67,7 +74,7 @@ export default function AdminHomeScreen({ navigation }) {
       fontFamily: "Arial",
     },
     pageDefault: {
-      width: "90%",
+      width: "100%",
       height: "90%",
       backgroundColor: '#fff',
       alignItems: 'center',
@@ -114,7 +121,7 @@ export default function AdminHomeScreen({ navigation }) {
     },
 
     content: {
-      width:"90%",
+      width:"95%",
       flex:"1",
     },
 
@@ -147,16 +154,30 @@ export default function AdminHomeScreen({ navigation }) {
       borderBottomWidth: "0.5px",
       borderTopWidth: "0.5px",
       borderColor: "#DADADA",
+      flexDirection: "row",
+      alignItems:"center"
     },
 
   });
 
-  const Item = ({title, backgroundColor, transform, onMouseEnter, onMouseLeave}) => (
-    <Animated.View>
+  const Item = ({name, email, approver, processor, backgroundColor, transform, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
-      <Text style={styles.title}>{title}</Text>
+      <View style={{height:"100%", width:"10%", minWidth:"70px", alignItems: "center", justifyContent: "center"}}>
+      <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
+      </View>
+
+      <View style={{height:"100%", width:"50%", justifyContent:"center"}}>
+      <Text style={{fontSize: "13px", fontWeight:"700"}}>{name}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Email: {email}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Approver: {approver}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Processor: {processor}</Text>
+      </View>
+
+      <View  style={{height:"100%", flexDirection: "column", flex:1, alignItems: "center", justifyContent: "center"}}>
+      <Text></Text>
+      </View>
+      
     </TouchableOpacity>
-    </Animated.View>
   );
 
   const [selectedId, setSelectedId] = useState();
@@ -168,7 +189,11 @@ export default function AdminHomeScreen({ navigation }) {
     
     return (
       <Item 
-        title={item.title} 
+        name={item.name} 
+        email = {item.id}
+        approver = {item.email}
+        processor = {item.processor}
+
         onMouseEnter={() => setSelectedId(item.id)} 
         onMouseLeave={() => setSelectedId(null)}
         backgroundColor={backgroundColor}
@@ -224,4 +249,5 @@ export default function AdminHomeScreen({ navigation }) {
     
   );
 }
+
 
