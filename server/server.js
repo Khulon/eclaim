@@ -31,7 +31,7 @@ app.get('/', function (req, res) {
     var request = new sql.Request();
         
     // query to the database and get the records
-    request.query('SELECT * from Employees', function (err, rows) {
+    request.query('SELECT * from Accounts', function (err, rows) {
         
         if (err) console.log(err)
 
@@ -49,8 +49,30 @@ app.post('/register',(req, res) => {
     let password = {password: req.body.password};
     let statement = "INSERT INTO Accounts VALUES ('"+email.email+"','"+password.password+"')";
     var query = new sql.Request();
-    query.query(statement, email, password,(err, results) => {
-      if(err) throw err;
-      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-    }); 
+    query.query(statement)
+    .then((result) => {
+      res.json({result: result.recordset, message: "Account Created!"});})
+    .catch((err) => {
+      res.json({message: "Error!"});
+    });
+    
+  });
+
+  app.post('/login',(req, res) => {
+    let email = {email: req.body.companyEmail};
+    let password = {password: req.body.password};
+    let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email.email+"' and password = '"+password.password+"'";
+    var query = new sql.Request();
+    query.query(statement)
+    .then((result) => {
+      let count = result.recordset[0].count;
+      if(count == 1) {
+        res.json({message: "Login Successful!"});
+      } else {
+        res.json({message: "Login Failed!"});
+      }
+    })
+    .catch((err) => {
+      res.json({message: "Error!"});
+    });
   });

@@ -112,8 +112,18 @@ export default function LoginScreen({ navigation }) {
   
     });
 
-  const [companyEmail, setCompanyEmail] = useState('')
-  const [password, setPassword] = useState('')
+    const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: ''})
+
+    const login = () => {
+      const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+      let response = "";
+      fetch('http://localhost:5000/login', {
+        method: 'POST', 
+        headers: header,
+        body: JSON.stringify(loginDetails)})
+        .then((response) => response.json())
+        .then((resp) => console.log(resp));
+    };
 
 
   return (
@@ -142,8 +152,8 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Company Email</Text>
           <TextInput style={styles.textInput}
             placeholder="example@mail.com" 
-            value={companyEmail} 
-            onChangeText={(companyEmail) => setCompanyEmail(companyEmail)} 
+            value={loginDetails.companyEmail} 
+            onChangeText={(companyEmail) => setLoginDetails({...loginDetails, companyEmail: companyEmail})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -152,8 +162,8 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Password</Text>
           <TextInput style={styles.textInput}
             placeholder="......." 
-            value={password} 
-            onChangeText={(password) => setPassword(password)} 
+            value={loginDetails.password} 
+            onChangeText={(password) => setLoginDetails({...loginDetails, password: password})}
             autoCapitalize="none" 
             autoCorrect={false} 
             secureTextEntry={true}
@@ -164,7 +174,7 @@ export default function LoginScreen({ navigation }) {
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} > Login </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress = {login}> Login </TouchableOpacity>
         </Animated.View>
         </View>
       </View>
