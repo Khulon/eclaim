@@ -127,8 +127,7 @@ export default function AdminHomeScreen({ navigation }) {
 
     inputContainer: {
       paddingVertical:'5px',
-      width:'90%',
-      maxWidth: '450px',
+      width:'85%',
       paddingBottom: "15px",
     },
     defaultButton: {
