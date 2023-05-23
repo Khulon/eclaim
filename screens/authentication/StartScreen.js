@@ -7,67 +7,81 @@ export default function StartScreen({ navigation }) {
 
   const loginButtonHover = useRef(new Animated.Value(0)).current;
 
-
-
-  const styles = StyleSheet.create({
-    page: {
-      height: "100%",
-      width: "100%",
-      minWidth: "330px",
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: "Arial",
-    },
-    pageLogin: {
-      width: "90%",
-      height: "90%",
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      flexDirection: "column",
-      
-    },
-    text: {
-      fontSize: "17px",
-      fontWeight: "700",
-      fontFamily: "inherit",
-    },
-  
-    textLink: {
-      fontWeight: "700",
-      textDecorationLine: 'underline',
-      color: '#E04F4F'
-    },
-  
-    defaultButton: {
-      fontFamily: "inherit",
-          backgroundColor: "#E04F4F",
-          border: "none",
-      
-          padding: "10px",
-          color: "white",
-          textAlign: "center",
-          fontSize: "16px",
-          fontWeight: "700",
-          
-          width: "100%",
-          height: "40px",
-          borderRadius: "14px",
-      
-          cursor: "pointer",
-    },
-  
-  });
-
-
+  /*
   const [message, setMessage] = useState("");
 
+  
   useEffect(() => {
     fetch("http://localhost:5000")
     .then((res) => res.json())
     .then((data) => setMessage(data))
 
   }, []);
+
+  <div>
+    {message &&
+      message.map((msg) => (
+      <div>
+        Email:{msg.email} <div>Password:{msg.passwords}</div>
+    </div>
+    ))}
+  </div> */
+        
+
+  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
+
+
+
+const styles = StyleSheet.create({
+  page: {
+    height: "100%",
+    width: "100%",
+    minWidth: "330px",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: "Arial",
+  },
+  pageLogin: {
+    width: "90%",
+    height: "90%",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    flexDirection: "column",
+    
+  },
+  text: {
+    fontSize: "17px",
+    fontWeight: "700",
+    fontFamily: "inherit",
+  },
+
+  textLink: {
+    fontWeight: "700",
+    textDecorationLine: 'underline',
+    color: '#E04F4F'
+  },
+
+  defaultButton: {
+    fontFamily: "inherit",
+        backgroundColor: isLoginButtonHover? "#E35D5D" :"#E04F4F",
+        border: "none",
+    
+        padding: isLoginButtonHover? "11px" :"10px",
+        color: "white",
+        textAlign: "center",
+        fontSize: "16px",
+        fontWeight: "700",
+        
+        width: "90%",
+        maxWidth: "400px",
+        height: "40px",
+        borderRadius: "14px",
+    
+        cursor: "pointer"
+  },
+
+});
 
   return (
     <View style={styles.page}>
@@ -82,14 +96,6 @@ export default function StartScreen({ navigation }) {
         <Text style={styles.text}>Eng Kong Holdings</Text>
         <Text style={styles.text}>Pte Ltd</Text>
         
-        <div>
-          {message &&
-            message.map((msg) => (
-            <div>
-              Email:{msg.email} <div>Password:{msg.passwords}</div>
-          </div>
-          ))}
-        </div> 
 
         </View>
 
