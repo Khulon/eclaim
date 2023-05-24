@@ -4,8 +4,8 @@ const AuthContext = createContext({});
 
 export const AuthProvider = ({children}) => {
 
-  const [userType, setUserType] = useState({userType: null});
-  const [user, setUser] = useState({email: null});
+  const [userType, setUserType] = useState({userType: 'Admin'});
+  const [user, setUser] = useState({email: 'hi'});
   const [loadingInitial, setLoadingInitial] = useState(true);
 
   
