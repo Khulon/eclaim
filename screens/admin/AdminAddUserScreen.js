@@ -10,9 +10,8 @@ export default function AdminAddUserScreen({ navigation }) {
 
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [selectedId, setSelectedId] = useState();
-  const [search, setSearch] = useState('')
+  const CancelButtonHover = useRef(new Animated.Value(0)).current;
+  const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
   const styles = StyleSheet.create({
     page: {
@@ -132,16 +131,6 @@ export default function AdminAddUserScreen({ navigation }) {
   
       cursor: "pointer"
     },
-    userCard: {
-      backgroundColor: 'white',
-      height:"80px",
-      padding: "10px",
-      borderBottomWidth: "0.5px",
-      borderTopWidth: "0.5px",
-      borderColor: "#DADADA",
-      flexDirection: "row",
-      alignItems:"center"
-    },
     normalBoldText: {
         fontSize: "15px",
         fontWeight: "700",
@@ -162,6 +151,12 @@ export default function AdminAddUserScreen({ navigation }) {
         width:'90%',
         maxWidth: '450px'
       },
+
+      buttonContainer: {
+        width:"50%",
+        justifyContent:"center",
+        alignItems:"center"
+      }
 
   });
 
@@ -197,7 +192,7 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>Create</Text>
+          <Text style={styles.bigText}>Add</Text>
         </View>
         <View style={{paddingHorizontal: '7px'}}>
           <Text style={styles.bigText}>User</Text>
@@ -223,6 +218,16 @@ export default function AdminAddUserScreen({ navigation }) {
             placeholder="Company" 
             value={company} 
             onChangeText={(company) => setCompany(company)}
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+          </View>
+          <View style={styles.inputContainer}>
+          <Text style={styles.normalBoldText}>Department</Text>
+          <TextInput style={styles.textInput}
+            placeholder="Department" 
+            value={department} 
+            onChangeText={(department) => setDepatment(department)}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -267,16 +272,6 @@ export default function AdminAddUserScreen({ navigation }) {
             autoCorrect={false} 
           />
           </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Company</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Company" 
-            value={company} 
-            onChangeText={(company) => setCompany(company)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
         </View>
 
 
@@ -289,9 +284,19 @@ export default function AdminAddUserScreen({ navigation }) {
 
 
       <View style={styles.bottomCard}>
-        <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} > Add </TouchableOpacity>
+        <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+        <View style={styles.buttonContainer}>
+        <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
+        <TouchableOpacity style={styles.defaultButton} > Cancel </TouchableOpacity>
         </Animated.View>
+        </View>
+
+        <View style={styles.buttonContainer}>
+        <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
+        </Animated.View>
+        </View>
+        </View>
 
       </View>
 

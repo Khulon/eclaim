@@ -9,7 +9,7 @@ const Stack = createStackNavigator();
 
 export default function AdminStack() {
     return (
-        <Stack.Navigator initialRouteName="AdminAddUserScreen">
+        <Stack.Navigator initialRouteName="AdminHomeScreen">
             <Stack.Screen name="AdminHomeScreen" component={AdminHomeScreen} options={{headerShown: false}}/> 
             <Stack.Screen name="AdminAddUserScreen" component={AdminAddUserScreen} options={{headerShown: false}}/> 
         </Stack.Navigator>
