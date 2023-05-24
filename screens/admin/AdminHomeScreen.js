@@ -16,7 +16,7 @@ export default function AdminHomeScreen({ navigation }) {
 
   }, []);
 
-  
+  /*
   const DATA = [
     {
       email: 'karenlim@gmail.com',
@@ -31,7 +31,7 @@ export default function AdminHomeScreen({ navigation }) {
       processor: 'ruben tan',
     },
   ]; 
-  
+  */
 
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [selectedId, setSelectedId] = useState();
@@ -196,7 +196,7 @@ export default function AdminHomeScreen({ navigation }) {
       <FlatList
         style={{height:"0px"}}
         showsVerticalScrollIndicator={false}
-        data={DATA}
+        data={data}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -206,7 +206,7 @@ export default function AdminHomeScreen({ navigation }) {
 
       <View style={styles.bottomCard}>
         <Text style={{paddingTop:"15px"}}>Total Employees:</Text>
-        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>3</Text>
+        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{data.length}</Text>
         
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
         <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen")}  style={styles.defaultButton} > Add </TouchableOpacity>
