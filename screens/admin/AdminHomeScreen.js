@@ -16,16 +16,22 @@ export default function AdminHomeScreen({ navigation }) {
 
   }, []);
 
-  /*
+  
   const DATA = [
     {
-      id: 'karenlim@gmail.com',
+      email: 'karenlim@gmail.com',
       name: 'Karen Lim',
       approver: 'john toh',
       processor: 'ruben tan',
     },
+    {
+      email: 'karentan@gmail.com',
+      name: 'Karen Tan',
+      approver: 'john toh',
+      processor: 'ruben tan',
+    },
   ]; 
-  */
+  
 
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [selectedId, setSelectedId] = useState();
@@ -125,8 +131,8 @@ export default function AdminHomeScreen({ navigation }) {
 
   });
 
-  const Item = ({name, email, approver, processor, backgroundColor, transform, onMouseEnter, onMouseLeave}) => (
-    <TouchableOpacity onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
+  const Item = ({name, email, approver, processor, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+    <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"70px", alignItems: "center", justifyContent: "center"}}>
       <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
       </View>
@@ -160,6 +166,7 @@ export default function AdminHomeScreen({ navigation }) {
 
         onMouseEnter={() => setSelectedId(item.email)} 
         onMouseLeave={() => setSelectedId(null)}
+        onPress={() => navigation.navigate("AdminEditUserScreen", { props: selectedId })}
         backgroundColor={backgroundColor}
         transform={transform}
       />
@@ -189,7 +196,7 @@ export default function AdminHomeScreen({ navigation }) {
       <FlatList
         style={{height:"0px"}}
         showsVerticalScrollIndicator={false}
-        data={data}
+        data={DATA}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
