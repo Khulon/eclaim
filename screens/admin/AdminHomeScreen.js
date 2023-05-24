@@ -58,9 +58,8 @@ export default function AdminHomeScreen({ navigation }) {
     },
   ];
 
-
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-
+  const [selectedId, setSelectedId] = useState();
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -101,8 +100,6 @@ export default function AdminHomeScreen({ navigation }) {
       borderTopWidth: "2px",
       borderColor: "#DADADA",
       backgroundColor: "white",
-
-      
     },
 
     text: {
@@ -179,7 +176,6 @@ export default function AdminHomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  const [selectedId, setSelectedId] = useState();
   
   const renderItem = ({item}) => {
 

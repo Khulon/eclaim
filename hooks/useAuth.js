@@ -3,8 +3,8 @@ import React, { useRef, useState, createContext, useContext, useEffect } from 'r
 const AuthContext = createContext({});
 
 export const AuthProvider = ({children}) => {
-  const [userType, setUserType] = useState(null);
-  const [user, setUser] = useState(null);
+  const [userType, setUserType] = useState({userType:'admin'});
+  const [user, setUser] = useState(true);
   const [loadingInitial, setLoadingInitial] = useState(true);
 
   
