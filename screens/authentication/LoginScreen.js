@@ -1,7 +1,8 @@
 import { Animated, StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput} from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Ionicons } from "react-native-vector-icons";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
+import useAuth from '../../hooks/useAuth';
 
 
 export default function LoginScreen({ navigation}) {
@@ -110,22 +111,17 @@ export default function LoginScreen({ navigation}) {
   
     });
 
+    const { loginUser } = useAuth();
     const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: ''})
-    const [userType, setUserType] = useState({userType: ''});
 
-    
-    const loginUser = async () => {
-      const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-      await fetch('http://localhost:5000/login', {
-        method: 'POST', 
-        headers: header,
-        body: JSON.stringify(loginDetails)})
-        .then((response) => response.json())
-        .then((resp) => { 
-          console.log(resp);
-          setUserType({...userType, userType: resp.user});
-        });
-    }; 
+    async function handleLogin() {
+      try {
+        loginUser(loginDetails);
+        console.log('login success')
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
 
   return (
@@ -176,7 +172,7 @@ export default function LoginScreen({ navigation}) {
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} onPress = {loginUser}> Login </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress = {() => handleLogin()}> Login </TouchableOpacity>
         </Animated.View>
         </View>
       </View>
