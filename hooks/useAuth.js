@@ -3,15 +3,15 @@ import React, { useRef, useState, createContext, useContext, useEffect } from 'r
 const AuthContext = createContext({});
 
 export const AuthProvider = ({children}) => {
-  const [userType, setUserType] = useState(null);
-  const [user, setUser] = useState(null);
+  const [userType, setUserType] = useState({userType: null});
+  const [user, setUser] = useState({email: null});
   const [loadingInitial, setLoadingInitial] = useState(true);
 
   
   useEffect(() => {
 
     if (user) {
-      console.log(user);
+      console.log(user.email);
     }
     console.log(loadingInitial)
 
@@ -30,9 +30,9 @@ export const AuthProvider = ({children}) => {
         .then((resp) => { 
           console.log(resp);
           if(resp.message == 'Login Successful!') {
-            setUser(true);
+            setUser({...user, email: resp.email});
           }
-          setUserType({...userType, userType: resp.user});
+          setUserType({...userType, userType: resp.userType});
         });
     }; 
 

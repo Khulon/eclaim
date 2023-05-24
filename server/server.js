@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const sql = require('mssql');
 const app = express();
+var async = require('async');
 
 app.use(cors());
 app.use(express.json());
@@ -58,33 +59,49 @@ app.post('/register',(req, res) => {
     
   });
 
-  app.post('/login',(req, res) => {
-    let email = {email: req.body.companyEmail};
-    let password = {password: req.body.password};
-    let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email.email+"' and password = '"+password.password+"'";
-    let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email.email+"' and password = '"+password.password+"'";
-    var query = new sql.Request();
-    var adminQuery = new sql.Request();
-    adminQuery.query(checkAdmin)
-    .then((result) => {
+app.get('/admin',(req, res) => {
+  var request = new sql.Request();
+        
+    // query to the database and get the records
+    request.query('SELECT * from Employees, Processors', function (err, rows) {
+        
+        if (err) console.log(err)
 
-      let count = result.recordset[0].count;
-      if(count == 1) {
-        res.send({user: "Admin", message: "Login Successful!"});	
-      } else {
-        query.query(statement)
-        .then((result) => {
-
-          let count = result.recordset[0].count;
-          if(count == 1) {
-            res.send({user: "Normal", message: "Login Successful!"});
-          } else {
-            res.json({message: "Login Failed!"});
-          }
-        });
-      }
-    })
-    .catch((err) => {
-      res.json({message: "Error!"});
+        // send records as a response
+        res.send(rows.recordset);
     });
+  
+
+});
+
+
+app.post('/login',(req, res) => {
+  let email = {email: req.body.companyEmail};
+  let password = {password: req.body.password};
+  let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email.email+"' and password = '"+password.password+"'";
+  let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email.email+"' and password = '"+password.password+"'";
+  var query = new sql.Request();
+  var adminQuery = new sql.Request();
+  adminQuery.query(checkAdmin)
+  .then((result) => {
+
+    let count = result.recordset[0].count;
+    if(count == 1) {
+      res.send({email: email, userType: "Admin", message: "Login Successful!"});	
+    } else {
+      query.query(statement)
+      .then((result) => {
+
+        let count = result.recordset[0].count;
+        if(count == 1) {
+          res.send({email: email, userType: "Normal", message: "Login Successful!"});
+        } else {
+          res.json({message: "Login Failed!"});
+        }
+      });
+    }
+  })
+  .catch((err) => {
+    res.json({message: "Error!"});
   });
+});
