@@ -206,7 +206,7 @@ export default function AdminAddUserScreen({ navigation }) {
         </View>
   
 
-        <View style={{width:'100%', alignItems:'center', justifyContent:'center'}}>
+        <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
           <View style={styles.inputContainer}>
           <Text style={styles.normalBoldText}>Name</Text>
           <TextInput style={styles.textInput}
@@ -277,7 +277,6 @@ export default function AdminAddUserScreen({ navigation }) {
             autoCorrect={false} 
           />
           </View>
-          
         </View>
 
 
