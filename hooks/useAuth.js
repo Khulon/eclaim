@@ -3,6 +3,7 @@ import React, { useRef, useState, createContext, useContext, useEffect } from 'r
 const AuthContext = createContext({});
 
 export const AuthProvider = ({children}) => {
+
   const [userType, setUserType] = useState({userType: null});
   const [user, setUser] = useState({email: null});
   const [loadingInitial, setLoadingInitial] = useState(true);
