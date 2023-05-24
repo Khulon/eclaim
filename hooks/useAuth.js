@@ -1,0 +1,57 @@
+import React, { useRef, useState, createContext, useContext, useEffect } from 'react';
+
+const AuthContext = createContext({});
+
+export const AuthProvider = ({children}) => {
+  const [userType, setUserType] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+
+  
+  useEffect(() => {
+
+    if (user) {
+      console.log(user);
+    }
+    console.log(loadingInitial)
+
+    setLoadingInitial(false);
+  });
+
+  
+
+    async function loginUser (loginDetails) {
+      const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+      await fetch('http://localhost:5000/login', {
+        method: 'POST', 
+        headers: header,
+        body: JSON.stringify(loginDetails)})
+        .then((response) => response.json())
+        .then((resp) => { 
+          console.log(resp);
+          if(resp.message == 'Login Successful!') {
+            setUser(true);
+          }
+          setUserType({...userType, userType: resp.user});
+        });
+    }; 
+
+    return (
+      <AuthContext.Provider value = {{
+        user,
+        userType,
+        loadingInitial,
+
+        loginUser,
+
+      }}>
+
+        {!loadingInitial && children}
+      </AuthContext.Provider>
+    )
+
+};
+
+export default function useAuth() {
+  return useContext(AuthContext);
+}
