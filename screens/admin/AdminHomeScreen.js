@@ -5,8 +5,18 @@ import { Ionicons } from "react-native-vector-icons";
 
 
 export default function AdminHomeScreen({ navigation }) {        
+  const [data, setData] = useState("");
 
+  
+  useEffect(() => {
 
+    fetch("http://localhost:5000/admin")
+    .then((res) => res.json())
+    .then((data) => setData(data))
+
+  }, []);
+
+  /*
   const DATA = [
     {
       id: 'karenlim@gmail.com',
@@ -14,49 +24,8 @@ export default function AdminHomeScreen({ navigation }) {
       approver: 'john toh',
       processor: 'ruben tan',
     },
-    {
-      id: 'karentan@gmail.com',
-      name: 'Karen Tan',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-    {
-      id: 'bobloh@gmail.com',
-      name: 'Bob Loh',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-    {
-      id: 'desmondchan@gmail.com',
-      name: 'Desmon Chan',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-    {
-      id: 'weijietan@gmail.com',
-      name: 'Tan Wei Jie',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-    {
-      id: 'cleonchan@gmail.com',
-      name: 'Cleon Chan',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-    {
-      id: 'williamtoh@gmail.com',
-      name: 'Willian Toh',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-    {
-      id: 'nicholaslim@gmail.com',
-      name: 'Nicholas Lim',
-      approver: 'john toh',
-      processor: 'ruben tan',
-    },
-  ];
+  ]; 
+  */
 
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [selectedId, setSelectedId] = useState();
@@ -179,17 +148,17 @@ export default function AdminHomeScreen({ navigation }) {
   
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.id === selectedId ? '#EEEEEE' : 'white';
-    const transform = item.id === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
+    const backgroundColor = item.email === selectedId ? '#EEEEEE' : 'white';
+    const transform = item.email === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
     
     return (
       <Item 
         name={item.name} 
-        email = {item.id}
-        approver = {item.email}
-        processor = {item.processor}
+        email = {item.email}
+        approver = {null}
+        processor = {item.company_prefix == item.company ? item.processor_email : 'None'}
 
-        onMouseEnter={() => setSelectedId(item.id)} 
+        onMouseEnter={() => setSelectedId(item.email)} 
         onMouseLeave={() => setSelectedId(null)}
         backgroundColor={backgroundColor}
         transform={transform}
@@ -220,7 +189,7 @@ export default function AdminHomeScreen({ navigation }) {
       <FlatList
         style={{height:"0px"}}
         showsVerticalScrollIndicator={false}
-        data={DATA}
+        data={data}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />

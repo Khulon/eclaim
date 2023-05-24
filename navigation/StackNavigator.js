@@ -14,8 +14,8 @@ export default function StackNavigator() {
 
     return (
         <Stack.Navigator>
-        {user ? (
-            userType.userType == 'admin' ? (
+        {user.email != null ? (
+            userType.userType == 'Admin' ? (
                 <Stack.Screen name="AdminStack" component={AdminStack} options={{headerShown: false}}/> 
             ):(
                 <Stack.Screen name="HomeStack" component={HomeStack} options={{headerShown: false}}/> 
