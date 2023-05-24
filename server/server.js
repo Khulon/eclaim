@@ -70,10 +70,30 @@ app.get('/admin',(req, res) => {
         // send records as a response
         res.send(rows.recordset);
     });
-  
 
 });
 
+app.post('/admin/addUser',(req, res) => {
+  let name = {name: req.body.name};
+  let email = {email: req.body.email};
+  let company = {company: req.body.company};
+  let department = {department: req.body.department};
+  let isSupervisor = {isSupervisor: req.body.isSupervisor};
+  let isApprover = {isApprover: req.body.isApprover};
+  let isProcessor = {isProcessor: req.body.isProcessor};
+
+  var request = new sql.Request();
+  request.query("INSERT INTO Employees VALUES('"+email.email+"','"+name.name+"','"+company.company+"'," +
+  "'"+isProcessor.isProcessor+"','"+isApprover.isApprover+"','"+isSupervisor.isSupervisor+"')",
+   function (err) {
+      
+      if (err) console.log(err)
+
+      // send records as a response
+      res.send({email: email, message: "User Added!"});
+  });
+
+});
 
 app.post('/login',(req, res) => {
   let email = {email: req.body.companyEmail};

@@ -2,7 +2,6 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, S
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { createBoxShadowValue } from 'react-native-web/dist/cjs/exports/StyleSheet/preprocess';
 
 
 export default function AdminAddUserScreen({ navigation }) {        
@@ -160,14 +159,20 @@ export default function AdminAddUserScreen({ navigation }) {
 
   });
 
-  
-  const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
-  const [companyEmail, setCompanyEmail] = useState('');
-  const [department, setDepatment] = useState('');
-  const [isSupervisor, setIsSupervisor] = useState('');
-  const [isApprover, setIsApprover] = useState('');
-  const [isProcessor, setIsProccessor] = useState('');
+  const [newUser, setNewUser] = useState({name:'', email:'', 
+  company:'', department:'', isSupervisor: '', isApprover:'', isProcessor: ''});
+
+  const addUser = () => {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://localhost:5000/admin/addUser', {
+      method: 'POST', 
+      headers: header,
+      body: JSON.stringify(newUser)})
+      .then((response) => response.json())
+      .then((resp) => { 
+        console.log(resp);
+      });
+  }; 
 
   return (
     <View style={styles.page}>
@@ -206,8 +211,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Name</Text>
           <TextInput style={styles.textInput}
             placeholder="Eg. Paul Lim" 
-            value={name} 
-            onChangeText={(name) => setName(name)} 
+            value = {newUser.name}
+            onChangeText={(name) => setNewUser({...newUser, name:name})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -216,8 +221,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Company</Text>
           <TextInput style={styles.textInput}
             placeholder="Company" 
-            value={company} 
-            onChangeText={(company) => setCompany(company)}
+            value={newUser.company} 
+            onChangeText={(company) => setNewUser({...newUser, company:company})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -226,8 +231,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Department</Text>
           <TextInput style={styles.textInput}
             placeholder="Department" 
-            value={department} 
-            onChangeText={(department) => setDepatment(department)}
+            value={newUser.department} 
+            onChangeText={(department) => setNewUser({...newUser, department:department})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -236,8 +241,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Company Email</Text>
           <TextInput style={styles.textInput}
             placeholder="example@gmail.com" 
-            value={companyEmail} 
-            onChangeText={(companyEmail) => setCompanyEmail(companyEmail)}
+            value={newUser.email} 
+            onChangeText={(email) => setNewUser({...newUser, email: email})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -246,8 +251,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Is a Supervisor?</Text>
           <TextInput style={styles.textInput}
             placeholder="Choose" 
-            value={isSupervisor} 
-            onChangeText={(isSupervisor) => setIsSupervisor(isSupervisor)}
+            value={newUser.isSupervisor} 
+            onChangeText={(isSupervisor) => setNewUser({...newUser, isSupervisor:isSupervisor})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -256,8 +261,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Is a Approver?</Text>
           <TextInput style={styles.textInput}
             placeholder="Choose" 
-            value={isApprover} 
-            onChangeText={(isApprover) => setIsApprover(isApprover)}
+            value={newUser.isApprover} 
+            onChangeText={(isApprover) => setNewUser({...newUser, isApprover:isApprover})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -266,8 +271,8 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Is a Processor</Text>
           <TextInput style={styles.textInput}
             placeholder="Choose" 
-            value={isProcessor} 
-            onChangeText={(isProcessor) => setIsProccessor(isProcessor)}
+            value={newUser.isProcessor} 
+            onChangeText={(isProcessor) => setNewUser({...newUser, isProcessor:isProcessor})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -293,7 +298,7 @@ export default function AdminAddUserScreen({ navigation }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {addUser}> Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
