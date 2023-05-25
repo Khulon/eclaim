@@ -22,15 +22,23 @@ export default function AdminHomeScreen({ navigation }) {
   const DATA = [
     {
       email: 'karenlim@gmail.com',
+      email: 'karenlim@gmail.com',
       name: 'Karen Lim',
-      approver: 'john toh',
-      processor: 'ruben tan',
+      company_prefix: 'EKCA',
+      department: ['EKA','EGK'],
+      supervisor: '0',
+      approver: '0',
+      processor: '1',
     },
     {
       email: 'karentan@gmail.com',
+      email: 'karentan@gmail.com',
       name: 'Karen Tan',
-      approver: 'john toh',
-      processor: 'ruben tan',
+      company_prefix: 'EKCA',
+      department: ['EKA','EGK', 'EEE'],
+      supervisor: '0',
+      approver: '0',
+      processor: '1',
     },
   ]; 
   */
@@ -133,9 +141,20 @@ export default function AdminHomeScreen({ navigation }) {
 
   });
 
+  //find the index at which the email is located in the json file
+
+  async function handleEditUser (selectedId) {
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].email == selectedId) {
+        navigation.navigate("AdminEditUserScreen", { props: data[i] })
+        return
+      }
+    }
+}
+
   const Item = ({name, email, approver, processor, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
-      <View style={{height:"100%", width:"10%", minWidth:"70px", alignItems: "center", justifyContent: "center"}}>
+      <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
       <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
       </View>
 
@@ -149,7 +168,7 @@ export default function AdminHomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  
+
   const renderItem = ({item}) => {
 
     const backgroundColor = item.email === selectedId ? '#EEEEEE' : 'white';
@@ -164,7 +183,8 @@ export default function AdminHomeScreen({ navigation }) {
 
         onMouseEnter={() => setSelectedId(item.email)} 
         onMouseLeave={() => setSelectedId(null)}
-        onPress={() => navigation.navigate("AdminEditUserScreen", { data })}
+
+        onPress={() => console.log(handleEditUser(selectedId))}
         backgroundColor={backgroundColor}
         transform={transform}
       />
