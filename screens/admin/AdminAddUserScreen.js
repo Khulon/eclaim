@@ -2,7 +2,7 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, S
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { createBoxShadowValue } from 'react-native-web/dist/cjs/exports/StyleSheet/preprocess';
+import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
 
 
 export default function AdminAddUserScreen({ navigation }) {        
@@ -12,6 +12,35 @@ export default function AdminAddUserScreen({ navigation }) {
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
+
+
+  const [selected, setSelected] = React.useState("");
+  const companies = [
+    {key:'0', value:'EKCA'},
+    {key:'1', value:'Reefertec'},
+    {key:'2', value:'PCL'},
+    {key:'3', value:'SmartZ'},
+    {key:'4', value:'EKH'},
+    ]
+  const departments = [
+    {key:'0', value:'EKTS'},
+    {key:'1', value:'EKTU'},
+    {key:'2', value:'EKTY'},
+    {key:'3', value:'EKJP'},
+    {key:'4', value:'EKTK'},
+    {key:'5', value:'IME'},
+    {key:'6', value:'Reefertec'},
+    {key:'7', value:'Smartz'},
+    {key:'8', value:'PCL'},
+    {key:'9', value:'Finance'},
+    {key:'10', value:'IT'},
+    {key:'11', value:'Marketing'},
+    {key:'12', value:'HR'},
+    {key:'13', value:'Eddie'},
+    {key:'14', value:'Paul'},
+    ]
+
+
 
   const styles = StyleSheet.create({
     page: {
@@ -156,7 +185,30 @@ export default function AdminAddUserScreen({ navigation }) {
         width:"50%",
         justifyContent:"center",
         alignItems:"center"
-      }
+      },
+      dropdownStyles: {
+        position:"absolute",
+        width:"100%",
+        top:35,
+        zIndex:1,
+        backgroundColor:"white",
+        borderColor:"#DADADA"
+
+      },
+      dropdownItemStyles: {
+          marginHorizontal:"5px",
+          height:"40px",
+      },
+      dropdownTextStyles: {
+          color: "#6A6A6A",
+      },
+      boxStyles: {
+          borderColor:"#DADADA",
+      },
+      inputStyles: {
+          color: "#6A6A6A",
+      },
+
 
   });
 
@@ -164,10 +216,10 @@ export default function AdminAddUserScreen({ navigation }) {
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [companyEmail, setCompanyEmail] = useState('');
-  const [department, setDepatment] = useState('');
+  const [department, setDepartment] = useState('');
   const [isSupervisor, setIsSupervisor] = useState('');
   const [isApprover, setIsApprover] = useState('');
-  const [isProcessor, setIsProccessor] = useState('');
+  const [isProcessor, setIsProcessor] = useState('');
 
   return (
     <View style={styles.page}>
@@ -201,80 +253,113 @@ export default function AdminAddUserScreen({ navigation }) {
         </View>
   
 
-        <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Name</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Eg. Paul Lim" 
-            value={name} 
-            onChangeText={(name) => setName(name)} 
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Company</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Company" 
-            value={company} 
-            onChangeText={(company) => setCompany(company)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Department</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Department" 
-            value={department} 
-            onChangeText={(department) => setDepatment(department)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Company Email</Text>
-          <TextInput style={styles.textInput}
-            placeholder="example@gmail.com" 
-            value={companyEmail} 
-            onChangeText={(companyEmail) => setCompanyEmail(companyEmail)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Is a Supervisor?</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Choose" 
-            value={isSupervisor} 
-            onChangeText={(isSupervisor) => setIsSupervisor(isSupervisor)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Is a Approver?</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Choose" 
-            value={isApprover} 
-            onChangeText={(isApprover) => setIsApprover(isApprover)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.normalBoldText}>Is a Processor</Text>
-          <TextInput style={styles.textInput}
-            placeholder="Choose" 
-            value={isProcessor} 
-            onChangeText={(isProcessor) => setIsProccessor(isProcessor)}
-            autoCapitalize="none" 
-            autoCorrect={false} 
-          />
-          </View>
+      <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Name</Text>
+        <TextInput style={styles.textInput}
+          placeholder="Eg. Paul Lim" 
+          value={name} 
+          onChangeText={(name) => setName(name)} 
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+        <View style={[styles.inputContainer,{zIndex:5}]}>
+        <Text style={styles.normalBoldText}>Company</Text>
+        <SelectList
+              dropdownStyles={styles.dropdownStyles}
+              dropdownItemStyles={styles.dropdownItemStyles}
+              dropdownTextStyles={styles.dropdownTextStyles}
+              boxStyles={styles.boxStyles}
+              inputStyles={styles.inputStyles}  
+              setSelected={(val) => setSelected(val)} 
+              onSelect={() => setCompany(selected)}
+              placeholder={company}
+              data={companies} 
+              save="value"
+              showsVerticalScrollIndicator = {false}
+              search = {false}
+          />  
+        </View>
+        <View style={[styles.inputContainer,{zIndex:4}]}>
+        <Text style={styles.normalBoldText}>Department</Text>
+        <MultipleSelectList
+              dropdownStyles={[styles.dropdownStyles, {top:45}]}
+              dropdownItemStyles={styles.dropdownItemStyles}
+              dropdownTextStyles={styles.dropdownTextStyles}
+              boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
+              inputStyles={[styles.inputStyles]}  
+              setSelected={(val) => setSelected(val)} 
+              onSelect={() => setDepartment(selected)}
+              placeholder={department}
+              data={departments} 
+              save="value"
+              showsVerticalScrollIndicator = {true}
+          />  
+        </View>
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Company Email</Text>
+        <TextInput style={styles.textInput}
+          placeholder="example@gmail.com" 
+          value={companyEmail} 
+          onChangeText={(companyEmail) => setCompanyEmail(companyEmail)}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+        <View style={[styles.inputContainer,{zIndex:3}]}>
+        <Text style={styles.normalBoldText}>Is a Supervisor?</Text>
+        <SelectList
+              dropdownStyles={styles.dropdownStyles}
+              dropdownItemStyles={styles.dropdownItemStyles}
+              dropdownTextStyles={styles.dropdownTextStyles}
+              boxStyles={styles.boxStyles}
+              inputStyles={styles.inputStyles}  
+              setSelected={(val) => setSelected(val)} 
+              onSelect={() => setIsSupervisor(selected)}
+              placeholder={isSupervisor}
+              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
+              save="value"
+              showsVerticalScrollIndicator = {false}
+              search = {false}
+          />  
         </View>
 
-
+        <View style={[styles.inputContainer,{zIndex:2}]}>
+        <Text style={styles.normalBoldText}>Is a Approver?</Text>
+        <SelectList
+              dropdownStyles={styles.dropdownStyles}
+              dropdownItemStyles={styles.dropdownItemStyles}
+              dropdownTextStyles={styles.dropdownTextStyles}
+              boxStyles={styles.boxStyles}
+              inputStyles={styles.inputStyles}  
+              setSelected={(val) => setSelected(val)} 
+              onSelect={() => setIsApprover(selected)}
+              placeholder={isApprover}
+              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
+              save="value"
+              showsVerticalScrollIndicator = {false}
+              search = {false}
+          />  
+        </View>
+        <View style={[styles.inputContainer,{zIndex:1}]}>
+        <Text style={styles.normalBoldText}>Is a Processor?</Text>
+        <SelectList
+              dropdownStyles={styles.dropdownStyles}
+              dropdownItemStyles={styles.dropdownItemStyles}
+              dropdownTextStyles={styles.dropdownTextStyles}
+              boxStyles={styles.boxStyles}
+              inputStyles={styles.inputStyles}  
+              setSelected={(val) => setSelected(val)}
+              onSelect={() => setIsProcessor(selected)}
+              placeholder={isProcessor} 
+              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
+              save="value"
+              showsVerticalScrollIndicator = {false}
+              search = {false}
+          />  
+        </View>
+      </View>
 
 
       </ScrollView>
@@ -287,7 +372,7 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} > Cancel </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.defaultButton} > Cancel </TouchableOpacity>
         </Animated.View>
         </View>
 
