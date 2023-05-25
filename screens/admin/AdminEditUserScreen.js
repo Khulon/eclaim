@@ -7,7 +7,7 @@ import { createBoxShadowValue } from 'react-native-web/dist/cjs/exports/StyleShe
 
 export default function AdminEditUserScreen({ navigation, route }) {        
 
-  const selectedId = route.params.props;
+  const selectedId = route.data;
     
 
 

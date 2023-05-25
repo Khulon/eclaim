@@ -7,8 +7,6 @@ import { AuthProvider } from './hooks/useAuth';
 const Stack = createStackNavigator();
 
 export default function MyStack() {
-  
-  
 
   return (
     <NavigationContainer>

@@ -2,8 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput, Anim
 import React, { useRef, useState } from 'react';
 import { Ionicons } from "react-native-vector-icons";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
-
-
+import useAuth from '../../hooks/useAuth';
 
 
 export default function RegistrationScreen({ navigation }) {
@@ -112,17 +111,10 @@ export default function RegistrationScreen({ navigation }) {
   
     });
 
+  const {createUser} = useAuth();
   const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: '', confirmPassword: ''})
 
-  const createUser = () => {
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://localhost:5000/register', {
-      method: 'POST',	
-      headers: header,
-      body: JSON.stringify(loginDetails)})
-      .then((response) => response.json())
-      .then((resp) => console.log(resp));
-  };
+  
 
   return (
     <View style={styles.page}>
@@ -183,7 +175,7 @@ export default function RegistrationScreen({ navigation }) {
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(registerButtonHover)} onMouseLeave={() => MovePosAnimation(registerButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: registerButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} onPress={createUser}> Register </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress={() => createUser(loginDetails)}> Register </TouchableOpacity>
         </Animated.View>
         </View>
       </View>
