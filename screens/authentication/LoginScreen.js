@@ -117,7 +117,6 @@ export default function LoginScreen({ navigation}) {
     async function handleLogin() {
       try {
         loginUser(loginDetails);
-        console.log('login success')
       } catch (error) {
         console.log(error);
       }
