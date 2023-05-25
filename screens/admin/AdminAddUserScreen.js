@@ -284,7 +284,7 @@ export default function AdminAddUserScreen({ navigation }) {
               setSelected={(val) => setSelected(val)} 
               onSelect={(company) => setNewUser({...newUser, company:company})}
               placeholder={newUser.company}
-              data={newUser.companies} 
+              data={companies} 
               save="value"
               showsVerticalScrollIndicator = {false}
               search = {false}
@@ -301,7 +301,7 @@ export default function AdminAddUserScreen({ navigation }) {
               setSelected={(val) => setSelected(val)} 
               onSelect={(department) => setNewUser({...newUser, department:department})}
               placeholder={newUser.department}
-              data={newUser.departments} 
+              data={departments} 
               save="value"
               showsVerticalScrollIndicator = {true}
           />  
