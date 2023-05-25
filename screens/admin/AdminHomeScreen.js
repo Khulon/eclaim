@@ -42,7 +42,8 @@ export default function AdminHomeScreen({ navigation }) {
     },
   ]; 
   */
-
+  
+  const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [selectedId, setSelectedId] = useState();
   const [search, setSearch] = useState('')
@@ -73,6 +74,21 @@ export default function AdminHomeScreen({ navigation }) {
       flexDirection: "column",
       borderBottomWidth: "2px",
       borderColor: "#DADADA"
+    },
+
+    backButton: {
+      fontFamily: "inherit",
+      backgroundColor: "#D9D9D9",
+      border: "none",
+
+      alignItems: 'center',
+      justifyContent: 'center',
+      
+      width: isBackButtonHover ? "43px" :"40px",
+      height: isBackButtonHover ? "43px" :"40px",
+      borderRadius: "14px",
+
+      cursor: "pointer"
     },
 
     bottomCard: {
@@ -205,7 +221,18 @@ export default function AdminHomeScreen({ navigation }) {
     <View style={styles.page}>
       <View style={styles.pageDefault}>
       <View style={styles.topCard}>
-        <Text style={{paddingBottom:"15px"}}>Admin Home</Text>
+        <View style={{width:'100%', flexDirection:'row',paddingBottom:"15px"}}>
+          <View style={{width:'23%', position:'absolute', alignItems:'center'}}>
+            <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => handleLogOut()}>
+            <View style={styles.backButton}>
+              <Text><Ionicons name="log-out-outline" color="#444" size='large'/></Text>
+            </View>
+            </TouchableOpacity>
+          </View>
+            <View style={{width:'100%', alignItems:"center"}}>
+            <Text>Admin Home</Text>
+            </View>
+          </View>
         <Text style={{fontFamily:"inherit", fontSize: "25px", fontWeight:"700"}}>User Accounts</Text>
         <View style={styles.inputContainer}>
           <TextInput style={styles.textInput}
@@ -237,7 +264,6 @@ export default function AdminHomeScreen({ navigation }) {
         
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
         <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen")}  style={styles.defaultButton} > Add </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleLogOut()}  style={styles.defaultButton} > Log Out </TouchableOpacity>
         </Animated.View>
 
       </View>
