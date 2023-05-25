@@ -2,10 +2,12 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, F
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
+import useAuth from '../../hooks/useAuth';
 
 
 export default function AdminHomeScreen({ navigation }) {        
   const [data, setData] = useState("");
+  
 
   
   useEffect(() => {
@@ -162,10 +164,6 @@ export default function AdminHomeScreen({ navigation }) {
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Approver: {approver}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Processor: {processor}</Text>
       </View>
-
-      <View  style={{height:"100%", flexDirection: "column", flex:1, alignItems: "center", justifyContent: "center"}}>
-      <Text></Text>
-      </View>
       
     </TouchableOpacity>
   );
@@ -185,6 +183,7 @@ export default function AdminHomeScreen({ navigation }) {
 
         onMouseEnter={() => setSelectedId(item.email)} 
         onMouseLeave={() => setSelectedId(null)}
+
         onPress={() => console.log(handleEditUser(selectedId))}
         backgroundColor={backgroundColor}
         transform={transform}
@@ -192,6 +191,15 @@ export default function AdminHomeScreen({ navigation }) {
     )
   }
 
+  const { logoutUser } = useAuth();
+
+  async function handleLogOut() {
+    try {
+      logoutUser();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <View style={styles.page}>
@@ -229,6 +237,7 @@ export default function AdminHomeScreen({ navigation }) {
         
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
         <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen")}  style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleLogOut()}  style={styles.defaultButton} > Log Out </TouchableOpacity>
         </Animated.View>
 
       </View>

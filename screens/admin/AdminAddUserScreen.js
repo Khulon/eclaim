@@ -5,6 +5,7 @@ import { Ionicons } from "react-native-vector-icons";
 import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
 
 
+
 export default function AdminAddUserScreen({ navigation }) {        
 
 
@@ -212,14 +213,22 @@ export default function AdminAddUserScreen({ navigation }) {
 
   });
 
-  
-  const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
-  const [companyEmail, setCompanyEmail] = useState('');
-  const [department, setDepartment] = useState('');
-  const [isSupervisor, setIsSupervisor] = useState('');
-  const [isApprover, setIsApprover] = useState('');
-  const [isProcessor, setIsProcessor] = useState('');
+
+  const [newUser, setNewUser] = useState({name:'', email:'', 
+  company:'', department:'', isSupervisor: '', isApprover:'', isProcessor: ''});
+
+  const addUser = () => {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://localhost:5000/admin/addUser', {
+      method: 'POST', 
+      headers: header,
+      body: JSON.stringify(newUser)})
+      .then((response) => response.json())
+      .then((resp) => { 
+        console.log(resp);
+      });
+  }; 
+
 
   return (
     <View style={styles.page}>
@@ -258,8 +267,8 @@ export default function AdminAddUserScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Name</Text>
         <TextInput style={styles.textInput}
           placeholder="Eg. Paul Lim" 
-          value={name} 
-          onChangeText={(name) => setName(name)} 
+          value={newUser.name} 
+          onChangeText={(name) => setNewUser({...newUser, name:name})} 
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -273,9 +282,9 @@ export default function AdminAddUserScreen({ navigation }) {
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
               setSelected={(val) => setSelected(val)} 
-              onSelect={() => setCompany(selected)}
-              placeholder={company}
-              data={companies} 
+              onSelect={(company) => setNewUser({...newUser, company:company})}
+              placeholder={newUser.company}
+              data={newUser.companies} 
               save="value"
               showsVerticalScrollIndicator = {false}
               search = {false}
@@ -290,9 +299,9 @@ export default function AdminAddUserScreen({ navigation }) {
               boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
               inputStyles={[styles.inputStyles]}  
               setSelected={(val) => setSelected(val)} 
-              onSelect={() => setDepartment(selected)}
-              placeholder={department}
-              data={departments} 
+              onSelect={(department) => setNewUser({...newUser, department:department})}
+              placeholder={newUser.department}
+              data={newUser.departments} 
               save="value"
               showsVerticalScrollIndicator = {true}
           />  
@@ -301,8 +310,8 @@ export default function AdminAddUserScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Company Email</Text>
         <TextInput style={styles.textInput}
           placeholder="example@gmail.com" 
-          value={companyEmail} 
-          onChangeText={(companyEmail) => setCompanyEmail(companyEmail)}
+          value={newUser.email} 
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -316,13 +325,14 @@ export default function AdminAddUserScreen({ navigation }) {
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
               setSelected={(val) => setSelected(val)} 
-              onSelect={() => setIsSupervisor(selected)}
-              placeholder={isSupervisor}
+              onSelect={(isSupervisor) => setNewUser({...newUser, isSupervisor:isSupervisor})}
+              placeholder={newUser.isSupervisor}
               data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
               save="value"
               showsVerticalScrollIndicator = {false}
               search = {false}
           />  
+
         </View>
 
         <View style={[styles.inputContainer,{zIndex:2}]}>
@@ -334,8 +344,8 @@ export default function AdminAddUserScreen({ navigation }) {
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
               setSelected={(val) => setSelected(val)} 
-              onSelect={() => setIsApprover(selected)}
-              placeholder={isApprover}
+              onSelect={(isApprover) => setNewUser({...newUser, isApprover:isApprover})}
+              placeholder={newUser.isApprover}
               data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
               save="value"
               showsVerticalScrollIndicator = {false}
@@ -351,8 +361,8 @@ export default function AdminAddUserScreen({ navigation }) {
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
               setSelected={(val) => setSelected(val)}
-              onSelect={() => setIsProcessor(selected)}
-              placeholder={isProcessor} 
+              onSelect={(isProcessor) => setNewUser({...newUser, isProcessor:isProcessor})}
+              placeholder={newUser.isProcessor} 
               data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
               save="value"
               showsVerticalScrollIndicator = {false}
@@ -378,7 +388,7 @@ export default function AdminAddUserScreen({ navigation }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {addUser}> Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>

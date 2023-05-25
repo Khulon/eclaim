@@ -46,13 +46,13 @@ var server = app.listen(5000, function () {
 });
 
 app.post('/register',(req, res) => {
-    let email = {email: req.body.companyEmail};
-    let password = {password: req.body.password};
-    let statement = "INSERT INTO Accounts VALUES ('"+email.email+"','"+password.password+"')";
+    let email = req.body.companyEmail;
+    let password = req.body.password;
+    let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"')";
     var query = new sql.Request();
     query.query(statement)
     .then((result) => {
-      res.json({result: result.recordset, message: "Account Created!"});})
+      res.json({user: email, userType: "Normal", message: "Account Created!"});})
     .catch((err) => {
       res.json({message: "Error!"});
     });
@@ -70,16 +70,36 @@ app.get('/admin',(req, res) => {
         // send records as a response
         res.send(rows.recordset);
     });
-  
 
 });
 
+app.post('/admin/addUser',(req, res) => {
+  let name = req.body.name;
+  let email = req.body.email;
+  let company = req.body.company;
+  let department = req.body.department;
+  let isSupervisor = req.body.isSupervisor;
+  let isApprover = req.body.isApprover;
+  let isProcessor = req.body.isProcessor;
+
+  var request = new sql.Request();
+  request.query("INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
+  "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"')",
+   function (err) {
+      
+      if (err) console.log(err)
+
+      // send records as a response
+      res.send({email: email, message: "User Added!"});
+  });
+
+});
 
 app.post('/login',(req, res) => {
-  let email = {email: req.body.companyEmail};
-  let password = {password: req.body.password};
-  let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email.email+"' and password = '"+password.password+"'";
-  let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email.email+"' and password = '"+password.password+"'";
+  let email = req.body.companyEmail;
+  let password = req.body.password;
+  let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'";
+  let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'";
   var query = new sql.Request();
   var adminQuery = new sql.Request();
   adminQuery.query(checkAdmin)

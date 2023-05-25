@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
 import AuthenticationStack from './AuthenticationStack';
-import useAuth from '../hooks/useAuth';
 import HomeStack from './HomeStack';
 import AdminStack from './AdminStack';
 
+
 const Stack = createStackNavigator();
-    
+
 
 export default function StackNavigator() {
-    const {user, setUser} = useAuth();
-    const { userType, setUserType } = useAuth();
+
+    const session = window.localStorage.getItem('session');
+    const sessionType = window.localStorage.getItem('sessionType');
 
     return (
         <Stack.Navigator>
-        {user.email != null ? (
-            userType.userType == 'Admin' ? (
+        {session != null ? (
+            sessionType == 'Admin' ? (
                 <Stack.Screen name="AdminStack" component={AdminStack} options={{headerShown: false}}/> 
             ):(
                 <Stack.Screen name="HomeStack" component={HomeStack} options={{headerShown: false}}/> 
@@ -25,7 +26,7 @@ export default function StackNavigator() {
         )}
         </Stack.Navigator>
     );
-}
+};
 
 
 
