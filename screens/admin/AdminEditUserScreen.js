@@ -1,11 +1,8 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
-
-
-
     
 
 export default function AdminEditUserScreen({ navigation, route }) {        
@@ -39,23 +36,6 @@ const departments = [
     {key:'13', value:'Eddie'},
     {key:'14', value:'Paul'},
     ]
-
-
-  function loadCurrentDepartmentAsString () {
-    var departmentString = ''
-    if (route.params.props.department.length == 0) {
-        return departmentString
-    }
-    else {
-        for (var i = 0; i < route.params.props.department.length; i++) {
-            if (i == 0) {
-                departmentString += route.params.props.department[i]
-            }
-            departmentString += ', ' + route.params.props.department[i]
-        }    
-    }
-    return departmentString;
-  }
   
 
   const styles = StyleSheet.create({
@@ -227,11 +207,23 @@ const departments = [
 
   });
 
-  
+  console.log(route.params.props.name)
+  console.log(route.params.dpts[0])
+
+  var dpts = '';
+  for (let i = 0; i < route.params.dpts.length; i++) {
+    if (i == route.params.dpts.length - 1) {
+      dpts += route.params.dpts[i].department;
+      break;
+    } else {
+      dpts += route.params.dpts[i].department + ', ';
+    }
+  }
+
   const [name, setName] = useState(route.params.props.name);
   const [company, setCompany] = useState(route.params.props.company);
   const [companyEmail, setCompanyEmail] = useState(route.params.props.email);
-  const [department, setDepartment] = useState(loadCurrentDepartmentAsString());
+  const [department, setDepartment] = useState(dpts);
   const [isSupervisor, setIsSupervisor] = useState(route.params.props.supervisor);
   const [isApprover, setIsApprover] = useState(route.params.props.approver);
   const [isProcessor, setIsProcessor] = useState(route.params.props.processor);
@@ -306,9 +298,9 @@ const departments = [
                 inputStyles={[styles.inputStyles]}  
                 setSelected={(val) => setSelected(val)} 
                 onSelect={() => setDepartment(selected)}
-                placeholder={department}
+                placeholder = {department}
                 data={departments} 
-                save="value"
+                save="key"
                 showsVerticalScrollIndicator = {true}
             />  
           </View>
