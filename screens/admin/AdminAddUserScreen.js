@@ -15,7 +15,6 @@ export default function AdminAddUserScreen({ navigation }) {
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
 
-  const [selected, setSelected] = React.useState("");
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
@@ -23,6 +22,7 @@ export default function AdminAddUserScreen({ navigation }) {
     {key:'3', value:'SmartZ'},
     {key:'4', value:'EKH'},
     ]
+
   const departments = [
     {key:'0', value:'EKTS'},
     {key:'1', value:'EKTU'},
@@ -213,12 +213,20 @@ export default function AdminAddUserScreen({ navigation }) {
 
   });
 
-
+  
+  const [userDepartments, setDepartments] = React.useState([]);
   const [newUser, setNewUser] = useState({name:'', email:'', 
-  company:'', department:'', isSupervisor: '', isApprover:'', isProcessor: ''});
+  company:null, department:null, isSupervisor: '', isApprover:'', isProcessor: ''});
+
+  useEffect(() => {
+    setNewUser({...newUser, department: userDepartments});
+  }, [userDepartments]);
+
 
   const addUser = () => {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    console.log(userDepartments);
+    console.log(newUser);
     fetch('http://localhost:5000/admin/addUser', {
       method: 'POST', 
       headers: header,
@@ -226,6 +234,9 @@ export default function AdminAddUserScreen({ navigation }) {
       .then((response) => response.json())
       .then((resp) => { 
         console.log(resp);
+        if(resp.message == 'User Added!') {
+          window.location.reload(false);
+        }
       });
   }; 
 
@@ -266,7 +277,7 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Name</Text>
         <TextInput style={styles.textInput}
-          placeholder="Eg. Paul Lim" 
+          placeholder="eg. Paul Lim" 
           value={newUser.name} 
           onChangeText={(name) => setNewUser({...newUser, name:name})} 
           autoCapitalize="none" 
@@ -280,10 +291,9 @@ export default function AdminAddUserScreen({ navigation }) {
               dropdownItemStyles={styles.dropdownItemStyles}
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles}  
-              setSelected={(val) => setSelected(val)} 
-              onSelect={(company) => setNewUser({...newUser, company:company})}
-              placeholder={newUser.company}
+              inputStyles={styles.inputStyles} 
+              setSelected={(company) => setNewUser({...newUser, company:company})}
+              placeholder= "eg. EKCA"
               data={companies} 
               save="value"
               showsVerticalScrollIndicator = {false}
@@ -291,16 +301,16 @@ export default function AdminAddUserScreen({ navigation }) {
           />  
         </View>
         <View style={[styles.inputContainer,{zIndex:4}]}>
-        <Text style={styles.normalBoldText}>Department</Text>
+        <Text style={styles.normalBoldText}>Department(s)</Text>
         <MultipleSelectList
               dropdownStyles={[styles.dropdownStyles, {top:45}]}
               dropdownItemStyles={styles.dropdownItemStyles}
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
               inputStyles={[styles.inputStyles]}  
-              setSelected={(val) => setSelected(val)} 
-              onSelect={(department) => setNewUser({...newUser, department:department})}
-              placeholder={newUser.department}
+              setSelected={(val) => {
+                setDepartments(val);
+                }} 
               data={departments} 
               save="value"
               showsVerticalScrollIndicator = {true}
@@ -309,7 +319,7 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Company Email</Text>
         <TextInput style={styles.textInput}
-          placeholder="example@gmail.com" 
+          placeholder="example@engkong.com" 
           value={newUser.email} 
           onChangeText={(email) => setNewUser({...newUser, email: email})}
           autoCapitalize="none" 
@@ -324,9 +334,7 @@ export default function AdminAddUserScreen({ navigation }) {
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
-              setSelected={(val) => setSelected(val)} 
-              onSelect={(isSupervisor) => setNewUser({...newUser, isSupervisor:isSupervisor})}
-              placeholder={newUser.isSupervisor}
+              setSelected={(val) => setNewUser({...newUser, isSupervisor:val})} 
               data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
               save="value"
               showsVerticalScrollIndicator = {false}
@@ -343,9 +351,7 @@ export default function AdminAddUserScreen({ navigation }) {
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
-              setSelected={(val) => setSelected(val)} 
-              onSelect={(isApprover) => setNewUser({...newUser, isApprover:isApprover})}
-              placeholder={newUser.isApprover}
+              setSelected={(val) => setNewUser({...newUser, isApprover:val})} 
               data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
               save="value"
               showsVerticalScrollIndicator = {false}
@@ -360,9 +366,7 @@ export default function AdminAddUserScreen({ navigation }) {
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={styles.boxStyles}
               inputStyles={styles.inputStyles}  
-              setSelected={(val) => setSelected(val)}
-              onSelect={(isProcessor) => setNewUser({...newUser, isProcessor:isProcessor})}
-              placeholder={newUser.isProcessor} 
+              setSelected={(val) => setNewUser({...newUser, isProcessor:val})} 
               data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
               save="value"
               showsVerticalScrollIndicator = {false}

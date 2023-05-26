@@ -16,19 +16,22 @@ export default function AdminHomeScreen({ navigation }) {
   }, []);
 
   async function fetchData() {
+     
     try {
       await fetch("http://localhost:5000/admin")
       .then((res) => res.json())
-      .then((data) => setFullData(data))
+      .then((data) => {
+        setFullData(data);
+        setData(data);
+      })
       setIsLoading(false)
     } catch (error) {
       alert("Failed to load. Please check your internet connection!")
       setIsLoading(false)
     }
-    
-  }
 
-  
+  } 
+
   const FULLDATA = [
     {
       email: 'karenlim@gmail.com',
@@ -307,7 +310,7 @@ export default function AdminHomeScreen({ navigation }) {
 
       <View style={styles.bottomCard}>
         <Text style={{paddingTop:"15px"}}>Total Employees:</Text>
-        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{data.length}</Text>
+        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{fullData.length}</Text>
         
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
         <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen")}  style={styles.defaultButton} > Add </TouchableOpacity>
