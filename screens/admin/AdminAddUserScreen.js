@@ -235,6 +235,7 @@ export default function AdminAddUserScreen({ navigation }) {
       .then((resp) => { 
         console.log(resp);
         if(resp.message == 'User Added!') {
+          alert('User Added!');
           window.location.reload(false);
         }
       });
