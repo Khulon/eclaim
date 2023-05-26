@@ -1,4 +1,4 @@
-import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ImageBackgroundComponent} from 'react-native';
+import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
@@ -8,34 +8,29 @@ import filter from "lodash.filter"
 export default function AdminHomeScreen({ navigation }) {        
   const [data, setData] = useState("");
   const [fullData, setFullData] = useState("");
+  const [isLoading, setIsLoading] = useState(false);  
 
-  
   useEffect(() => {
-
-    
-    fetch("http://localhost:5000/admin")
-      .then((res) => res.json())
-      .then((data) => {
-        setFullData(data);
-        setData(data);})
-      
-
-
+    setIsLoading(true)
+    fetchData()
   }, []);
 
-  /*
-  async function fetchData () {
+  async function fetchData() {
+     
     try {
       await fetch("http://localhost:5000/admin")
       .then((res) => res.json())
-      .then((data) => setFullData(data))
-
-      setData(fullData);
-      console.log(data)
+      .then((data) => {
+        setFullData(data);
+        setData(data);
+      })
+      setIsLoading(false)
     } catch (error) {
-
+      alert("Failed to load. Please check your internet connection!")
+      setIsLoading(false)
     }
-  } */
+
+  } 
 
   const FULLDATA = [
     {
@@ -53,7 +48,7 @@ export default function AdminHomeScreen({ navigation }) {
       email: 'karentan@gmail.com',
       name: 'Karen Tan',
       company_prefix: 'EKCA',
-      department: ['EKA','EGK', 'EEE'],
+      department: ['EKA','EGK','EEE'],
       supervisor: '0',
       approver: '0',
       processor: '1',
@@ -75,6 +70,16 @@ export default function AdminHomeScreen({ navigation }) {
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: "Arial",
+    },
+    loadingPage: {
+      position:'absolute',
+      height:'100%',
+      width:'100%',
+      zIndex: isLoading ? 999 : -1,
+      justifyContent:'center',
+      alignItems:'center',
+      backgroundColor:'black',
+      opacity: isLoading ? '50%' : '0%'
     },
     pageDefault: {
       width: "100%",
@@ -256,6 +261,10 @@ export default function AdminHomeScreen({ navigation }) {
 
   return (
     <View style={styles.page}>
+      <View style={styles.loadingPage}>
+        <ActivityIndicator size='large' color="#E04F4F" />
+      </View>
+
       <View style={styles.pageDefault}>
       <View style={styles.topCard}>
         <View style={{width:'100%', flexDirection:'row',paddingBottom:"15px"}}>
