@@ -183,13 +183,16 @@ export default function AdminHomeScreen({ navigation }) {
   });
 
   //find the index at which the email is located in the json file
-  async function handleEditUser (selectedId) {
+  function handleEditUser (selectedId) {
+    setIsLoading(true)
     for (var i = 0; i < data.length; i++) {
-      if (data[i].email == selectedId) {
+      if (data[i].email == selectedId) { 
         navigation.navigate("AdminEditUserScreen", { props: data[i] })
+        setIsLoading(false)
         return
       }
     }
+    setIsLoading(false)
   }
 
   function handleSearch (search) {

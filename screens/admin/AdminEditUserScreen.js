@@ -303,11 +303,11 @@ const departments = [
                 dropdownItemStyles={styles.dropdownItemStyles}
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
-                inputStyles={[styles.inputStyles]}  
-                setSelected={(val) => setSelected(val)} 
+                inputStyles={[styles.inputStyles]}
+                setSelected={(val) => setSelected(val)}
                 onSelect={() => setDepartment(selected)}
                 placeholder={department}
-                data={departments} 
+                data={departments}
                 save="value"
                 showsVerticalScrollIndicator = {true}
             />  
