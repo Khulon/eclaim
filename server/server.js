@@ -77,7 +77,7 @@ app.post('/admin/addUser',(req, res) => {
   let name = req.body.name;
   let email = req.body.email;
   let company = req.body.company;
-  let department = req.body.department;
+  let departments = req.body.department;
   let isSupervisor = req.body.isSupervisor;
   let isApprover = req.body.isApprover;
   let isProcessor = req.body.isProcessor;
@@ -86,11 +86,17 @@ app.post('/admin/addUser',(req, res) => {
   request.query("INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
   "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"')",
    function (err) {
-      
       if (err) console.log(err)
+    
+      for(var i = 0; i < departments.length; i++) {
+        var request = new sql.Request();
+        request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')",
+          function (err) {
+            if (err) console.log(err)
+          });
+      }
 
-      // send records as a response
-      res.send({email: email, message: "User Added!"});
+      res.send({email: email, departments: departments, message: "User Added!"});
   });
 
 });

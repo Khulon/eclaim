@@ -232,9 +232,9 @@ const departments = [
   const [company, setCompany] = useState(route.params.props.company);
   const [companyEmail, setCompanyEmail] = useState(route.params.props.email);
   const [department, setDepartment] = useState(loadCurrentDepartmentAsString());
-  const [isSupervisor, setIsSupervisor] = useState((route.params.props.supervisor == 1)? 'Yes':'No');
-  const [isApprover, setIsApprover] = useState((route.params.props.approver == 1)? 'Yes':'No');
-  const [isProcessor, setIsProcessor] = useState((route.params.props.processor == 1)? 'Yes':'No');
+  const [isSupervisor, setIsSupervisor] = useState(route.params.props.supervisor);
+  const [isApprover, setIsApprover] = useState(route.params.props.approver);
+  const [isProcessor, setIsProcessor] = useState(route.params.props.processor);
 
   return (
     <View style={styles.page}>
@@ -341,7 +341,7 @@ const departments = [
           </View>
 
           <View style={[styles.inputContainer,{zIndex:2}]}>
-          <Text style={styles.normalBoldText}>Is a Approver?</Text>
+          <Text style={styles.normalBoldText}>Is an Approver?</Text>
           <SelectList
                 dropdownStyles={styles.dropdownStyles}
                 dropdownItemStyles={styles.dropdownItemStyles}

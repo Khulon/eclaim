@@ -36,12 +36,14 @@ export const AuthProvider = ({children}) => {
       .then((resp) => {
         console.log(resp);
         if(resp.message == 'Account Created!') {
-          window.localStorage.setItem('sessionType', resp.userType);
-          window.localStorage.setItem('session', resp.user);
+          window.location.reload(false);
+          alert('Account Created!');
         }
-        
+        else {
+          alert('Account Creation Failed!');
+        }
       });
-      window.location.reload(false);
+      
   };
 
     return (
