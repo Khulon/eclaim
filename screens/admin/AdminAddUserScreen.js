@@ -291,15 +291,9 @@ export default function AdminAddUserScreen({ navigation }) {
               dropdownItemStyles={styles.dropdownItemStyles}
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles}  
-<<<<<<< Updated upstream
-              setSelected={(val) => setSelected(val)} 
-              onSelect={(company) => setNewUser({...newUser, company:company})}
-              placeholder={newUser.company}
-=======
+              inputStyles={styles.inputStyles} 
               setSelected={(company) => setNewUser({...newUser, company:company})}
               placeholder= "eg. EKCA"
->>>>>>> Stashed changes
               data={companies} 
               save="value"
               showsVerticalScrollIndicator = {false}
@@ -314,15 +308,9 @@ export default function AdminAddUserScreen({ navigation }) {
               dropdownTextStyles={styles.dropdownTextStyles}
               boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
               inputStyles={[styles.inputStyles]}  
-<<<<<<< Updated upstream
-              setSelected={(val) => setSelected(val)} 
-              onSelect={(department) => setNewUser({...newUser, department:department})}
-              placeholder={newUser.department}
-=======
               setSelected={(val) => {
                 setDepartments(val);
                 }} 
->>>>>>> Stashed changes
               data={departments} 
               save="value"
               showsVerticalScrollIndicator = {true}
