@@ -3,23 +3,23 @@ import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import useAuth from '../../hooks/useAuth';
-
+import filter from "lodash.filter"
 
 export default function AdminHomeScreen({ navigation }) {        
   const [data, setData] = useState("");
-  
+  const [fullData, setFullData] = useState("");
 
   
   useEffect(() => {
 
     fetch("http://localhost:5000/admin")
     .then((res) => res.json())
-    .then((data) => setData(data))
+    .then((data) => setFullData(data))
 
   }, []);
 
-  /*
-  const DATA = [
+  
+  const FULLDATA = [
     {
       email: 'karenlim@gmail.com',
       email: 'karenlim@gmail.com',
@@ -41,7 +41,7 @@ export default function AdminHomeScreen({ navigation }) {
       processor: '1',
     },
   ]; 
-  */
+  
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
@@ -110,6 +110,7 @@ export default function AdminHomeScreen({ navigation }) {
     },
     textInput: {
       height: "35px",
+      width:'100%',
       color: "#6A6A6A",
       backgroundColor: "#D9D9D9",
       borderWidth: "1px",
@@ -127,6 +128,7 @@ export default function AdminHomeScreen({ navigation }) {
       paddingVertical:'5px',
       width:'85%',
       paddingBottom: "15px",
+      flexDirection:'row-reverse'
     },
     defaultButton: {
       fontFamily: "inherit",
@@ -158,7 +160,6 @@ export default function AdminHomeScreen({ navigation }) {
   });
 
   //find the index at which the email is located in the json file
-
   async function handleEditUser (selectedId) {
     for (var i = 0; i < data.length; i++) {
       if (data[i].email == selectedId) {
@@ -166,7 +167,25 @@ export default function AdminHomeScreen({ navigation }) {
         return
       }
     }
-}
+  }
+
+  function handleSearch (search) {
+    setSearch(search)
+    const formattedQuery = search.toLowerCase();
+    const filteredData = filter(fullData, (person)=> {
+      return contains(person, formattedQuery)
+    })
+    setData(filteredData)
+    console.log(filteredData)
+  }
+
+  const contains = ({name,email}, query) => {
+    if (name.includes(query) || email.includes(query)) {
+      return true
+    }
+    return false
+  }
+
 
   const Item = ({name, email, approver, processor, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
@@ -174,7 +193,7 @@ export default function AdminHomeScreen({ navigation }) {
       <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
       </View>
 
-      <View style={{height:"100%", width:"50%", justifyContent:"center"}}>
+      <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
       <Text style={{fontSize: "13px", fontWeight:"700"}}>{name}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Email: {email}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Approver: {approver}</Text>
@@ -238,10 +257,14 @@ export default function AdminHomeScreen({ navigation }) {
           <TextInput style={styles.textInput}
             placeholder="Search" 
             value={search} 
-            onChangeText={(search) => setSearch(search)} 
+            onChangeText={(search) => handleSearch(search)} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
+          <View style={{height:'35px', width:'35px', position:'absolute', alignItems:'center', justifyContent:'center'}}>
+          <Text style={{paddingRight:'10px'}}><Ionicons name="search-outline" color="#444" size='large'/></Text>
+          </View>
+
         </View>
       </View>
 
@@ -252,7 +275,7 @@ export default function AdminHomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         data={data}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.email}
       />
       </View>
 
