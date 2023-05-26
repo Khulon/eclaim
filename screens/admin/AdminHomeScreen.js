@@ -185,6 +185,7 @@ export default function AdminHomeScreen({ navigation }) {
 
   });
 
+
   const [userDepartments, setUserDepartments] = useState(null);
 
   useEffect(() => {
@@ -209,7 +210,6 @@ export default function AdminHomeScreen({ navigation }) {
       console.log(data);
       setUserDepartments(data);
     });
-    
   }
 
   function handleSearch (search) {
