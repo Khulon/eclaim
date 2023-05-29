@@ -2,20 +2,18 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, S
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
-import MonthlyExpenseForm from './MonthlyExpenseForm';
+import { SelectList} from 'react-native-dropdown-select-list'
 
 
 
 export default function AddClaimScreen({ navigation }) {        
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [isExistingClaim, setIsExistingClaim] = useState('');
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [newClaim, setNewClaim] = useState({formId:'', expenseType:'', 
-  company:null});
+  
 
 
+  /*
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
@@ -23,7 +21,7 @@ export default function AddClaimScreen({ navigation }) {
     {key:'3', value:'SmartZ'},
     {key:'4', value:'EKH'},
     ]
-
+ */
   const expenseTypes = [
     {key:'0', value:'Travelling'},
     {key:'1', value:'Monthly'},
@@ -201,16 +199,27 @@ export default function AddClaimScreen({ navigation }) {
 
 
   function handleAddClaim() {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    console.log(claim)
     switch(isExistingClaim) {
       case 'Yes':
-        //handleJoin()
+        //handleJoin() using form id
         break;
       case 'No':
-        if (newClaim.expenseType != '' && newClaim.company != null) {
-          (newClaim.expenseType == 'Travelling') ? (
-            navigation.navigate("TravellingExpenseForm", {props: newClaim })
+        fetch('http://localhost:5000/addClaim', {
+          method: 'POST',
+          headers: header,
+          body: JSON.stringify(claim)})
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+      	});
+
+        if (claim.expenseType != '') {
+          (claim.expenseType == 'Travelling') ? (
+            navigation.navigate("TravellingExpenseForm", {props: claim })
           ) : (
-            navigation.navigate("MonthlyExpenseForm", {props: newClaim })
+            navigation.navigate("MonthlyExpenseForm", {props: claim })
           )
         }
         else {
@@ -222,6 +231,10 @@ export default function AddClaimScreen({ navigation }) {
     }
 
   }
+
+  
+  const [isExistingClaim, setIsExistingClaim] = useState('');
+  const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId:null, expenseType:null});
 
 
   return (
@@ -280,7 +293,7 @@ export default function AddClaimScreen({ navigation }) {
           <Text style={styles.normalBoldText}>Form ID</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. 1827463" 
-            onChangeText={(formId) => setNewClaim({...newClaim, formId:formId})} 
+            onChangeText={(formId) => setClaim({...claim, formId:formId})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -295,24 +308,8 @@ export default function AddClaimScreen({ navigation }) {
                   dropdownTextStyles={styles.dropdownTextStyles}
                   boxStyles={styles.boxStyles}
                   inputStyles={styles.inputStyles}  
-                  setSelected={(val) => setNewClaim({...newClaim, expenseType:val})}
+                  setSelected={(val) => setClaim({...claim, expenseType:val})}
                   data={expenseTypes} 
-                  save="value"
-                  showsVerticalScrollIndicator = {false}
-                  search = {false}
-              />  
-            </View>
-    
-            <View style={[styles.inputContainer,{zIndex:1}]}>
-            <Text style={styles.normalBoldText}>Company</Text>
-            <SelectList
-                  dropdownStyles={styles.dropdownStyles}
-                  dropdownItemStyles={styles.dropdownItemStyles}
-                  dropdownTextStyles={styles.dropdownTextStyles}
-                  boxStyles={styles.boxStyles}
-                  inputStyles={styles.inputStyles}  
-                  setSelected={(val) => setNewClaim({...newClaim, company:val})} 
-                  data={companies} 
                   save="value"
                   showsVerticalScrollIndicator = {false}
                   search = {false}

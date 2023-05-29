@@ -2,7 +2,6 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, S
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
 
 
 
@@ -11,16 +10,16 @@ export default function TravellingExpenseForm({ navigation, route }) {
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [newClaim, setNewClaim] = useState({country:'', exchangeRate:'', dateFrom:'', dateTo:''});
-  const [company, setCompany] = useState(route.params.props.company)
 
 
+  /*
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
     {key:'2', value:'PCL'},
     {key:'3', value:'SmartZ'},
     {key:'4', value:'EKH'},
-    ]
+    ] */
 
   const expenseTypes = [
     {key:'0', value:'Travelling'},
@@ -219,11 +218,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
 
       <View style={styles.content}>
       <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}>
-        <View style={{width:"100%", alignItems:"center"}}>
-            <Text style={{fontSize:'18px'}}>
-                ({company})
-            </Text>
-        </View>
+      
 
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
