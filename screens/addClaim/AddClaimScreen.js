@@ -7,9 +7,6 @@ export default function AddClaimScreen({ navigation }) {
 
         
 
-  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
-
-
 
   const styles = StyleSheet.create({
     page: {
@@ -37,22 +34,13 @@ export default function AddClaimScreen({ navigation }) {
 
   });
 
-  const { logoutUser } = useAuth();
-
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
 
         <Text style={styles.text}>Add Claim</Text>
-        <TouchableOpacity onPress = {() => handleLogOut()}>Log Out</TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()}>Go Back</TouchableOpacity>
 
       </View>
     </View>
