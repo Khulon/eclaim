@@ -1,13 +1,12 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React, { useState} from "react";
 import useAuth from '../../hooks/useAuth';
-
+import ConfirmationButton from '../../components/ConfirmationButton';
 
 export default function ProfileScreen({ navigation }) {
 
         
 
-  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
 
 
 
@@ -52,7 +51,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.pageLogin}>
 
         <Text style={styles.text}>Profile Screen</Text>
-        <TouchableOpacity onPress = {() => handleLogOut()}>Log Out</TouchableOpacity>
+        <TouchableOpacity onPress = {() => ConfirmationButton('Alert!', 'Are you sure you want to log out?', ()=>handleLogOut())}>Log Out</TouchableOpacity>
 
       </View>
     </View>

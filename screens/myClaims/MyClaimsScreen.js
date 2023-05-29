@@ -37,22 +37,12 @@ export default function MyClaimsScreen({ navigation }) {
 
   });
 
-  const { logoutUser } = useAuth();
-
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
 
         <Text style={styles.text}>MyClaims Screen</Text>
-        <TouchableOpacity onPress = {() => handleLogOut()}>Log Out</TouchableOpacity>
 
       </View>
     </View>
