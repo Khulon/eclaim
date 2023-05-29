@@ -220,7 +220,6 @@ export default function MonthlyExpenseForm({ navigation}) {
 
       <View style={styles.content}>
       <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}>
-        
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>

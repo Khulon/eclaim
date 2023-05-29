@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list';
+import ConfirmationButton from '../../components/ConfirmationButton';
     
 
 export default function AdminEditUserScreen({ navigation, route }) {        
@@ -411,13 +412,13 @@ const departments = [
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(DeleteButtonHover)} onMouseLeave={() => MovePosAnimation(DeleteButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: DeleteButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} onPress = {() => deleteUser(userDetails)}> Delete </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress = {() => ConfirmationButton('Are you sure you want to delete?', 'This action cannot be undone', () => deleteUser(userDetails))}> Delete </TouchableOpacity>
         </Animated.View>
         </View>
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity onPress={()=> updateUser(userDetails)} style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
+        <TouchableOpacity onPress={() => ConfirmationButton('Confirm user edit?', 'User details will be updated', ()=> updateUser(userDetails))} style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>

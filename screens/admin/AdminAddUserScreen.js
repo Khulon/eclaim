@@ -223,7 +223,7 @@ export default function AdminAddUserScreen({ navigation }) {
   }, [userDepartments]);
 
 
-  const addUser = () => {
+  function addUser (){
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     console.log(userDepartments);
     console.log(newUser);
@@ -387,13 +387,13 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.defaultButton} > Cancel </TouchableOpacity>
+        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to leave?', 'User information will not be saved', () => navigation.goBack())} style={styles.defaultButton} > Cancel </TouchableOpacity>
         </Animated.View>
         </View>
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {addUser}> Save </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Confirm user creation?', 'User details can still be updated once created', () => addUser())}> Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
