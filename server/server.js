@@ -54,6 +54,7 @@ app.post('/register',(req, res) => {
     .then((result) => {
       res.json({user: email, userType: "Normal", message: "Account Created!"});})
     .catch((err) => {
+      console.log(err)
       res.json({message: "Error!"});
     });
     
@@ -85,6 +86,72 @@ app.post('/admin/editUser',(req, res) => {
   });
 
 });
+
+app.post('/admin/editUser/save',(req, res) => {
+  let name = req.body.name;
+  let oldEmail = req.body.oldEmail;
+  let newEmail = req.body.newEmail;
+  let departments = req.body.department;
+  let company = req.body.company;
+  let isSupervisor = req.body.supervisor;
+  let isApprover = req.body.approver;
+  let isProcessor = req.body.processor;
+
+  var request = new sql.Request();
+
+  request.query("UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
+  + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'",
+   function (err) {
+      if (err) console.log(err)
+
+      const newDpts = [];
+      var search = "(";
+      
+
+      for(var i = 0; i < departments.length; i++) {
+        if(i == departments.length - 1) {
+          search += "'"+departments[i]+"')";
+        } else {
+          search += "'"+departments[i]+"',";
+        }
+      }
+
+      var request = new sql.Request();
+      departments.forEach((dpt) => { newDpts.push(dpt)});
+
+      request.query("DELETE FROM BelongsToDepartments WHERE email = '"+newEmail+"'",
+      function (err) {
+        if (err) console.log(err)
+      });
+      
+        
+      for (var i = 0; i < newDpts.length; i++) {
+        request.query("INSERT INTO BelongsToDepartments VALUES('"+newEmail+"','"+newDpts[i]+"')",
+        function (err) {
+          if (err) console.log(err)
+        });
+      }
+
+      res.send({message: "User Updated!"});
+
+  });
+
+});
+
+
+app.post('/admin/deleteUser',(req, res) => {
+  let email = req.body.oldEmail;
+  var request = new sql.Request();
+
+  request.query("DELETE FROM Employees WHERE email = '"+email+"'",
+   function (err) {
+      if (err) console.log(err)
+
+      res.send({message: "User Deleted!"});
+  });
+
+});
+
 
 app.post('/admin/addUser',(req, res) => {
   let name = req.body.name;

@@ -1,8 +1,8 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
+import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list';
     
 
 export default function AdminEditUserScreen({ navigation, route }) {        
@@ -11,7 +11,6 @@ export default function AdminEditUserScreen({ navigation, route }) {
   const DeleteButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
   
-  const [selected, setSelected] = React.useState("");
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
@@ -207,8 +206,6 @@ const departments = [
 
   });
 
-  console.log(route.params.props.name)
-  console.log(route.params.dpts[0])
 
   var dpts = '';
   for (let i = 0; i < route.params.dpts.length; i++) {
@@ -220,13 +217,51 @@ const departments = [
     }
   }
 
-  const [name, setName] = useState(route.params.props.name);
-  const [company, setCompany] = useState(route.params.props.company);
-  const [companyEmail, setCompanyEmail] = useState(route.params.props.email);
-  const [department, setDepartment] = useState(dpts);
-  const [isSupervisor, setIsSupervisor] = useState(route.params.props.supervisor);
-  const [isApprover, setIsApprover] = useState(route.params.props.approver);
-  const [isProcessor, setIsProcessor] = useState(route.params.props.processor);
+  function deleteUser(userDetails) {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://localhost:5000/admin/deleteUser', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify(userDetails)})
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+      	});
+
+      window.location.reload(false);
+      
+  }
+
+  
+
+
+  
+  function updateUser(userDetails) {
+    console.log(userDetails)
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://localhost:5000/admin/editUser/save', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify(userDetails)})
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+      	});
+
+      window.location.reload(false);
+      
+  }
+
+  const [userDepartments, setUserDepartments] = React.useState([]);
+  const [userDetails, setUserDetails] = useState({name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
+     company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
+      approver: route.params.props.approver, processor: route.params.props.processor,
+       department: null});
+
+  useEffect(() => {
+    setUserDetails({...userDetails, department: userDepartments});
+  }, [userDepartments]);
+
 
   return (
     <View style={styles.page}>
@@ -265,8 +300,8 @@ const departments = [
           <Text style={styles.normalBoldText}>Name</Text>
           <TextInput style={styles.textInput}
             placeholder="Eg. Paul Lim" 
-            value={name} 
-            onChangeText={(name) => setName(name)} 
+            value={userDetails.name} 
+            onChangeText={(name) => setUserDetails({...userDetails, name: name})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -279,9 +314,8 @@ const departments = [
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles}  
-                setSelected={(val) => setSelected(val)} 
-                onSelect={() => setCompany(selected)}
-                placeholder={company}
+                setSelected={(company) => setUserDetails({...userDetails, company: company})}
+                placeholder={userDetails.company}
                 data={companies} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
@@ -296,9 +330,8 @@ const departments = [
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
                 inputStyles={[styles.inputStyles]}
-                setSelected={(val) => setSelected(val)}
-                onSelect={() => setDepartment(selected)}
-                placeholder={department}
+                setSelected={(department) => setUserDepartments(department)}
+                placeholder={dpts}
                 data={departments}
                 save="value"
                 showsVerticalScrollIndicator = {true}
@@ -308,8 +341,8 @@ const departments = [
           <Text style={styles.normalBoldText}>Company Email</Text>
           <TextInput style={styles.textInput}
             placeholder="example@gmail.com" 
-            value={companyEmail} 
-            onChangeText={(companyEmail) => setCompanyEmail(companyEmail)}
+            value={userDetails.oldEmail} 
+            onChangeText={(email) => setUserDetails({...userDetails, newEmail: email})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -322,9 +355,8 @@ const departments = [
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles}  
-                setSelected={(val) => setSelected(val)} 
-                onSelect={() => setIsSupervisor(selected)}
-                placeholder={isSupervisor}
+                setSelected={(val) => setUserDetails({...userDetails, supervisor: val})}
+                placeholder={userDetails.supervisor}
                 data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
@@ -340,9 +372,8 @@ const departments = [
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles}  
-                setSelected={(val) => setSelected(val)} 
-                onSelect={() => setIsApprover(selected)}
-                placeholder={isApprover}
+                setSelected={(val) => setUserDetails({...userDetails, approver: val})} 
+                placeholder={userDetails.approver}
                 data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
@@ -357,9 +388,8 @@ const departments = [
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles}  
-                setSelected={(val) => setSelected(val)}
-                onSelect={() => setIsProcessor(selected)}
-                placeholder={isProcessor} 
+                setSelected={(val) => setUserDetails({...userDetails, processor: val})}
+                placeholder={userDetails.processor} 
                 data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
@@ -381,13 +411,13 @@ const departments = [
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(DeleteButtonHover)} onMouseLeave={() => MovePosAnimation(DeleteButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: DeleteButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} > Delete </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress = {() => deleteUser(userDetails)}> Delete </TouchableOpacity>
         </Animated.View>
         </View>
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity onPress={()=> console.log(department)} style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
+        <TouchableOpacity onPress={()=> updateUser(userDetails)} style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
