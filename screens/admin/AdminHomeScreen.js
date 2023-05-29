@@ -186,7 +186,7 @@ export default function AdminHomeScreen({ navigation }) {
   });
 
 
-  const [userDepartments, setUserDepartments] = useState(null);
+  const [userDepartments, setUserDepartments] = useState([]);
 
   useEffect(() => {
     for (var i = 0; i < data.length; i++) {

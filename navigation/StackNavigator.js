@@ -21,7 +21,7 @@ export default function StackNavigator() {
 
     return (
         <Stack.Navigator>
-        {session == null ? (
+        {session != null ? (
             sessionType == 'Admin' ? (
                 <Stack.Screen name="AdminStack" component={AdminStack} options={{headerShown: false}}/> 
             ):(
