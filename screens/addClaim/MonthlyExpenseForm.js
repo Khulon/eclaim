@@ -220,7 +220,7 @@ export default function MonthlyExpenseForm({ navigation, route }) {
       <View style={styles.content}>
       <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}>
         <View style={{width:"100%", alignItems:"center"}}>
-            <Text>
+            <Text style={{fontSize:'18px'}}>
                 ({company})
             </Text>
         </View>

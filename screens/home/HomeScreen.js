@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
 import React, { useState} from "react";
 import useAuth from '../../hooks/useAuth';
 
@@ -6,9 +6,6 @@ import useAuth from '../../hooks/useAuth';
 export default function HomeScreen({ navigation }) {
 
         
-
-  const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
-
 
 
   const styles = StyleSheet.create({
@@ -37,22 +34,13 @@ export default function HomeScreen({ navigation }) {
 
   });
 
-  const { logoutUser } = useAuth();
-
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
 
         <Text style={styles.text}>Home Screen</Text>
-        <TouchableOpacity onPress = {() => handleLogOut()}>Log Out</TouchableOpacity>
+
 
       </View>
     </View>
