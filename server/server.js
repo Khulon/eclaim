@@ -73,6 +73,19 @@ app.get('/admin',(req, res) => {
 
 });
 
+app.post('/admin/editUser',(req, res) => {
+  let email = req.body.email;
+  var request = new sql.Request();
+
+  request.query("SELECT department FROM BelongsToDepartments WHERE email = '"+email+"'",
+   function (err, rows) {
+      if (err) console.log(err)
+
+      res.send(rows.recordset);
+  });
+
+});
+
 app.post('/admin/addUser',(req, res) => {
   let name = req.body.name;
   let email = req.body.email;

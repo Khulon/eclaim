@@ -4,6 +4,7 @@ import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAn
 import { Ionicons } from "react-native-vector-icons";
 import useAuth from '../../hooks/useAuth';
 import filter from "lodash.filter"
+import { set } from 'lodash';
 
 export default function AdminHomeScreen({ navigation }) {        
   const [data, setData] = useState("");
@@ -31,7 +32,8 @@ export default function AdminHomeScreen({ navigation }) {
     }
 
   } 
-
+  
+  /*
   const FULLDATA = [
     {
       email: 'karenlim@gmail.com',
@@ -54,11 +56,12 @@ export default function AdminHomeScreen({ navigation }) {
       processor: '1',
     },
   ]; 
+  */
   
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [selectedId, setSelectedId] = useState();
+  const [selectedId, setSelectedId] = useState({email: ''});
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -182,17 +185,31 @@ export default function AdminHomeScreen({ navigation }) {
 
   });
 
-  //find the index at which the email is located in the json file
-  function handleEditUser (selectedId) {
-    setIsLoading(true)
+
+  const [userDepartments, setUserDepartments] = useState(null);
+
+  useEffect(() => {
     for (var i = 0; i < data.length; i++) {
-      if (data[i].email == selectedId) { 
-        navigation.navigate("AdminEditUserScreen", { props: data[i] })
-        setIsLoading(false)
-        return
+      if (data[i].email == selectedId.email) {
+        console.log(userDepartments)
+        navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
       }
     }
-    setIsLoading(false)
+
+  }, [userDepartments]);
+
+  //find the index at which the email is located in the json file
+  async function handleEditUser (selectedId) {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    await fetch('http://localhost:5000/admin/editUser', {
+      method: 'POST', 
+      headers: header,
+      body: JSON.stringify(selectedId)})
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      setUserDepartments(data);
+    });
   }
 
   function handleSearch (search) {
@@ -232,8 +249,8 @@ export default function AdminHomeScreen({ navigation }) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.email === selectedId ? '#EEEEEE' : 'white';
-    const transform = item.email === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
+    const backgroundColor = item.email === selectedId.email ? '#EEEEEE' : 'white';
+    const transform = item.email === selectedId.email ? [{translateX: 2 }] : [{translateX: 0 }];
     
     return (
       <Item 
@@ -242,8 +259,8 @@ export default function AdminHomeScreen({ navigation }) {
         approver = {null}
         processor = {item.company_prefix == item.company ? item.processor_email : 'None'}
 
-        onMouseEnter={() => setSelectedId(item.email)} 
-        onMouseLeave={() => setSelectedId(null)}
+        onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
+        onMouseLeave={() => setSelectedId({...selectedId, email: null})}
 
         onPress={() => console.log(handleEditUser(selectedId))}
         backgroundColor={backgroundColor}
@@ -305,7 +322,7 @@ export default function AdminHomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         data={data}
         renderItem={renderItem}
-        keyExtractor={item => item.email}
+        keyExtractor={item => item.id}
       />
       </View>
 
