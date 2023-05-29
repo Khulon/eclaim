@@ -3,17 +3,15 @@ import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
-import MonthlyExpenseForm from './MonthlyExpenseForm';
 
 
 
-export default function AddClaimScreen({ navigation }) {        
+export default function TravellingExpenseForm({ navigation, route }) {        
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [isExistingClaim, setIsExistingClaim] = useState('');
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [newClaim, setNewClaim] = useState({formId:'', expenseType:'', 
-  company:null});
+  const [newClaim, setNewClaim] = useState({country:'', exchangeRate:'', dateFrom:'', dateTo:''});
+  const [company, setCompany] = useState(route.params.props.company)
 
 
   const companies = [
@@ -200,29 +198,6 @@ export default function AddClaimScreen({ navigation }) {
   });
 
 
-  function handleAddClaim() {
-    switch(isExistingClaim) {
-      case 'Yes':
-        //handleJoin()
-        break;
-      case 'No':
-        if (newClaim.expenseType != '' && newClaim.company != null) {
-          (newClaim.expenseType == 'Travelling') ? (
-            navigation.navigate("TravellingExpenseForm", {props: newClaim })
-          ) : (
-            navigation.navigate("MonthlyExpenseForm", {props: newClaim })
-          )
-        }
-        else {
-          alert("Please fill in all relevant fields!")
-        }
-        break;
-      default:
-        alert("Please fill in all relevant fields!")
-    }
-
-  }
-
 
   return (
     <View style={styles.page}>
@@ -245,12 +220,18 @@ export default function AddClaimScreen({ navigation }) {
       <View style={styles.content}>
       <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}>
         <View style={{width:"100%", alignItems:"center"}}>
+            <Text style={{fontSize:'18px'}}>
+                ({company})
+            </Text>
+        </View>
+
+        <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>Add</Text>
+          <Text style={styles.bigText}>Travelling</Text>
         </View>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>Claim</Text>
+          <Text style={styles.bigText}>Expense</Text>
         </View>
         </View>
         </View>
@@ -258,68 +239,47 @@ export default function AddClaimScreen({ navigation }) {
 
       <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
       
-        <View style={[styles.inputContainer,{zIndex:3}]}>
-        <Text style={styles.normalBoldText}>Join Existing?</Text>
-        <SelectList
-              dropdownStyles={styles.dropdownStyles}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              dropdownTextStyles={styles.dropdownTextStyles}
-              boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles}  
-              setSelected={(val) => setIsExistingClaim(val)} 
-              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
-              save="value"
-              showsVerticalScrollIndicator = {false}
-              search = {false}
-          />  
-        </View>
-        {isExistingClaim == '' ? (
-          <Text></Text>
-        ):(isExistingClaim == 'Yes') ? (
-          <View style={[styles.inputContainer, {}]}>
-          <Text style={styles.normalBoldText}>Form ID</Text>
+      <View style={[styles.inputContainer, {}]}>
+          <Text style={styles.normalBoldText}>Country</Text>
           <TextInput style={styles.textInput}
-            placeholder="eg. 1827463" 
-            onChangeText={(formId) => setNewClaim({...newClaim, formId:formId})} 
+            placeholder="eg. Spain" 
+            onChangeText={(val) => setNewClaim({...newClaim, country:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
-          </View>
-        ):(
-          <View style={{width:'100%', alignItems:'center'}}>
-          <View style={[styles.inputContainer,{zIndex:2}]}>
-            <Text style={styles.normalBoldText}>Expense Form Type</Text>
-            <SelectList
-                  dropdownStyles={styles.dropdownStyles}
-                  dropdownItemStyles={styles.dropdownItemStyles}
-                  dropdownTextStyles={styles.dropdownTextStyles}
-                  boxStyles={styles.boxStyles}
-                  inputStyles={styles.inputStyles}  
-                  setSelected={(val) => setNewClaim({...newClaim, expenseType:val})}
-                  data={expenseTypes} 
-                  save="value"
-                  showsVerticalScrollIndicator = {false}
-                  search = {false}
-              />  
-            </View>
+      </View>
+
+      <View style={[styles.inputContainer, {}]}>
+          <Text style={styles.normalBoldText}>Exchange Rate (1SGD = ?)</Text>
+          <TextInput style={styles.textInput}
+            placeholder="eg. 0.74USD" 
+            onChangeText={(val) => setNewClaim({...newClaim, exchangeRate:val})} 
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+      </View>
+
+      <View style={[styles.inputContainer, {}]}>
+          <Text style={styles.normalBoldText}>Date - From</Text>
+          <TextInput style={styles.textInput}
+            placeholder="dd/mm/yy" 
+            onChangeText={(val) => setNewClaim({...newClaim, dateFrom:val})} 
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+      </View>
+      <View style={[styles.inputContainer, {}]}>
+          <Text style={styles.normalBoldText}>Date - To</Text>
+          <TextInput style={styles.textInput}
+            placeholder="dd/mm/yy" 
+            onChangeText={(val) => setNewClaim({...newClaim, dateTo:val})} 
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+      </View>
+      
+
     
-            <View style={[styles.inputContainer,{zIndex:1}]}>
-            <Text style={styles.normalBoldText}>Company</Text>
-            <SelectList
-                  dropdownStyles={styles.dropdownStyles}
-                  dropdownItemStyles={styles.dropdownItemStyles}
-                  dropdownTextStyles={styles.dropdownTextStyles}
-                  boxStyles={styles.boxStyles}
-                  inputStyles={styles.inputStyles}  
-                  setSelected={(val) => setNewClaim({...newClaim, company:val})} 
-                  data={companies} 
-                  save="value"
-                  showsVerticalScrollIndicator = {false}
-                  search = {false}
-              />  
-            </View>
-            </View>
-        )}
 
       </View>
 
@@ -334,7 +294,7 @@ export default function AddClaimScreen({ navigation }) {
         <View style={{width:"100%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => handleAddClaim()} style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => console.log(newClaim)} style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
         </View>
 
