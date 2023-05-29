@@ -2,18 +2,19 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, S
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
 
 
 
-export default function MonthlyExpenseForm({ navigation, route }) {        
+
+export default function MonthlyExpenseForm({ navigation}) {        
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [newClaim, setNewClaim] = useState({payPeriodFrom:'', payPeriodTo:'', costCenter:''});
-  const [company, setCompany] = useState(route.params.props.company)
 
 
+
+  /*
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
@@ -21,7 +22,7 @@ export default function MonthlyExpenseForm({ navigation, route }) {
     {key:'3', value:'SmartZ'},
     {key:'4', value:'EKH'},
     ]
-
+*/
   const expenseTypes = [
     {key:'0', value:'Travelling'},
     {key:'1', value:'Monthly'},
@@ -219,11 +220,7 @@ export default function MonthlyExpenseForm({ navigation, route }) {
 
       <View style={styles.content}>
       <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}>
-        <View style={{width:"100%", alignItems:"center"}}>
-            <Text>
-                ({company})
-            </Text>
-        </View>
+        
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>
