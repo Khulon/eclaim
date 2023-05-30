@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
-import React, { useState} from "react";
+import React, { useEffect, useState} from "react";
 import useAuth from '../../hooks/useAuth';
-
+import BottomNavigator from '../../components/BottomNavigation';
 
 export default function HomeScreen({ navigation }) {
-
-        
-
+  
+  window.localStorage.setItem('stackScreen', 'Home');
 
   const styles = StyleSheet.create({
     page: {
@@ -18,13 +17,17 @@ export default function HomeScreen({ navigation }) {
       justifyContent: 'center',
       fontFamily: "Arial",
     },
-    pageLogin: {
+    pageHome: {
       width: "90%",
-      height: "90%",
+      flexGrow: 1,
       backgroundColor: '#fff',
       alignItems: 'center',
       flexDirection: "column",
-      
+    },
+    bottomNavigation: {
+      width:'100%',
+      height: '70px'
+
     },
     text: {
       fontSize: "17px",
@@ -37,11 +40,12 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.page}>
-      <View style={styles.pageLogin}>
+      <View style={styles.pageHome}>
 
         <Text style={styles.text}>Home Screen</Text>
-
-
+      </View>
+      <View style={styles.bottomNavigation}>
+      <BottomNavigator navigation={navigation} />
       </View>
     </View>
     

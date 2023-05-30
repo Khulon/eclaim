@@ -7,8 +7,7 @@ import ManagementStack from './ManagementStack';
 import AddClaimStack from './AddClaimStack';
 import MyClaimsStack from './MyClaimsStack';
 import ProfileStack from './ProfileStack';
-import BottomTabNavigator from './BottomTabNavigator';
-
+import StackFilter from './StackFilter';
 
 
 const Stack = createStackNavigator();
@@ -26,12 +25,12 @@ export default function StackNavigator() {
                 <Stack.Screen name="AdminStack" component={AdminStack} options={{headerShown: false}}/> 
             ):(
                 <Stack.Group screenOptions={{ headerShown: false, presentation: 'fullScreenModal'}}>
-                    <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
+                    <Stack.Screen name="StackFilter" component={StackFilter}/>
                     <Stack.Screen name="HomeStack" component={HomeStack}/> 
                     <Stack.Screen name="ManagementStack" component={ManagementStack}/> 
                     <Stack.Screen name="AddClaimStack" component={AddClaimStack}/> 
                     <Stack.Screen name="MyClaimsStack" component={MyClaimsStack}/> 
-                    <Stack.Screen name="ProfileStack" component={ProfileStack}/> 
+                    <Stack.Screen name="ProfileStack" component={ProfileStack}/>
                 </Stack.Group>
             )
         ):(
@@ -39,9 +38,5 @@ export default function StackNavigator() {
         )}
         </Stack.Navigator>
     );
+    
 };
-
-
-
-
-
