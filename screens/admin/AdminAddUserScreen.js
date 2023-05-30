@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
+import ConfirmationButton from '../../components/ConfirmationButton';
 
 
 
@@ -215,8 +216,8 @@ export default function AdminAddUserScreen({ navigation }) {
 
   
   const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:'', email:'', 
-  company:null, department:null, isSupervisor: '', isApprover:'', isProcessor: ''});
+  const [newUser, setNewUser] = useState({name:null, email:null, 
+  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
 
   useEffect(() => {
     setNewUser({...newUser, department: userDepartments});
@@ -237,6 +238,8 @@ export default function AdminAddUserScreen({ navigation }) {
         if(resp.message == 'User Added!') {
           alert('User Added!');
           window.location.reload(false);
+        } else {
+          alert('Failed to add user!');
         }
       });
   }; 

@@ -112,8 +112,23 @@ export default function RegistrationScreen({ navigation }) {
     });
 
   const {createUser} = useAuth();
-  const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: '', confirmPassword: ''})
+  const [loginDetails, setLoginDetails] = useState({companyEmail: null, password: null, confirmPassword: null})
 
+
+  function register() {
+    try{
+      
+      if(loginDetails.password != loginDetails.confirmPassword) {
+        alert("Passwords do not match");
+        throw new Error("Passwords do not match");
+        
+      } 
+      createUser(loginDetails);
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
   
 
   return (
@@ -175,7 +190,7 @@ export default function RegistrationScreen({ navigation }) {
 
         <View style={{height: '15%', width: '100%', justifyContent:'center', alignItems: 'center'}}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(registerButtonHover)} onMouseLeave={() => MovePosAnimation(registerButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: registerButtonHover }]}}>
-        <TouchableOpacity style={styles.defaultButton} onPress={() => createUser(loginDetails)}> Register </TouchableOpacity>
+        <TouchableOpacity style={styles.defaultButton} onPress={() => register()}> Register </TouchableOpacity>
         </Animated.View>
         </View>
       </View>

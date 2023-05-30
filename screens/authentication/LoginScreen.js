@@ -112,7 +112,7 @@ export default function LoginScreen({ navigation}) {
     });
 
     const { loginUser } = useAuth();
-    const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: ''})
+    const [loginDetails, setLoginDetails] = useState({companyEmail: null, password: null})
 
     async function handleLogin() {
       try {
