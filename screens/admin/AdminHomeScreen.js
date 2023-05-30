@@ -4,11 +4,10 @@ import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAn
 import { Ionicons } from "react-native-vector-icons";
 import useAuth from '../../hooks/useAuth';
 import filter from "lodash.filter"
-import { set } from 'lodash';
 
 export default function AdminHomeScreen({ navigation }) {        
-  const [data, setData] = useState("");
-  const [fullData, setFullData] = useState("");
+  const [data, setData] = useState(null);
+  const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
 
   useEffect(() => {
@@ -189,16 +188,18 @@ export default function AdminHomeScreen({ navigation }) {
   const [userDepartments, setUserDepartments] = useState([]);
 
   useEffect(() => {
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].email == selectedId.email) {
-        console.log(userDepartments)
-        navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
+    if(data != null){
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].email == selectedId.email) {
+          console.log(userDepartments)
+          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
+        }
       }
     }
 
   }, [userDepartments]);
 
-  //find the index at which the email is located in the json file
+
   async function handleEditUser (selectedId) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     await fetch('http://localhost:5000/admin/editUser', {
@@ -209,7 +210,7 @@ export default function AdminHomeScreen({ navigation }) {
     .then((data) => {
       console.log(data);
       setUserDepartments(data);
-    });
+    })
   }
 
   function handleSearch (search) {
@@ -256,8 +257,8 @@ export default function AdminHomeScreen({ navigation }) {
       <Item 
         name={item.name} 
         email = {item.email}
-        approver = {null}
-        processor = {item.company_prefix == item.company ? item.processor_email : 'None'}
+        approver = {item.approver_name != null ? item.approver_name : 'None'}
+        processor = {item.processor_email != null ? item.processor_email : 'None'}
 
         onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
         onMouseLeave={() => setSelectedId({...selectedId, email: null})}
@@ -330,7 +331,7 @@ export default function AdminHomeScreen({ navigation }) {
 
       <View style={styles.bottomCard}>
         <Text style={{paddingTop:"15px"}}>Total Employees:</Text>
-        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{fullData.length}</Text>
+        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{fullData != null ? fullData.length : 0}</Text>
         
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
         <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen")}  style={styles.defaultButton} > Add </TouchableOpacity>

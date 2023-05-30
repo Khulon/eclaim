@@ -1,4 +1,4 @@
-import React, { useRef, useState, createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 
 const AuthContext = createContext({});
 
@@ -16,9 +16,12 @@ export const AuthProvider = ({children}) => {
         if(resp.message == 'Login Successful!') {
           window.localStorage.setItem('sessionType', resp.userType);
           window.localStorage.setItem('session', resp.email);
+          window.location.reload(false);
+        } else {
+          alert('Login Failed!');
         }
       });
-      window.location.reload(false);
+      
   }; 
 
   async function logoutUser () {
@@ -40,7 +43,7 @@ export const AuthProvider = ({children}) => {
           alert('Account Created!');
         }
         else {
-          alert('Account Creation Failed!');
+          alert('Account creation failed!');
         }
       });
       
