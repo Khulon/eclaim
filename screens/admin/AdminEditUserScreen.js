@@ -4,6 +4,7 @@ import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAn
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list';
 import ConfirmationButton from '../../components/ConfirmationButton';
+import MultiSelect from 'react-native-multiple-select';
     
 
 export default function AdminEditUserScreen({ navigation, route }) {        
@@ -238,6 +239,7 @@ const departments = [
 
   
   function updateUser(userDetails) {
+    console.log(userDepartments)
     console.log(userDetails)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     fetch('http://localhost:5000/admin/editUser/save', {
@@ -249,11 +251,17 @@ const departments = [
           console.log(data);
       	});
 
-      window.location.reload(false);
+      //window.location.reload(false);
       
   }
 
-  const [userDepartments, setUserDepartments] = React.useState([]);
+  const fetchedDepartments = [];
+
+  for(var i in route.params.dpts) {
+    fetchedDepartments.push(route.params.dpts[i].department);
+  }
+
+  const [userDepartments, setUserDepartments] = React.useState(fetchedDepartments);
   const [userDetails, setUserDetails] = useState({name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
      company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
       approver: route.params.props.approver, processor: route.params.props.processor,
@@ -325,18 +333,27 @@ const departments = [
           </View>
           <View style={[styles.inputContainer,{zIndex:4}]}>
           <Text style={styles.normalBoldText}>Department</Text>
-          <MultipleSelectList
-                dropdownStyles={[styles.dropdownStyles, {top:45}]}
-                dropdownItemStyles={styles.dropdownItemStyles}
-                dropdownTextStyles={styles.dropdownTextStyles}
-                boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
-                inputStyles={[styles.inputStyles]}
-                setSelected={(department) => setUserDepartments(department)}
-                placeholder={dpts}
-                data={departments}
-                save="value"
-                showsVerticalScrollIndicator = {true}
-            />  
+          <MultiSelect
+              hideTags
+              items={departments}
+              uniqueKey="value"
+              onSelectedItemsChange={(department) => setUserDepartments(department)}
+              selectedItems= {userDepartments}
+              selectText="Pick Items"
+              searchInputPlaceholderText="Search Items..."
+              onChangeInput={ (text)=> console.log(text)}
+              altFontFamily="ProximaNova-Light"
+              tagRemoveIconColor="#CCC"
+              tagBorderColor="#CCC"
+              tagTextColor="#CCC"
+              selectedItemTextColor="#CCC"
+              selectedItemIconColor="#CCC"
+              itemTextColor="#000"
+              displayKey="value"
+              searchInputStyle={{ color: '#CCC' }}
+              submitButtonColor="#CCC"
+              submitButtonText="Submit"
+        />
           </View>
           <View style={styles.inputContainer}>
           <Text style={styles.normalBoldText}>Company Email</Text>
