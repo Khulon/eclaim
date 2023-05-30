@@ -2,7 +2,9 @@ import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, S
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
+import { SelectList } from 'react-native-dropdown-select-list'
+import ConfirmationButton from '../../components/ConfirmationButton';
+import MultiSelect from 'react-native-multiple-select';
 
 
 
@@ -215,8 +217,8 @@ export default function AdminAddUserScreen({ navigation }) {
 
   
   const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:'', email:'', 
-  company:null, department:null, isSupervisor: '', isApprover:'', isProcessor: ''});
+  const [newUser, setNewUser] = useState({name:null, email:null, 
+  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
 
   useEffect(() => {
     setNewUser({...newUser, department: userDepartments});
@@ -237,6 +239,8 @@ export default function AdminAddUserScreen({ navigation }) {
         if(resp.message == 'User Added!') {
           alert('User Added!');
           window.location.reload(false);
+        } else {
+          alert('Failed to add user!');
         }
       });
   }; 
@@ -303,19 +307,27 @@ export default function AdminAddUserScreen({ navigation }) {
         </View>
         <View style={[styles.inputContainer,{zIndex:4}]}>
         <Text style={styles.normalBoldText}>Department(s)</Text>
-        <MultipleSelectList
-              dropdownStyles={[styles.dropdownStyles, {top:45}]}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              dropdownTextStyles={styles.dropdownTextStyles}
-              boxStyles={[styles.boxStyles,{flexDirection:'column'}]}
-              inputStyles={[styles.inputStyles]}  
-              setSelected={(val) => {
-                setDepartments(val);
-                }} 
-              data={departments} 
-              save="value"
-              showsVerticalScrollIndicator = {true}
-          />  
+        <MultiSelect
+              hideTags
+              items={departments}
+              uniqueKey="value"
+              onSelectedItemsChange={(department) => setDepartments(department)}
+              selectedItems= {userDepartments}
+              selectText="Select department(s)"
+              searchInputPlaceholderText="Search Items..."
+              onChangeInput={ (text)=> console.log(text)}
+              altFontFamily="ProximaNova-Light"
+              tagRemoveIconColor="#CCC"
+              tagBorderColor="#CCC"
+              tagTextColor="#CCC"
+              selectedItemTextColor="#CCC"
+              selectedItemIconColor="#CCC"
+              itemTextColor="#000"
+              displayKey="value"
+              searchInputStyle={{ color: '#CCC' }}
+              submitButtonColor="#CCC"
+              submitButtonText="Submit"
+        />
         </View>
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Company Email</Text>

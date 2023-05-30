@@ -262,16 +262,12 @@ export default function MonthlyExpenseForm({ navigation}) {
           />
         </View>
 
-        
-
       </View>
 
 
       </ScrollView>
     
       </View>
-
-
 
       <View style={styles.bottomCard}>
         <View style={{width:"100%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>

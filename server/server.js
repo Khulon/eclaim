@@ -22,10 +22,14 @@ var config = {
 
 };
 
+
+//Connect to database
 sql.connect(config, function (err) {
     if (err) console.log(err);
     console.log("Connected!");
 });
+
+
 
 app.get('/', function (req, res) {
     // create Request object
@@ -41,10 +45,15 @@ app.get('/', function (req, res) {
     });
 });
 
+
+
 var server = app.listen(5000, function () {
     console.log('Server is running on port ' + server.address().port + '...');
 });
 
+
+
+//User registers an account
 app.post('/register',(req, res) => {
     let email = req.body.companyEmail;
     let password = req.body.password;
@@ -60,11 +69,16 @@ app.post('/register',(req, res) => {
     
   });
 
+
+
+//Load all users on admin home page
 app.get('/admin',(req, res) => {
   var request = new sql.Request();
         
     // query to the database and get the records
-    request.query('SELECT * from Employees, Processors', function (err, rows) {
+    request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
+    + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
+    + ' JOIN Processors P ON E.company_prefix = P.company', function (err, rows) {
         
         if (err) console.log(err)
 
@@ -74,6 +88,8 @@ app.get('/admin',(req, res) => {
 
 });
 
+
+//Load all departments that the user belongs to
 app.post('/admin/editUser',(req, res) => {
   let email = req.body.email;
   var request = new sql.Request();
@@ -87,6 +103,8 @@ app.post('/admin/editUser',(req, res) => {
 
 });
 
+
+//Admin edits user details
 app.post('/admin/editUser/save',(req, res) => {
   let name = req.body.name;
   let oldEmail = req.body.oldEmail;
@@ -139,20 +157,28 @@ app.post('/admin/editUser/save',(req, res) => {
 });
 
 
+
+
+//Admin deletes user
 app.post('/admin/deleteUser',(req, res) => {
   let email = req.body.oldEmail;
   var request = new sql.Request();
 
-  request.query("DELETE FROM Employees WHERE email = '"+email+"'",
-   function (err) {
-      if (err) console.log(err)
-
+  request.query("DELETE FROM Employees WHERE email = '"+email+"'")
+  .then(() => {
       res.send({message: "User Deleted!"});
+  })
+  .catch((err) => {
+    console.log(err)
+    res.json({message: "Failed to delete user!"});
   });
 
 });
 
 
+
+
+//Admin adds user
 app.post('/admin/addUser',(req, res) => {
   let name = req.body.name;
   let email = req.body.email;
@@ -164,23 +190,28 @@ app.post('/admin/addUser',(req, res) => {
 
   var request = new sql.Request();
   request.query("INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
-  "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"')",
-   function (err) {
-      if (err) console.log(err)
-    
-      for(var i = 0; i < departments.length; i++) {
-        var request = new sql.Request();
-        request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')",
-          function (err) {
-            if (err) console.log(err)
-          });
-      }
-
-      res.send({email: email, departments: departments, message: "User Added!"});
-  });
-
+  "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"')")
+  .then(() => {
+    for(var i = 0; i < departments.length; i++) {
+      var request = new sql.Request();
+      request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')")
+      .catch((err) => {
+        console.log(err)
+        res.json({message: "Failed to add user to department!"});
+        });
+    }})
+  .then(() => {
+    res.send({email: email, departments: departments, message: "User Added!"})
+  })
+  .catch((err) => {
+    console.log(err)
+    res.json({message: "Failed to add user!"});
+  })
 });
 
+
+
+//User to login
 app.post('/login',(req, res) => {
   let email = req.body.companyEmail;
   let password = req.body.password;
@@ -212,6 +243,9 @@ app.post('/login',(req, res) => {
   });
 });
 
+
+
+//User to add claim
 app.post('/addclaim',(req, res) => {
   let formCreator = req.body.creator;
   let expenseType = req.body.expenseType;
