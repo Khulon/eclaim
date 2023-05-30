@@ -211,3 +211,41 @@ app.post('/login',(req, res) => {
     res.json({message: "Error!"});
   });
 });
+
+app.post('/addclaim',(req, res) => {
+  let formCreator = req.body.creator;
+  let expenseType = req.body.expenseType;
+  
+
+  var request = new sql.Request();
+
+  request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count FROM Claims",
+    function (err, result) {
+      if (err) console.log(err)
+      
+      console.log(result.recordset[0].currentDateTime)
+
+      const query = "INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', '"+expenseType+"', "
+      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd)";
+      
+      request.input('id', sql.Int, result.recordset[0].count + 1);
+      request.input('total_amount', sql.Numeric, 0);
+      request.input('levels', sql.Int, 1);
+      request.input('claimees', sql.Int, 1);
+      request.input('status', sql.VarChar, "In Progress");
+      request.input('sd', sql.DateTime, null);
+      request.input('ad', sql.DateTime, null);
+      request.input('pd', sql.DateTime, null);
+      request.input('lsd', sql.DateTime, null);
+      request.input('lad', sql.DateTime, null);
+      request.input('lpd', sql.DateTime, null);
+      request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
+      
+      request.query(query,
+        function (err) {
+          if (err) console.log(err)
+          res.send({message: "Claim Added!", user: formCreator});
+
+        });
+  });
+});
