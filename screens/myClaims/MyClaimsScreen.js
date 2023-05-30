@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React, { useState} from "react";
 import useAuth from '../../hooks/useAuth';
-
+import BottomNavigator from '../../components/BottomNavigation';
 
 export default function MyClaimsScreen({ navigation }) {
 
-        
+  
+  window.localStorage.setItem('stackScreen', 'MyClaims');
 
   const [isLoginButtonHover, setIsLoginButtonHover] = useState(false);
 
@@ -23,11 +24,16 @@ export default function MyClaimsScreen({ navigation }) {
     },
     pageLogin: {
       width: "90%",
-      height: "90%",
+      flexGrow:1,
       backgroundColor: '#fff',
       alignItems: 'center',
       flexDirection: "column",
       
+    },
+    bottomNavigation: {
+      width:'100%',
+      height: '70px'
+
     },
     text: {
       fontSize: "17px",
@@ -44,6 +50,10 @@ export default function MyClaimsScreen({ navigation }) {
 
         <Text style={styles.text}>MyClaims Screen</Text>
 
+      </View>
+
+      <View style={styles.bottomNavigation}>
+      <BottomNavigator navigation={navigation} />
       </View>
     </View>
     
