@@ -130,11 +130,12 @@ app.post('/admin/editUser/save', async (req, res) => {
     
   var request = new sql.Request();
   try{
-    await request.query("UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
-    + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'");
-    
-    
-    await request.query("SET XACT_ABORT ON BEGIN TRANSACTION DELETE FROM BelongsToDepartments WHERE email = '"+oldEmail+"'; "
+     
+    await request.query("SET XACT_ABORT ON " 
+    + "BEGIN TRANSACTION "
+    + "UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
+    + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'"
+    + "DELETE FROM BelongsToDepartments WHERE email = '"+oldEmail+"'; "
       + "INSERT INTO BelongsToDepartments VALUES" + insertDpts + " COMMIT TRANSACTION");
 
 
@@ -233,40 +234,110 @@ app.post('/login', async (req, res) => {
 
 
 //User to add claim
-app.post('/addclaim', async (req, res) => {
+app.post('/addClaim', async (req, res) => {
   let formCreator = req.body.creator;
   let expenseType = req.body.expenseType;
-  
-
+ 
   var request = new sql.Request();
 
-  request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count FROM Claims",
-    function (err, result) {
-      if (err) console.log(err)
-      
-      console.log(result.recordset[0].currentDateTime)
+  let payPeriodFrom = req.body.payPeriodFrom;
+  let payPeriodTo = req.body.payPeriodTo;
+  let costCenter = req.body.costCenter;
+  let note = req.body.note;
 
-      const query = "INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', '"+expenseType+"', "
-      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd)";
-      
-      request.input('id', sql.Int, result.recordset[0].count + 1);
-      request.input('total_amount', sql.Numeric, 0);
-      request.input('levels', sql.Int, 1);
-      request.input('claimees', sql.Int, 1);
-      request.input('status', sql.VarChar, "In Progress");
-      request.input('sd', sql.DateTime, null);
-      request.input('ad', sql.DateTime, null);
-      request.input('pd', sql.DateTime, null);
-      request.input('lsd', sql.DateTime, null);
-      request.input('lad', sql.DateTime, null);
-      request.input('lpd', sql.DateTime, null);
-      request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
-      
-      request.query(query,
-        function (err) {
-          if (err) console.log(err)
-          res.send({message: "Claim Added!", user: formCreator});
+  if (expenseType == "Monthly") {
+  
+  try {
 
-        });
-  });
+    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count FROM Claims")
+    const newFormId = result.recordset[0].count + 1;
+    const fromDate = await request.query("SELECT PARSE('"+payPeriodFrom+"' as date USING 'AR-LB') AS fromDate")
+    const toDate = await request.query("SELECT PARSE('"+payPeriodTo+"' as date USING 'AR-LB') AS toDate")
+    
+    const query = "SET XACT_ABORT ON " 
+    + "BEGIN TRANSACTION "
+    +"INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', @expense_type, "
+      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd);"
+      + "INSERT INTO MonthlyGeneral VALUES(@formid , @fromDate, @toDate, @costCenter, @note);"
+      + " COMMIT TRANSACTION";
+        
+    request.input('id', sql.Int, newFormId);
+    request.input('expense_type', sql.Text, expenseType)
+    request.input('total_amount', sql.Numeric, 0);
+    request.input('levels', sql.Int, 1);
+    request.input('claimees', sql.Int, 1);
+    request.input('status', sql.VarChar, "In Progress");
+    request.input('sd', sql.DateTime, null);
+    request.input('ad', sql.DateTime, null);
+    request.input('pd', sql.DateTime, null);
+    request.input('lsd', sql.DateTime, null);
+    request.input('lad', sql.DateTime, null);
+    request.input('lpd', sql.DateTime, null);
+    request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
+    request.input('formid', sql.Int, newFormId);
+    request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
+    request.input('toDate', sql.Date, toDate.recordset[0].toDate);
+    request.input('costCenter', sql.VarChar, costCenter)
+    request.input('note', sql.Text, note);
+
+    await request.query(query);
+  
+    res.send({message: "Monthly claim added successfully!", user: formCreator});
+        
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Failed to add claim!"});
+  }
+
+} else {
+
+    try {
+    
+    let country = req.body.country;
+    let exchangeRate = req.body.exchangeRate;
+    let dateFrom = req.body.dateFrom;
+    let dateTo = req.body.dateTo;
+
+    var request = new sql.Request();
+
+    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count FROM Claims")
+    const newFormId = result.recordset[0].count + 1;
+    const fromDate = await request.query("SELECT PARSE('"+dateFrom+"' as date USING 'AR-LB') AS fromDate")
+    const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
+    
+    const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
+    + "INSERT INTO TravellingGeneral VALUES(@country, @exchangerate, @period_from, @period_to, @note, @formid);"
+    " INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', @expense_type, "
+      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd); COMMIT TRANSACTION";
+        
+    request.input('id', sql.Int, newFormId);
+    request.input('expense_type', sql.Text, expenseType)
+    request.input('total_amount', sql.Numeric, 0);
+    request.input('levels', sql.Int, 1);
+    request.input('claimees', sql.Int, 1);
+    request.input('status', sql.VarChar, "In Progress");
+    request.input('sd', sql.DateTime, null);
+    request.input('ad', sql.DateTime, null);
+    request.input('pd', sql.DateTime, null);
+    request.input('lsd', sql.DateTime, null);
+    request.input('lad', sql.DateTime, null);
+    request.input('lpd', sql.DateTime, null);
+    request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
+    request.input('country', sql.VarChar, country);
+    request.input('exchangerate', sql.Numeric, exchangeRate);
+    request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
+    request.input('period_to', sql.Date, toDate.recordset[0].toDate);
+    request.input('note', sql.Text, note);
+    request.input('formid', sql.Int, newFormId);
+
+    await request.query(query);
+
+    res.send({message: "Travelling claim added successfully!", user: formCreator});
+
+    } catch(err) {
+      console.log(err)
+      res.send({message: "Failed to add travelling claim!"});
+    }
+
+  }
 });
