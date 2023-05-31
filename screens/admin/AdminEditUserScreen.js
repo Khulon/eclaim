@@ -241,18 +241,22 @@ const departments = [
   function updateUser(userDetails) {
     console.log(userDepartments)
     console.log(userDetails)
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    const header = {'Content-Type': 'application/json' };
     fetch('http://localhost:5000/admin/editUser/save', {
-      method: 'POST',
-      headers: header,
-      body: JSON.stringify(userDetails)})
-      .then(response => response.json())
-      .then(data => {
-          console.log(data);
-      	});
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify(userDetails)})
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if(data.message == "User Updated!") {
+              alert("User updated successfully!")
+              window.location.reload(false);
+            } else {
+              alert("User update failed!")
+            }
+            })
 
-      //window.location.reload(false);
-      
   }
 
   const fetchedDepartments = [];
@@ -334,12 +338,11 @@ const departments = [
           <View style={[styles.inputContainer,{zIndex:4}]}>
           <Text style={styles.normalBoldText}>Department</Text>
           <MultiSelect
-              hideTags
               items={departments}
               uniqueKey="value"
               onSelectedItemsChange={(department) => setUserDepartments(department)}
               selectedItems= {userDepartments}
-              selectText="Pick Items"
+              selectText="Select department(s)"
               searchInputPlaceholderText="Search Items..."
               onChangeInput={ (text)=> console.log(text)}
               altFontFamily="ProximaNova-Light"
@@ -359,7 +362,7 @@ const departments = [
           <Text style={styles.normalBoldText}>Company Email</Text>
           <TextInput style={styles.textInput}
             placeholder="example@gmail.com" 
-            value={userDetails.oldEmail} 
+            value={userDetails.newEmail} 
             onChangeText={(email) => setUserDetails({...userDetails, newEmail: email})}
             autoCapitalize="none" 
             autoCorrect={false} 
