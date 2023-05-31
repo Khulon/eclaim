@@ -334,7 +334,6 @@ const departments = [
           <View style={[styles.inputContainer,{zIndex:4}]}>
           <Text style={styles.normalBoldText}>Department</Text>
           <MultiSelect
-              hideTags
               items={departments}
               uniqueKey="value"
               onSelectedItemsChange={(department) => setUserDepartments(department)}
@@ -342,24 +341,31 @@ const departments = [
               selectText="Pick Items"
               searchInputPlaceholderText="Search Items..."
               onChangeInput={ (text)=> console.log(text)}
-              altFontFamily="ProximaNova-Light"
-              tagRemoveIconColor="#CCC"
-              tagBorderColor="#CCC"
-              tagTextColor="#CCC"
-              selectedItemTextColor="#CCC"
-              selectedItemIconColor="#CCC"
-              itemTextColor="#000"
+
+              styleInputGroup={{borderBottomWidth:'1px', borderColor:'#DADADA'}}
+              styleSelectorContainer={{borderWidth:'1px', borderColor:'#DADADA' , borderRadius:'12px'}}
+              styleRowList={{padding:'5px', backgroundColor:'white'}}
+              styleDropdownMenuSubsection={{borderWidth:'1px', borderRadius:'12px', height:'45px', borderColor:'#DADADA', paddingLeft:'20px'}}
+              styleTextDropdown={{color:'#6A6A6A'}}
+
+              searchInputStyle={{height:'45px'}}
+              altFontFamily='inherit'
+              tagRemoveIconColor="#6A6A6A"
+              tagBorderColor="#6A6A6A"
+              tagTextColor="#6A6A6A"
+              selectedItemTextColor="#45B097"
+              selectedItemIconColor="#6A6A6A"
+              itemTextColor="#6A6A6A"
               displayKey="value"
-              searchInputStyle={{ color: '#CCC' }}
-              submitButtonColor="#CCC"
-              submitButtonText="Submit"
+              hideSubmitButton
+              hideDropdown
         />
           </View>
           <View style={styles.inputContainer}>
           <Text style={styles.normalBoldText}>Company Email</Text>
           <TextInput style={styles.textInput}
             placeholder="example@gmail.com" 
-            value={userDetails.oldEmail} 
+            value={userDetails.newEmail} 
             onChangeText={(email) => setUserDetails({...userDetails, newEmail: email})}
             autoCapitalize="none" 
             autoCorrect={false} 
@@ -448,5 +454,3 @@ const departments = [
     
   );
 }
-
-
