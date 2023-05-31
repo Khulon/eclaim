@@ -1,6 +1,5 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
-import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import useAuth from '../../hooks/useAuth';
 import filter from "lodash.filter"
@@ -42,7 +41,7 @@ export default function MyClaimsScreen({ navigation }) {
   const FULLDATA = [
     {
       claimId: '1234567',
-      creator: 'Paul Lim',
+      creator: 'Jane Lim',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'In Progress',
@@ -50,7 +49,7 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '2234567',
-      creator: 'Paul Lim',
+      creator: 'Paul Tan',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'Submitted',
@@ -58,7 +57,7 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '3234567',
-      creator: 'Paul Lim',
+      creator: 'Paul Yao',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'Approved',
@@ -66,7 +65,7 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '4234567',
-      creator: 'Paul Lim',
+      creator: 'Paul Hor',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'Rejected',
@@ -74,7 +73,7 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '5234567',
-      creator: 'Paul Lim',
+      creator: 'Paul Chan',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'In Progress',
@@ -228,15 +227,17 @@ export default function MyClaimsScreen({ navigation }) {
   function handleSearch (search) {
     setSearch(search)
     const formattedQuery = search.toLowerCase();
-    const filteredData = filter(fullData, (person)=> {
-      return contains(person, formattedQuery)
+    const filteredData = filter(fullData, (claim)=> {
+      return contains(claim, formattedQuery)
     })
     setData(filteredData)
-    console.log(filteredData)
+    //console.log(filteredData)
   }
 
-  const contains = ({name,email}, query) => {
-    if (name.includes(query) || email.includes(query)) {
+  const contains = ({creator, date}, query) => {
+    creator = creator.toLowerCase()
+    date = date.toLowerCase()
+    if (creator.includes(query) || date.includes(query)) {
       return true
     }
     return false
