@@ -7,6 +7,8 @@ export default function HomeScreen({ navigation }) {
   
   window.localStorage.setItem('stackScreen', 'Home');
 
+  const email = window.localStorage.getItem('session')
+
   const styles = StyleSheet.create({
     page: {
       height: "100%",
@@ -41,14 +43,24 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.page}>
       <View style={styles.pageHome}>
+      <View style={{alignItems: 'center', justifyContent: 'center', flexGrow:1}}>
+        <Image 
+          style={{width: 120, height: 120}}
+          source={require('../../assets/engkong_logo.png')}
+          resizeMode={'contain'}  
+        />
+        <Text style={styles.text}>Welcome</Text>
+        <Text style={styles.text}>{email}</Text>
+        
 
-        <Text style={styles.text}>Home Screen</Text>
+        </View>
       </View>
       <View style={styles.bottomNavigation}>
       <BottomNavigator navigation={navigation} />
       </View>
     </View>
     
+
   );
 }
 
