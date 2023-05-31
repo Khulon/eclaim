@@ -205,6 +205,7 @@ export default function AddClaimScreen({ navigation }) {
       case 'Yes':
         //handleJoin() using form id
         // Insert into claimee (trigger updates claimee count on Claims table)
+        
         break;
       case 'No':
         fetch('http://localhost:5000/addClaim', {

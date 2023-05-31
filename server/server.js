@@ -54,12 +54,12 @@ var server = app.listen(5000, function () {
 
 
 //User registers an account
-app.post('/register',(req, res) => {
+app.post('/register', (req, res) => {
     let email = req.body.companyEmail;
     let password = req.body.password;
     let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"')";
     var query = new sql.Request();
-    query.query(statement)
+     query.query(statement)
     .then((result) => {
       res.json({user: email, userType: "Normal", message: "Account Created!"});})
     .catch((err) => {
@@ -105,7 +105,7 @@ app.post('/admin/editUser',(req, res) => {
 
 
 //Admin edits user details
-app.post('/admin/editUser/save',(req, res) => {
+app.post('/admin/editUser/save', async (req, res) => {
   let name = req.body.name;
   let oldEmail = req.body.oldEmail;
   let newEmail = req.body.newEmail;
@@ -115,56 +115,49 @@ app.post('/admin/editUser/save',(req, res) => {
   let isApprover = req.body.approver;
   let isProcessor = req.body.processor;
 
+  const newDpts = [];
+  var insertDpts = "";
+  
+  for(var i = 0; i < departments.length; i++) {
+    if(i == departments.length - 1) {
+      insertDpts += "('"+newEmail+"'," + "'"+departments[i]+"');";
+    } else {
+      insertDpts += "('"+newEmail+"'," + "'"+departments[i]+"'),";
+    }
+  }
+
+  departments.forEach((dpt) => { newDpts.push(dpt)});
+    
   var request = new sql.Request();
+  try{
+    await request.query("UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
+    + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'");
+    
+    
+    await request.query("SET XACT_ABORT ON BEGIN TRANSACTION DELETE FROM BelongsToDepartments WHERE email = '"+oldEmail+"'; "
+      + "INSERT INTO BelongsToDepartments VALUES" + insertDpts + " COMMIT TRANSACTION");
 
-  request.query("UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
-  + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'",
-   function (err) {
-      if (err) console.log(err)
 
-      const newDpts = [];
-      var search = "(";
-      
+    res.send({message: "User Updated!"})
 
-      for(var i = 0; i < departments.length; i++) {
-        if(i == departments.length - 1) {
-          search += "'"+departments[i]+"')";
-        } else {
-          search += "'"+departments[i]+"',";
-        }
-      }
-
-      var request = new sql.Request();
-      departments.forEach((dpt) => { newDpts.push(dpt)});
-
-      request.query("DELETE FROM BelongsToDepartments WHERE email = '"+newEmail+"'",
-      function (err) {
-        if (err) console.log(err)
-      });
-      
-        
-      for (var i = 0; i < newDpts.length; i++) {
-        request.query("INSERT INTO BelongsToDepartments VALUES('"+newEmail+"','"+newDpts[i]+"')",
-        function (err) {
-          if (err) console.log(err)
-        });
-      }
-
-      res.send({message: "User Updated!"});
-
-  });
-
+  } catch(err) { 
+    console.log(err)
+    res.send({message: "Failed to update user!"});
+  }
+  
 });
 
 
 
 
+
+
 //Admin deletes user
-app.post('/admin/deleteUser',(req, res) => {
+app.post('/admin/deleteUser', async (req, res) => {
   let email = req.body.oldEmail;
   var request = new sql.Request();
 
-  request.query("DELETE FROM Employees WHERE email = '"+email+"'")
+  await request.query("DELETE FROM Employees WHERE email = '"+email+"'")
   .then(() => {
       res.send({message: "User Deleted!"});
   })
@@ -179,7 +172,7 @@ app.post('/admin/deleteUser',(req, res) => {
 
 
 //Admin adds user
-app.post('/admin/addUser',(req, res) => {
+app.post('/admin/addUser', async (req, res) => {
   let name = req.body.name;
   let email = req.body.email;
   let company = req.body.company;
@@ -189,16 +182,12 @@ app.post('/admin/addUser',(req, res) => {
   let isProcessor = req.body.isProcessor;
 
   var request = new sql.Request();
-  request.query("INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
+  await request.query("INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
   "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"')")
   .then(() => {
     for(var i = 0; i < departments.length; i++) {
       var request = new sql.Request();
       request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')")
-      .catch((err) => {
-        console.log(err)
-        res.json({message: "Failed to add user to department!"});
-        });
     }})
   .then(() => {
     res.send({email: email, departments: departments, message: "User Added!"})
@@ -212,14 +201,14 @@ app.post('/admin/addUser',(req, res) => {
 
 
 //User to login
-app.post('/login',(req, res) => {
+app.post('/login', async (req, res) => {
   let email = req.body.companyEmail;
   let password = req.body.password;
   let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'";
   let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'";
   var query = new sql.Request();
   var adminQuery = new sql.Request();
-  adminQuery.query(checkAdmin)
+  await adminQuery.query(checkAdmin)
   .then((result) => {
 
     let count = result.recordset[0].count;
@@ -238,15 +227,13 @@ app.post('/login',(req, res) => {
       });
     }
   })
-  .catch((err) => {
-    res.json({message: "Error!"});
-  });
+  
 });
 
 
 
 //User to add claim
-app.post('/addclaim',(req, res) => {
+app.post('/addclaim', async (req, res) => {
   let formCreator = req.body.creator;
   let expenseType = req.body.expenseType;
   

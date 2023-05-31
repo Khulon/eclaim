@@ -308,7 +308,6 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={[styles.inputContainer,{zIndex:4}]}>
         <Text style={styles.normalBoldText}>Department(s)</Text>
         <MultiSelect
-              hideTags
               items={departments}
               uniqueKey="value"
               onSelectedItemsChange={(department) => setDepartments(department)}
