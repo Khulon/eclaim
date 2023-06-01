@@ -41,7 +41,8 @@ export default function MyClaimsScreen({ navigation }) {
   const FULLDATA = [
     {
       claimId: '1234567',
-      creator: 'Jane Lim',
+      creator: 'janelim@gmailcom',
+      creator_Name: 'Jane Lim',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'In Progress',
@@ -49,7 +50,8 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '2234567',
-      creator: 'Paul Tan',
+      creator: 'paultanm@gmailcom',
+      creator_Name: 'Paul Tan',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'Submitted',
@@ -57,7 +59,8 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '3234567',
-      creator: 'Paul Yao',
+      creator: 'paulyaoming@gmailcom',
+      creator_Name: 'Paul Yao Ming',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'Approved',
@@ -65,7 +68,8 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '4234567',
-      creator: 'Paul Hor',
+      creator: 'janehor@gmailcom',
+      creator_Name: 'Jane Hor',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'Rejected',
@@ -73,7 +77,8 @@ export default function MyClaimsScreen({ navigation }) {
     },
     {
       claimId: '5234567',
-      creator: 'Paul Chan',
+      creator: 'paulchan@gmailcom',
+      creator_Name: 'Paul Chan',
       total: '43.23',
       date: '01 May 23 - 31 May 23',
       status: 'In Progress',
@@ -214,12 +219,11 @@ export default function MyClaimsScreen({ navigation }) {
   }
   */
 
-  async function handleEditUser (selectedId) {
+  async function handleEditClaim (selectedId) {
     for (var i = 0; i < data.length; i++) {
-      if (data[i].email == selectedId.email) {
-        setUserDepartments(data[i].department)
-        console.log(userDepartments)
-        navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
+      if (data[i].claimId == selectedId.claimId) {
+        console.log(data[i].claimId)
+        navigation.navigate("EditCreatedClaimScreen")
       }
     }
   }
@@ -244,7 +248,7 @@ export default function MyClaimsScreen({ navigation }) {
   }
 
 
-  const Item = ({date, creator, total, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+  const Item = ({date, creator_Name, total, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
         {expense_type == 'Travelling' ? (
@@ -256,7 +260,7 @@ export default function MyClaimsScreen({ navigation }) {
 
       <View style={{height:"100%", width:"50%", minWidth:"180px", justifyContent:"center"}}>
       <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: {total}</Text>
       </View>
 
@@ -280,7 +284,7 @@ export default function MyClaimsScreen({ navigation }) {
     return (
       <Item 
         date={item.date} 
-        creator = {item.creator}
+        creator_Name = {item.creator_Name}
         total = {item.total}
         status = {item.status}
         claimId = {item.claimId}
@@ -289,7 +293,7 @@ export default function MyClaimsScreen({ navigation }) {
         onMouseEnter={() => setSelectedId({...selectedId, claimId: item.claimId})}
         onMouseLeave={() => setSelectedId({...selectedId, claimId: null})}
 
-        onPress={() => handleEditUser(selectedId)}
+        onPress={() => handleEditClaim(selectedId)}
         backgroundColor={backgroundColor}
         transform={transform}
       />

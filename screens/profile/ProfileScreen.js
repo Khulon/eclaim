@@ -153,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
             source={{uri:image}}
           />
           <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
-          <Text><Ionicons name="images-outline" color="#444" size='25px'/></Text>
+          <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
           </View>
           </TouchableOpacity>
           
