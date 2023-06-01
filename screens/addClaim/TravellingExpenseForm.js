@@ -9,7 +9,28 @@ export default function TravellingExpenseForm({ navigation, route }) {
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [newClaim, setNewClaim] = useState({country:'', exchangeRate:'', dateFrom:'', dateTo:''});
+  const addClaim = route.params.props;
+  const [claim, setClaim] = useState({creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType,
+    country: null, exchangeRate:null, dateFrom: null, dateTo: null});
+
+  function addTravellingClaim (claim) {
+    console.log(claim)
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://localhost:5000/addClaim', {
+          method: 'POST',
+          headers: header,
+          body: JSON.stringify(claim)})
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          if(data.message == "Travelling claim added successfully!") {
+            alert("Travelling claim added successfully!")
+            window.location.reload(false)
+          } else {
+            alert("Error adding travelling claim!")
+          }
+        });
+  }; 
 
 
   /*
@@ -204,7 +225,8 @@ export default function TravellingExpenseForm({ navigation, route }) {
       <View style={styles.topCard}>
         
       <View style={styles.backButtonBar}>
-      <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} 
+      onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => window.location.reload()}>
         <View style={styles.backButton}>
           <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
         </View>
@@ -238,7 +260,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
           <Text style={styles.normalBoldText}>Country</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. Spain" 
-            onChangeText={(val) => setNewClaim({...newClaim, country:val})} 
+            onChangeText={(val) => setClaim({...claim, country:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -248,7 +270,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
           <Text style={styles.normalBoldText}>Exchange Rate (1SGD = ?)</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. 0.74USD" 
-            onChangeText={(val) => setNewClaim({...newClaim, exchangeRate:val})} 
+            onChangeText={(val) => setClaim({...claim, exchangeRate:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -258,7 +280,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
           <Text style={styles.normalBoldText}>Date - From</Text>
           <TextInput style={styles.textInput}
             placeholder="dd/mm/yy" 
-            onChangeText={(val) => setNewClaim({...newClaim, dateFrom:val})} 
+            onChangeText={(val) => setClaim({...claim, dateFrom:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -267,7 +289,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
           <Text style={styles.normalBoldText}>Date - To</Text>
           <TextInput style={styles.textInput}
             placeholder="dd/mm/yy" 
-            onChangeText={(val) => setNewClaim({...newClaim, dateTo:val})} 
+            onChangeText={(val) => setClaim({...claim, dateTo:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -289,7 +311,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
         <View style={{width:"100%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => console.log(newClaim)} style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => addTravellingClaim(claim)} style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
         </View>
 

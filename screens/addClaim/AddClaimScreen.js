@@ -200,24 +200,30 @@ export default function AddClaimScreen({ navigation }) {
 
   function handleAddClaim() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    console.log(claim)
     switch(isExistingClaim) {
       case 'Yes':
         //handleJoin() using form id
         // Insert into claimee (trigger updates claimee count on Claims table)
         
-        break;
-      case 'No':
-        fetch('http://localhost:5000/addClaim', {
+        fetch('http://localhost:5000/joinClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})
         .then(response => response.json())
         .then(data => {
           console.log(data);
-      	});
+          if(data.message == "Joined claim successfully!") {
+            alert("Joined claim successfully!")
+            window.location.reload(false)
+          } else {
+            alert("Error joining claim!")
+          }
+        });
+        
+        break;
+      case 'No':
 
-        if (claim.expenseType != '') {
+        if (claim.expenseType != null) {
           (claim.expenseType == 'Travelling') ? (
             navigation.navigate("TravellingExpenseForm", {props: claim })
           ) : (
@@ -235,7 +241,7 @@ export default function AddClaimScreen({ navigation }) {
   }
 
   
-  const [isExistingClaim, setIsExistingClaim] = useState('');
+  const [isExistingClaim, setIsExistingClaim] = useState(null);
   const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId:null, expenseType:null});
 
 
@@ -245,7 +251,7 @@ export default function AddClaimScreen({ navigation }) {
       <View style={styles.topCard}>
         
       <View style={styles.backButtonBar}>
-      <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => window.location.reload(false)}>
         <View style={styles.backButton}>
           <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
         </View>

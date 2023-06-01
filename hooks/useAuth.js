@@ -16,6 +16,8 @@ export const AuthProvider = ({children}) => {
         if(resp.message == 'Login Successful!') {
           window.localStorage.setItem('sessionType', resp.userType);
           window.localStorage.setItem('session', resp.email);
+          window.localStorage.setItem('userName', resp.name);
+          window.localStorage.setItem('stackScreen', 'HomeStack')
           window.location.reload(false);
         } else {
           alert('Login Failed!');
@@ -26,7 +28,7 @@ export const AuthProvider = ({children}) => {
 
   async function logoutUser () {
     window.localStorage.clear();
-    window.location.reload(false);
+    window.location.reload(true);
   }; 
 
   const createUser = async (loginDetails) => {

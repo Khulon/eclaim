@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, { useState} from "react";
+import React, { useEffect, useState} from "react";
 import useAuth from '../../hooks/useAuth';
 import ConfirmationButton from '../../components/ConfirmationButton';
 import BottomNavigator from '../../components/BottomNavigation';
@@ -12,7 +12,24 @@ export default function ProfileScreen({ navigation }) {
   window.localStorage.setItem('stackScreen', 'Profile');
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
+  const [userProfile, setUserProfile] = useState({email: '', name: '', company: '', approver: '', processor: '', password: ''});
 
+  
+  useEffect( () => {
+    const email = window.localStorage.getItem('session');
+    fetch('http://localhost:5000/getProfile', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
+      body: JSON.stringify({email: email})
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      setUserProfile({...userProfile, email: data.email, name: data.name, company: data.company_prefix,
+         approver: data.approver_name, processor: data.processor_email, password: data.password})
+    });
+      
+  }, []);
 
   const styles = StyleSheet.create({
     page: {
@@ -104,6 +121,7 @@ export default function ProfileScreen({ navigation }) {
   async function handleLogOut() {
     try {
       logoutUser();
+      console.log(window.localStorage.getItem('stackScreen'));
     } catch (error) {
       console.log(error);
     }
@@ -135,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={{width:'100%', height:'100px', justifyContent:'flex-end', alignItems:'center'}}>
         <View style={{width:'84%', flexDirection:'row', height:'50px', alignItems:'center', justifyContent:'space-between'}}>
         <Text style={{fontSize:'35px', fontWeight:'800', fontFamily:'inherit'}}>My Profile</Text>
-          <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress = {() => ConfirmationButton('Alert!', 'Are you sure you want to log out?', ()=>handleLogOut())}>
+          <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress = {() => ConfirmationButton('Alert!', 'Are you sure you want to log out?', ()=> handleLogOut())}>
             <View style={styles.backButton}>
               <Text><Ionicons name="log-out-outline" color="#444" size='large'/></Text>
             </View>
@@ -165,19 +183,19 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Email</Text>
-          <Text style={styles.normalInfoText}>cleon@gmail.com</Text>
+          <Text style={styles.normalInfoText}>{userProfile.name}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Processor</Text>
-          <Text style={styles.normalInfoText}>Jane Liu</Text>
+          <Text style={styles.normalInfoText}>{userProfile.processor}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Approver</Text>
-          <Text style={styles.normalInfoText}>Karen Chan</Text>
+          <Text style={styles.normalInfoText}>{userProfile.approver}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Password</Text>
-          <Text style={styles.normalInfoText}>........</Text>
+          <Text style={styles.normalInfoText}>{userProfile.password}</Text>
         </View>
         
       </View>
