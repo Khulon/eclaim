@@ -54,6 +54,13 @@ export default function ProfileScreen({ navigation }) {
       alignItems:'center',
       justifyContent:'center',
     },
+    circle: {
+      height:'170px',
+      width:'170px',
+      borderRadius:'85px',
+      justifyContent:'center',
+      alignItems:'center'
+    },  
     nameText: {
       fontWeight:'700',
       fontSize:'35px',
@@ -140,13 +147,13 @@ export default function ProfileScreen({ navigation }) {
         
       <View style={styles.content}>
         <View style={styles.displayContainer}>
-          <View style={{height:'170px', width:'170px', borderRadius:'85px', justifyContent:'center', alignItems:'center'}}>
+          <View style={styles.circle}>
           <TouchableOpacity onPress={()=> pickImage()}>
           <Image style={{width: 170, height: 170, borderRadius:85 }}
             source={{uri:image}}
           />
-          <View style={{position:"absolute", height:'170px', width:'170px', borderRadius:'85px', backgroundColor:'black', justifyContent:'center', alignItems:'center', zIndex:-1}}>
-
+          <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
+          <Text><Ionicons name="images-outline" color="#444" size='25px'/></Text>
           </View>
           </TouchableOpacity>
           
