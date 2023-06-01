@@ -7,6 +7,8 @@ export default function StartScreen({ navigation }) {
 
   const loginButtonHover = useRef(new Animated.Value(0)).current;
 
+  console.log(window.localStorage.getItem('stackScreen'))
+
   /*
   const [message, setMessage] = useState("");
 

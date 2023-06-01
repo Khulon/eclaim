@@ -5,7 +5,6 @@ import { View, ActivityIndicator} from 'react-native';
 export default function FilterScreen({ navigation }) {     
     
     const stackScreen = window.localStorage.getItem('stackScreen')
-
     
     useEffect(() => {
         switch(stackScreen) {

@@ -41,7 +41,7 @@ app.get('/', function (req, res) {
         if (err) console.log(err)
 
         // send records as a response
-        res.send(rows.recordset);
+        res.send(rows.recordset[0]);
     });
 });
 
@@ -87,6 +87,33 @@ app.get('/admin',(req, res) => {
     });
 
 });
+
+
+
+//Fetch data for profile page
+app.post('/getProfile', async (req, res) => {
+  try {
+    let email = req.body.email;
+    var request = new sql.Request();
+    
+    const queryString = 'SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, password, '
+    + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
+    + " JOIN Processors P ON E.company_prefix = P.company JOIN Accounts ON Accounts.email = E.email WHERE E.email = '"+email+"'"; 
+  
+    // query to the database and get the records
+    const result = await request.query(queryString);
+    
+    res.send(result.recordset[0]);
+
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+});
+
+
+
 
 
 //Load all departments that the user belongs to
@@ -208,20 +235,22 @@ app.post('/login', async (req, res) => {
   let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'";
   let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'";
   var query = new sql.Request();
+  let name = await query.query("SELECT name AS name FROM Employees WHERE email = '"+email+"'");
   var adminQuery = new sql.Request();
+
   await adminQuery.query(checkAdmin)
   .then((result) => {
 
     let count = result.recordset[0].count;
     if(count == 1) {
-      res.send({email: email, userType: "Admin", message: "Login Successful!"});	
+      res.send({email: email, name: name.recordset[0].name, userType: "Admin", message: "Login Successful!"});	
     } else {
       query.query(statement)
       .then((result) => {
 
         let count = result.recordset[0].count;
         if(count == 1) {
-          res.send({email: email, userType: "Normal", message: "Login Successful!"});
+          res.send({email: email, name: name.recordset[0].name, userType: "Normal", message: "Login Successful!"});
         } else {
           res.json({message: "Login Failed!"});
         }
@@ -243,6 +272,9 @@ app.post('/addClaim', async (req, res) => {
   let payPeriodFrom = req.body.payPeriodFrom;
   let payPeriodTo = req.body.payPeriodTo;
   let costCenter = req.body.costCenter;
+  if (costCenter == "") {
+    costCenter = null;
+  }
   let note = req.body.note;
 
   if (expenseType == "Monthly") {
@@ -291,8 +323,8 @@ app.post('/addClaim', async (req, res) => {
 
 } else {
 
-    try {
-    
+  try {
+  
     let country = req.body.country;
     let exchangeRate = req.body.exchangeRate;
     let dateFrom = req.body.dateFrom;
@@ -334,10 +366,30 @@ app.post('/addClaim', async (req, res) => {
 
     res.send({message: "Travelling claim added successfully!", user: formCreator});
 
-    } catch(err) {
+  } catch(err) {
       console.log(err)
       res.send({message: "Failed to add travelling claim!"});
-    }
+  }
 
   }
 });
+
+app.post('/joinClaim', async (req, res) => {
+  let formId = req.body.formId;
+  let formCreator = req.body.creator;
+
+  try {
+    var request = new sql.Request();
+    
+    //handles case where form creator joins claim as it will throw error
+    await request.query("INSERT INTO Claimees VALUES('"+formId+"', '"+formCreator+"' )");
+
+    res.send({message: "Joined claim successfully!", user: formCreator})
+
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Failed to join claim!"});
+  }
+
+});
+

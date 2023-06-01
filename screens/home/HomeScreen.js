@@ -7,7 +7,7 @@ export default function HomeScreen({ navigation }) {
   
   window.localStorage.setItem('stackScreen', 'Home');
 
-  const email = window.localStorage.getItem('session')
+  const name = window.localStorage.getItem('userName')
 
   const styles = StyleSheet.create({
     page: {
@@ -50,7 +50,7 @@ export default function HomeScreen({ navigation }) {
           resizeMode={'contain'}  
         />
         <Text style={styles.text}>Welcome</Text>
-        <Text style={styles.text}>{email}</Text>
+        <Text style={styles.text}>{name}</Text>
         
 
         </View>

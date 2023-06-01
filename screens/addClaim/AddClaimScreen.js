@@ -205,18 +205,23 @@ export default function AddClaimScreen({ navigation }) {
         //handleJoin() using form id
         // Insert into claimee (trigger updates claimee count on Claims table)
         
-        break;
-      case 'No':
-        /*
-        fetch('http://localhost:5000/addClaim', {
+        fetch('http://localhost:5000/joinClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})
         .then(response => response.json())
         .then(data => {
           console.log(data);
-          
-      	}); */
+          if(data.message == "Joined claim successfully!") {
+            alert("Joined claim successfully!")
+            window.location.reload(false)
+          } else {
+            alert("Error joining claim!")
+          }
+        });
+        
+        break;
+      case 'No':
 
         if (claim.expenseType != null) {
           (claim.expenseType == 'Travelling') ? (

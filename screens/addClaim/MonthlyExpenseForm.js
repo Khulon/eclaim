@@ -259,7 +259,7 @@ export default function MonthlyExpenseForm({route}) {
         <View style={[styles.inputContainer]}>
           <Text style={styles.normalBoldText}>Pay Period - From</Text>
           <TextInput style={styles.textInput}
-            placeholder="dd/mm/yy" 
+            placeholder="dd/mm/yyyy" 
             onChangeText={(val) => setClaim({...claim, payPeriodFrom:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
@@ -268,7 +268,7 @@ export default function MonthlyExpenseForm({route}) {
         <View style={[styles.inputContainer]}>
           <Text style={styles.normalBoldText}>Pay Period - To</Text>
           <TextInput style={styles.textInput}
-            placeholder="dd/mm/yy" 
+            placeholder="dd/mm/yyyy" 
             onChangeText={(val) => setClaim({...claim, payPeriodTo:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
