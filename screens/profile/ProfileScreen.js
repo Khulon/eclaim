@@ -4,7 +4,6 @@ import useAuth from '../../hooks/useAuth';
 import ConfirmationButton from '../../components/ConfirmationButton';
 import BottomNavigator from '../../components/BottomNavigation';
 import { Ionicons } from "react-native-vector-icons";
-import exampleImage from '../../assets/profile.jpeg'
 import * as ImagePicker from 'expo-image-picker';
 
 export default function ProfileScreen({ navigation }) {
@@ -12,9 +11,12 @@ export default function ProfileScreen({ navigation }) {
   window.localStorage.setItem('stackScreen', 'Profile');
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [userProfile, setUserProfile] = useState({email: '', name: '', company: '', approver: '', processor: '', password: ''});
+
+  const userDetails = JSON.parse(window.localStorage.getItem('details'))
+  const image = window.localStorage.getItem('image')
 
   
+  /*
   useEffect( () => {
     const email = window.localStorage.getItem('session');
     fetch('http://localhost:5000/getProfile', {
@@ -29,7 +31,7 @@ export default function ProfileScreen({ navigation }) {
          approver: data.approver_name, processor: data.processor_email, password: data.password})
     });
       
-  }, []);
+  }, []); */
 
   const styles = StyleSheet.create({
     page: {
@@ -127,7 +129,7 @@ export default function ProfileScreen({ navigation }) {
     }
   }
 
-  const [image, setImage] = useState(null);
+  
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -138,12 +140,32 @@ export default function ProfileScreen({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
+    console.log(result.uri);
 
     if (!result.canceled) {
-      setImage(result.uri);
+      window.localStorage.setItem('image', result.uri);
     }
+
+    fetch('http://localhost:5000/uploadImage', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
+      body: JSON.stringify({email: userDetails.email, image: result.uri})
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if(data.message != 'Failed to upload image!') {
+        console.log('Image uploaded successfully!')
+        alert('Image uploaded successfully!')
+        window.location.reload(false)
+      } else {
+        console.log('Image uploaded failed')
+        alert('Image uploaded failed!')
+      }
+    }
+    );
   };
+
   
 
   return (
@@ -168,7 +190,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.circle}>
           <TouchableOpacity onPress={()=> pickImage()}>
           <Image style={{width: 170, height: 170, borderRadius:85 }}
-            source={{uri:image}}
+            source={image}
           />
           <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
@@ -178,24 +200,24 @@ export default function ProfileScreen({ navigation }) {
 
 
           </View>
-          <Text style={styles.nameText}>Name</Text>
+          <Text style={styles.nameText}>{userDetails.name}</Text>
         </View>
 
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Email</Text>
-          <Text style={styles.normalInfoText}>{userProfile.name}</Text>
+          <Text style={styles.normalInfoText}>{userDetails.email}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Processor</Text>
-          <Text style={styles.normalInfoText}>{userProfile.processor}</Text>
+          <Text style={styles.normalInfoText}>{userDetails.processor_email}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Approver</Text>
-          <Text style={styles.normalInfoText}>{userProfile.approver}</Text>
+          <Text style={styles.normalInfoText}>{userDetails.approver_name}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Password</Text>
-          <Text style={styles.normalInfoText}>{userProfile.password}</Text>
+          <Text style={styles.normalInfoText}>{userDetails.password}</Text>
         </View>
         
       </View>
@@ -210,5 +232,4 @@ export default function ProfileScreen({ navigation }) {
     
   );
 }
-
 

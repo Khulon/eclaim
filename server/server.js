@@ -5,7 +5,7 @@ const app = express();
 var async = require('async');
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 
 var config = {
     user:'eclaim',
@@ -90,27 +90,7 @@ app.get('/admin',(req, res) => {
 
 
 
-//Fetch data for profile page
-app.post('/getProfile', async (req, res) => {
-  try {
-    let email = req.body.email;
-    var request = new sql.Request();
-    
-    const queryString = 'SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, password, '
-    + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
-    + " JOIN Processors P ON E.company_prefix = P.company JOIN Accounts ON Accounts.email = E.email WHERE E.email = '"+email+"'"; 
-  
-    // query to the database and get the records
-    const result = await request.query(queryString);
-    
-    res.send(result.recordset[0]);
 
-  } catch(err) {
-    console.log(err)
-    res.send({message: "Error!"});
-  }
-
-});
 
 
 
@@ -210,8 +190,11 @@ app.post('/admin/addUser', async (req, res) => {
   let isProcessor = req.body.isProcessor;
 
   var request = new sql.Request();
-  await request.query("INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
-  "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"')")
+  const query = "INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
+  "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"', @profile)"
+
+  request.input('profile', sql.VarChar, null)
+  await request.query(query)
   .then(() => {
     for(var i = 0; i < departments.length; i++) {
       var request = new sql.Request();
@@ -230,36 +213,43 @@ app.post('/admin/addUser', async (req, res) => {
 
 //User to login
 app.post('/login', async (req, res) => {
-  let email = req.body.companyEmail;
-  let password = req.body.password;
-  let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'";
-  let checkAdmin = "SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'";
-  var query = new sql.Request();
-  let name = await query.query("SELECT name AS name FROM Employees WHERE email = '"+email+"'");
-  var adminQuery = new sql.Request();
+  try {
+    let email = req.body.companyEmail;
+    let password = req.body.password;
+    var request = new sql.Request();
+    let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'";
+    let checkAdmin = await request.query("SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'");
+    let count = checkAdmin.recordset[0].count;
 
-  await adminQuery.query(checkAdmin)
-  .then((result) => {
+    //Admin login
+    if (count == 1) {
+      res.send({ email: email, userType: "Admin", message: "Login Successful!"});	
 
-    let count = result.recordset[0].count;
-    if(count == 1) {
-      res.send({email: email, name: name.recordset[0].name, userType: "Admin", message: "Login Successful!"});	
     } else {
-      query.query(statement)
-      .then((result) => {
+      const result = await request.query(statement)
+      let count = result.recordset[0].count;
 
-        let count = result.recordset[0].count;
-        if(count == 1) {
-          res.send({email: email, name: name.recordset[0].name, userType: "Normal", message: "Login Successful!"});
-        } else {
-          res.json({message: "Login Failed!"});
-        }
-      });
+      //Normal user login  
+      if(count == 1) {
+        var request = new sql.Request();
+        
+        const result = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, password, '
+        + 'processor_email, profile FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
+        + " JOIN Processors P ON E.company_prefix = P.company JOIN Accounts ON Accounts.email = E.email WHERE E.email = '"+email+"'");
+
+        let records = result.recordset[0];
+
+        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name,message: "Login Successful!", details: records});
+
+      } else {
+        res.json({message: "Login Failed!"});
+      }
     }
-  })
-  
+} catch(err) {
+    console.log(err)
+    res.json({message: "Login Failed!"});
+}
 });
-
 
 
 //User to add claim
@@ -389,6 +379,27 @@ app.post('/joinClaim', async (req, res) => {
   } catch(err) {
     console.log(err)
     res.send({message: "Failed to join claim!"});
+  }
+
+});
+
+
+
+//Add or change profile photo
+app.post('/uploadImage', async (req, res) => {
+  try {
+    let email = req.body.email;
+    let image = req.body.image;
+
+
+    var request = new sql.Request();
+    await request.query("UPDATE Employees SET profile = '"+image+"' WHERE email = '"+email+"'");
+    res.send({message: "Image updated successfully!"});
+
+
+  } catch (err) {
+    console.log(err)
+    res.send({message: "Failed to upload image!"});
   }
 
 });

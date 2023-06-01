@@ -8,6 +8,7 @@ export default function HomeScreen({ navigation }) {
   window.localStorage.setItem('stackScreen', 'Home');
 
   const name = window.localStorage.getItem('userName')
+  console.log(name)
 
   const styles = StyleSheet.create({
     page: {
