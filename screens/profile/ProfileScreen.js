@@ -4,6 +4,8 @@ import useAuth from '../../hooks/useAuth';
 import ConfirmationButton from '../../components/ConfirmationButton';
 import BottomNavigator from '../../components/BottomNavigation';
 import { Ionicons } from "react-native-vector-icons";
+import exampleImage from '../../assets/profile.jpeg'
+import * as ImagePicker from 'expo-image-picker';
 
 export default function ProfileScreen({ navigation }) {
 
@@ -33,6 +35,8 @@ export default function ProfileScreen({ navigation }) {
     content: {
       width:'100%',
       flexGrow:1,
+      justifyContent:'center',
+      alignItems:'center'
     },
     bottomNavigation: {
       width:'100%',
@@ -48,8 +52,15 @@ export default function ProfileScreen({ navigation }) {
       width:'100%',
       height:'40%',
       alignItems:'center',
-      justifyContent:'center'
+      justifyContent:'center',
     },
+    circle: {
+      height:'170px',
+      width:'170px',
+      borderRadius:'85px',
+      justifyContent:'center',
+      alignItems:'center'
+    },  
     nameText: {
       fontWeight:'700',
       fontSize:'35px',
@@ -98,6 +109,25 @@ export default function ProfileScreen({ navigation }) {
     }
   }
 
+  const [image, setImage] = useState(null);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.uri);
+    }
+  };
+  
+
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
@@ -117,14 +147,18 @@ export default function ProfileScreen({ navigation }) {
         
       <View style={styles.content}>
         <View style={styles.displayContainer}>
-          <View style={{height:'140px', width:'140px', borderRadius:'70px', justifyContent:'center', alignItems:'center'}}>
-          
-          <Image 
-          style={{width: 140, height: 140, borderRadius:70 }}
-          source={require('../../assets/profile.jpeg')}
-          resizeMode={'contain'}  
+          <View style={styles.circle}>
+          <TouchableOpacity onPress={()=> pickImage()}>
+          <Image style={{width: 170, height: 170, borderRadius:85 }}
+            source={{uri:image}}
           />
+          <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
+          <Text><Ionicons name="images-outline" color="#444" size='25px'/></Text>
+          </View>
+          </TouchableOpacity>
           
+
+
           </View>
           <Text style={styles.nameText}>Name</Text>
         </View>
