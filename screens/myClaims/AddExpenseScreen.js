@@ -4,11 +4,11 @@ import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAn
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
-import MultiSelect from 'react-native-multiple-select';
+import * as ImagePicker from 'expo-image-picker';
 
 
 
-export default function AddExpenseScreen({ navigation }) {        
+export default function AdminAddUserScreen({ navigation }) {        
 
 
   
@@ -17,12 +17,13 @@ export default function AddExpenseScreen({ navigation }) {
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
 
-  const companies = [
-    {key:'0', value:'EKCA'},
-    {key:'1', value:'Reefertec'},
-    {key:'2', value:'PCL'},
-    {key:'3', value:'SmartZ'},
-    {key:'4', value:'EKH'},
+  const expenseTypeDropdown = [
+    {key:'0', value:'Entertainment and Gifts'},
+    {key:'1', value:'Taxi, C/park, ERP'},
+    {key:'2', value:'Fuel'},
+    {key:'3', value:'Vehical Repair'},
+    {key:'4', value:'Medical'},
+    {key:'5', value:'Others'},
     ]
 
   const departments = [
@@ -127,15 +128,6 @@ export default function AddExpenseScreen({ navigation }) {
       fontWeight: "700",
       fontFamily: "inherit",
     },
-    textInput: {
-      height: "35px",
-      color: "#6A6A6A",
-      backgroundColor: "#D9D9D9",
-      borderWidth: "1px",
-      borderRadius: "12px",
-      padding: "10px",
-      borderColor: "#DADADA",
-    },
 
     content: {
       width:"90%",
@@ -168,54 +160,69 @@ export default function AddExpenseScreen({ navigation }) {
         fontWeight: "700",
         fontFamily: "inherit",
         paddingVertical:'10px'
-      },
-      textInput: {
-        height: "45px",
+    },
+    textInput: {
+    height: "45px",
+    color: "#6A6A6A",
+    borderWidth: "1px",
+    borderRadius: "12px",
+    padding: "15px",
+    borderColor: "#DADADA",
+    },
+
+    imageInput: {
+    width:'100%',
+    height: "100px",
+    color: "#6A6A6A",
+    borderWidth: "1px",
+    borderRadius: "12px",
+    padding: "15px",
+    borderColor: "#DADADA",
+    position:"absolute", 
+    backgroundColor:'#F4F4F4', 
+    zIndex:-1,
+    justifyContent:'center',
+    alignItems:'center'
+    },
+
+    inputContainer: {
+    paddingVertical:'5px',
+    width:'90%',
+    maxWidth: '450px'
+    },
+
+    buttonContainer: {
+    width:"50%",
+    justifyContent:"center",
+    alignItems:"center"
+    },
+    dropdownStyles: {
+    position:"absolute",
+    width:"100%",
+    top:35,
+    zIndex:1,
+    backgroundColor:"white",
+    borderColor:"#DADADA"
+
+    },
+    dropdownItemStyles: {
+        marginHorizontal:"5px",
+        height:"40px",
+    },
+    dropdownTextStyles: {
         color: "#6A6A6A",
-        borderWidth: "1px",
-        borderRadius: "12px",
-        padding: "15px",
-        borderColor: "#DADADA",
-      },
-  
-      inputContainer: {
-        paddingVertical:'5px',
-        width:'90%',
-        maxWidth: '450px'
-      },
-
-      buttonContainer: {
-        width:"50%",
-        justifyContent:"center",
-        alignItems:"center"
-      },
-      dropdownStyles: {
-        position:"absolute",
-        width:"100%",
-        top:35,
-        zIndex:1,
-        backgroundColor:"white",
-        borderColor:"#DADADA"
-
-      },
-      dropdownItemStyles: {
-          marginHorizontal:"5px",
-          height:"40px",
-      },
-      dropdownTextStyles: {
-          color: "#6A6A6A",
-      },
-      boxStyles: {
-          borderColor:"#DADADA",
-      },
-      inputStyles: {
-          color: "#6A6A6A",
-      },
+    },
+    boxStyles: {
+        borderColor:"#DADADA",
+    },
+    inputStyles: {
+        color: "#6A6A6A",
+    },
 
 
   });
 
-  
+  const image = window.localStorage.getItem('image')
   const [userDepartments, setDepartments] = React.useState([]);
   const [newUser, setNewUser] = useState({name:null, email:null, 
   company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
@@ -244,6 +251,23 @@ export default function AddExpenseScreen({ navigation }) {
         }
       });
   }; 
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result.uri);
+
+    if (!result.canceled) {
+      window.localStorage.setItem('image', result.uri);
+    }
+}
+
 
 
   return (
@@ -277,116 +301,139 @@ export default function AddExpenseScreen({ navigation }) {
         </View>
         </View>
   
-
       <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
+      <View style={[styles.inputContainer,{zIndex:5}]}>
+        <Text style={styles.normalBoldText}>Expense Type</Text>
+        <SelectList
+                dropdownStyles={styles.dropdownStyles}
+                dropdownItemStyles={styles.dropdownItemStyles}
+                dropdownTextStyles={styles.dropdownTextStyles}
+                boxStyles={styles.boxStyles}
+                inputStyles={styles.inputStyles} 
+                setSelected={(company) => setNewUser({...newUser, company:company})}
+                data={expenseTypeDropdown} 
+                save="value"
+                showsVerticalScrollIndicator = {false}
+                search = {false}
+            />  
+        </View>
+        
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Name</Text>
+        <Text style={styles.normalBoldText}>If others, state type</Text>
         <TextInput style={styles.textInput}
-          placeholder="eg. Paul Lim" 
+          placeholder="eg. overtime meal" 
           value={newUser.name} 
           onChangeText={(name) => setNewUser({...newUser, name:name})} 
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
-        <View style={[styles.inputContainer,{zIndex:5}]}>
-        <Text style={styles.normalBoldText}>Company</Text>
-        <SelectList
-              dropdownStyles={styles.dropdownStyles}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              dropdownTextStyles={styles.dropdownTextStyles}
-              boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles} 
-              setSelected={(company) => setNewUser({...newUser, company:company})}
-              placeholder= "eg. EKCA"
-              data={companies} 
-              save="value"
-              showsVerticalScrollIndicator = {false}
-              search = {false}
-          />  
-        </View>
-        <View style={[styles.inputContainer,{zIndex:4}]}>
-        <Text style={styles.normalBoldText}>Department(s)</Text>
-        <MultiSelect
-              items={departments}
-              uniqueKey="value"
-              onSelectedItemsChange={(department) => setDepartments(department)}
-              selectedItems= {userDepartments}
-              selectText="Select department(s)"
-              searchInputPlaceholderText="Search Items..."
-              onChangeInput={ (text)=> console.log(text)}
-              altFontFamily="ProximaNova-Light"
-              tagRemoveIconColor="#CCC"
-              tagBorderColor="#CCC"
-              tagTextColor="#CCC"
-              selectedItemTextColor="#CCC"
-              selectedItemIconColor="#CCC"
-              itemTextColor="#000"
-              displayKey="value"
-              searchInputStyle={{ color: '#CCC' }}
-              submitButtonColor="#CCC"
-              submitButtonText="Submit"
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Date</Text>
+        <TextInput style={styles.textInput}
+          placeholder="dd/mm/yy" 
+          value={newUser.name} 
+          onChangeText={(name) => setNewUser({...newUser, name:name})} 
+          autoCapitalize="none" 
+          autoCorrect={false} 
         />
         </View>
+
+        
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Company Email</Text>
+        <Text style={styles.normalBoldText}>Amount before GST</Text>
         <TextInput style={styles.textInput}
-          placeholder="example@engkong.com" 
+          placeholder="eg. 20.34" 
           value={newUser.email} 
           onChangeText={(email) => setNewUser({...newUser, email: email})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
-        <View style={[styles.inputContainer,{zIndex:3}]}>
-        <Text style={styles.normalBoldText}>Is a Supervisor?</Text>
-        <SelectList
-              dropdownStyles={styles.dropdownStyles}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              dropdownTextStyles={styles.dropdownTextStyles}
-              boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles}  
-              setSelected={(val) => setNewUser({...newUser, isSupervisor:val})} 
-              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
-              save="value"
-              showsVerticalScrollIndicator = {false}
-              search = {false}
-          />  
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Amount after GST</Text>
+        <TextInput style={styles.textInput}
+          placeholder="eg. 23.00" 
+          value={newUser.email} 
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+
+        {newUser.company == 'Entertainment and Gifts' ? (
+        <View style={{width:'100%', alignItems:'center'}}>
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Place</Text>
+        <TextInput style={styles.textInput}
+          placeholder="eg. 23.00" 
+          value={newUser.email} 
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Customer Name</Text>
+        <TextInput style={styles.textInput}
+          placeholder="eg. 23.00" 
+          value={newUser.email} 
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Company</Text>
+        <TextInput style={styles.textInput}
+          placeholder="eg. 23.00" 
+          value={newUser.email} 
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+
+            </View>
+
+        ):(
+            <View></View>
+        )}
+
+        
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Description</Text>
+        <TextInput style={[styles.textInput,{height:'100px'}]}
+          placeholder="Desciption of expense" 
+          value={newUser.email} 
+          multiline={true}
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+        
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Reciept</Text>
+        <TouchableOpacity onPress={()=> pickImage()}>
+          <Image style={{width: 170, height: 170, borderRadius:85 }}
+            source={image}
+          />
+          <View style={[styles.imageInput]}>
+          <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
+          </View>
+          </TouchableOpacity>
 
         </View>
 
-        <View style={[styles.inputContainer,{zIndex:2}]}>
-        <Text style={styles.normalBoldText}>Is a Approver?</Text>
-        <SelectList
-              dropdownStyles={styles.dropdownStyles}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              dropdownTextStyles={styles.dropdownTextStyles}
-              boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles}  
-              setSelected={(val) => setNewUser({...newUser, isApprover:val})} 
-              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
-              save="value"
-              showsVerticalScrollIndicator = {false}
-              search = {false}
-          />  
-        </View>
-        <View style={[styles.inputContainer,{zIndex:1}]}>
-        <Text style={styles.normalBoldText}>Is a Processor?</Text>
-        <SelectList
-              dropdownStyles={styles.dropdownStyles}
-              dropdownItemStyles={styles.dropdownItemStyles}
-              dropdownTextStyles={styles.dropdownTextStyles}
-              boxStyles={styles.boxStyles}
-              inputStyles={styles.inputStyles}  
-              setSelected={(val) => setNewUser({...newUser, isProcessor:val})} 
-              data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
-              save="value"
-              showsVerticalScrollIndicator = {false}
-              search = {false}
-          />  
-        </View>
+
       </View>
-
 
       </ScrollView>
     
