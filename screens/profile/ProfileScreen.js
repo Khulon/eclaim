@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React, { useState} from "react";
+import React, { useEffect, useState} from "react";
 import useAuth from '../../hooks/useAuth';
 import ConfirmationButton from '../../components/ConfirmationButton';
 import BottomNavigator from '../../components/BottomNavigation';
@@ -12,6 +12,26 @@ export default function ProfileScreen({ navigation }) {
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
 
+  const userDetails = JSON.parse(window.localStorage.getItem('details'))
+  const image = window.localStorage.getItem('image')
+
+  
+  /*
+  useEffect( () => {
+    const email = window.localStorage.getItem('session');
+    fetch('http://localhost:5000/getProfile', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
+      body: JSON.stringify({email: email})
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      setUserProfile({...userProfile, email: data.email, name: data.name, company: data.company_prefix,
+         approver: data.approver_name, processor: data.processor_email, password: data.password})
+    });
+      
+  }, []); */
 
   const styles = StyleSheet.create({
     page: {
@@ -103,12 +123,13 @@ export default function ProfileScreen({ navigation }) {
   async function handleLogOut() {
     try {
       logoutUser();
+      console.log(window.localStorage.getItem('stackScreen'));
     } catch (error) {
       console.log(error);
     }
   }
 
-  const [image, setImage] = useState(null);
+  
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -119,12 +140,32 @@ export default function ProfileScreen({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
+    console.log(result.uri);
 
     if (!result.canceled) {
-      setImage(result.uri);
+      window.localStorage.setItem('image', result.uri);
     }
+
+    fetch('http://localhost:5000/uploadImage', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
+      body: JSON.stringify({email: userDetails.email, image: result.uri})
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if(data.message != 'Failed to upload image!') {
+        console.log('Image uploaded successfully!')
+        alert('Image uploaded successfully!')
+        window.location.reload(false)
+      } else {
+        console.log('Image uploaded failed')
+        alert('Image uploaded failed!')
+      }
+    }
+    );
   };
+
   
 
   return (
@@ -134,7 +175,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={{width:'100%', height:'100px', justifyContent:'flex-end', alignItems:'center'}}>
         <View style={{width:'84%', flexDirection:'row', height:'50px', alignItems:'center', justifyContent:'space-between'}}>
         <Text style={{fontSize:'35px', fontWeight:'800', fontFamily:'inherit'}}>My Profile</Text>
-          <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress = {() => ConfirmationButton('Alert!', 'Are you sure you want to log out?', ()=>handleLogOut())}>
+          <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress = {() => ConfirmationButton('Alert!', 'Are you sure you want to log out?', ()=> handleLogOut())}>
             <View style={styles.backButton}>
               <Text><Ionicons name="log-out-outline" color="#444" size='large'/></Text>
             </View>
@@ -149,7 +190,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.circle}>
           <TouchableOpacity onPress={()=> pickImage()}>
           <Image style={{width: 170, height: 170, borderRadius:85 }}
-            source={{uri:image}}
+            source={image}
           />
           <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
@@ -159,24 +200,24 @@ export default function ProfileScreen({ navigation }) {
 
 
           </View>
-          <Text style={styles.nameText}>Name</Text>
+          <Text style={styles.nameText}>{userDetails.name}</Text>
         </View>
 
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Email</Text>
-          <Text style={styles.normalInfoText}>cleon@gmail.com</Text>
+          <Text style={styles.normalInfoText}>{userDetails.email}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Processor</Text>
-          <Text style={styles.normalInfoText}>Jane Liu</Text>
+          <Text style={styles.normalInfoText}>{userDetails.processor_email}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Approver</Text>
-          <Text style={styles.normalInfoText}>Karen Chan</Text>
+          <Text style={styles.normalInfoText}>{userDetails.approver_name}</Text>
         </View>
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Password</Text>
-          <Text style={styles.normalInfoText}>........</Text>
+          <Text style={styles.normalInfoText}>{userDetails.password}</Text>
         </View>
         
       </View>
@@ -191,5 +232,4 @@ export default function ProfileScreen({ navigation }) {
     
   );
 }
-
 

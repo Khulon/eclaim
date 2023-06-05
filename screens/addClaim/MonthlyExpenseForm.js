@@ -6,11 +6,32 @@ import { Ionicons } from "react-native-vector-icons";
 
 
 
-export default function MonthlyExpenseForm({ navigation}) {        
+export default function MonthlyExpenseForm({route}) {        
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [newClaim, setNewClaim] = useState({payPeriodFrom:'', payPeriodTo:'', costCenter:''});
+  const addClaim = route.params.props;
+  const [claim, setClaim] = useState({creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, 
+     payPeriodFrom: null, payPeriodTo: null, costCenter: null, note: null});
+
+  function addMonthlyClaim (claim) {
+    console.log(claim)
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://localhost:5000/addClaim', {
+          method: 'POST',
+          headers: header,
+          body: JSON.stringify(claim)})
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          if(data.message == "Monthly claim added successfully!") {
+            alert("Monthly claim added successfully!")
+            window.location.reload(false)
+          } else {
+            alert("Error adding monthly claim!")
+          }
+        });
+  }; 
 
 
 
@@ -206,7 +227,8 @@ export default function MonthlyExpenseForm({ navigation}) {
       <View style={styles.topCard}>
         
       <View style={styles.backButtonBar}>
-      <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)}
+       onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => window.location.reload(false)}>
         <View style={styles.backButton}>
           <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
         </View>
@@ -234,29 +256,29 @@ export default function MonthlyExpenseForm({ navigation}) {
 
       <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
       
-        <View style={[styles.inputContainer, {}]}>
+        <View style={[styles.inputContainer]}>
           <Text style={styles.normalBoldText}>Pay Period - From</Text>
           <TextInput style={styles.textInput}
-            placeholder="dd/mm/yy" 
-            onChangeText={(val) => setNewClaim({...newClaim, payPeriodFrom:val})} 
+            placeholder="dd/mm/yyyy" 
+            onChangeText={(val) => setClaim({...claim, payPeriodFrom:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
         </View>
-        <View style={[styles.inputContainer, {}]}>
+        <View style={[styles.inputContainer]}>
           <Text style={styles.normalBoldText}>Pay Period - To</Text>
           <TextInput style={styles.textInput}
-            placeholder="dd/mm/yy" 
-            onChangeText={(val) => setNewClaim({...newClaim, payPeriodTo:val})} 
+            placeholder="dd/mm/yyyy" 
+            onChangeText={(val) => setClaim({...claim, payPeriodTo:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
         </View>
-        <View style={[styles.inputContainer, {}]}>
+        <View style={[styles.inputContainer]}>
           <Text style={styles.normalBoldText}>Cost Center</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. SG Depot" 
-            onChangeText={(val) => setNewClaim({...newClaim, costCenter:val})} 
+            onChangeText={(val) => setClaim({...claim, costCenter:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
           />
@@ -273,7 +295,7 @@ export default function MonthlyExpenseForm({ navigation}) {
         <View style={{width:"100%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => console.log(newClaim)} style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => addMonthlyClaim(claim)} style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
         </View>
 

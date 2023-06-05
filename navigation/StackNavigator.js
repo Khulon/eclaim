@@ -8,13 +8,14 @@ import AddClaimStack from './AddClaimStack';
 import MyClaimsStack from './MyClaimsStack';
 import ProfileStack from './ProfileStack';
 import StackFilter from './StackFilter';
+import useAuth from '../hooks/useAuth';
 
 
 const Stack = createStackNavigator();
 
 
 export default function StackNavigator() {
-
+    
     const session = window.localStorage.getItem('session');
     const sessionType = window.localStorage.getItem('sessionType');
 

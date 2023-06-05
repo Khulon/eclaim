@@ -1,13 +1,13 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
 import React, { useEffect, useState} from "react";
-import useAuth from '../../hooks/useAuth';
 import BottomNavigator from '../../components/BottomNavigation';
 
 export default function HomeScreen({ navigation }) {
   
   window.localStorage.setItem('stackScreen', 'Home');
 
-  const email = window.localStorage.getItem('session')
+  const name = window.localStorage.getItem('userName')
+  console.log(name)
 
   const styles = StyleSheet.create({
     page: {
@@ -50,7 +50,7 @@ export default function HomeScreen({ navigation }) {
           resizeMode={'contain'}  
         />
         <Text style={styles.text}>Welcome</Text>
-        <Text style={styles.text}>{email}</Text>
+        <Text style={styles.text}>{name}</Text>
         
 
         </View>

@@ -1,8 +1,9 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({children}) => {
+
 
   async function loginUser (loginDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
@@ -16,7 +17,13 @@ export const AuthProvider = ({children}) => {
         if(resp.message == 'Login Successful!') {
           window.localStorage.setItem('sessionType', resp.userType);
           window.localStorage.setItem('session', resp.email);
+          window.localStorage.setItem('userName', resp.name);
+          window.localStorage.setItem('stackScreen', 'HomeStack');
+          window.localStorage.setItem('image', resp.image);
+          window.localStorage.setItem('details', JSON.stringify(resp.details));
+        
           window.location.reload(false);
+          
         } else {
           alert('Login Failed!');
         }
@@ -26,7 +33,7 @@ export const AuthProvider = ({children}) => {
 
   async function logoutUser () {
     window.localStorage.clear();
-    window.location.reload(false);
+    window.location.reload(true);
   }; 
 
   const createUser = async (loginDetails) => {
@@ -51,10 +58,10 @@ export const AuthProvider = ({children}) => {
 
     return (
       <AuthContext.Provider value = {{
-
         loginUser,
         logoutUser,
-        createUser
+        createUser,
+        
 
       }}>
 
