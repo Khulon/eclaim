@@ -12,9 +12,11 @@ export default function MyClaimsScreen({ navigation }) {
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
 
-
   useEffect(() => {
+    setFullData(FULLDATA);
+    setData(FULLDATA);
     //setIsLoading(true)
+    /*
     const email = window.localStorage.getItem('session');
     fetch(`http://localhost:5000/myClaims/${email}`)
     .then((response) => response.json())
@@ -23,57 +25,46 @@ export default function MyClaimsScreen({ navigation }) {
       setFullData(data);
       setData(data);
     });
+    */
     
   }, []);
   
-  /* 
+  
   const FULLDATA = [
     {
-      claimId: '1234567',
-      creator: 'janelim@gmailcom',
-      creator_Name: 'Jane Lim',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
+      id: '1234567',
+      form_creator: 'janelim@gmailcom',
+      total_amount: '43.23',
+      pay_period_from: '2023-05-01',
+      pay_period_to:'2023-05-31',
+      period_from: '2023-05-01',
+      period_to: '2023-05-31',
       status: 'In Progress',
-      expense_Type: 'Travelling'
+      form_type: 'Travelling'
     },
     {
-      claimId: '2234567',
-      creator: 'paultanm@gmailcom',
-      creator_Name: 'Paul Tan',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
+      id: '1234568',
+      form_creator: 'janeTan@gmailcom',
+      total_amount: '43.23',
+      pay_period_from: '2023-05-01',
+      pay_period_to:'2023-05-31',
+      period_from: '2023-05-01',
+      period_to: '2023-05-31',
       status: 'Submitted',
-      expense_type: 'Travelling'
+      form_type: 'Travelling'
     },
     {
-      claimId: '3234567',
-      creator: 'paulyaoming@gmailcom',
-      creator_Name: 'Paul Yao Ming',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'Approved',
-      expense_type: 'Travelling'
-    },
-    {
-      claimId: '4234567',
-      creator: 'janehor@gmailcom',
-      creator_Name: 'Jane Hor',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
+      id: '1234569',
+      form_creator: 'janeliu@gmailcom',
+      total_amount: '43.23',
+      pay_period_from: '2023-05-01',
+      pay_period_to:'2023-05-31',
+      period_from: '2023-05-01',
+      period_to: '2023-05-31',
       status: 'Rejected',
-      expense_type: 'Monthly'
+      form_type: 'Travelling'
     },
-    {
-      claimId: '5234567',
-      creator: 'paulchan@gmailcom',
-      creator_Name: 'Paul Chan',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-  ]; */
+  ]; 
     
   
   const [selectedId, setSelectedId] = useState({id: ''});
@@ -177,7 +168,7 @@ export default function MyClaimsScreen({ navigation }) {
   });
 
 
-  //const [userDepartments, setUserDepartments] = useState([]);
+  
 
   /*
   useEffect(() => {
@@ -209,12 +200,15 @@ export default function MyClaimsScreen({ navigation }) {
   */
 
   async function handleEditClaim (selectedId) {
+
     for (var i = 0; i < data.length; i++) {
       if (data[i].id == selectedId.id) {
         console.log(data[i].id)
         navigation.navigate("EditCreatedClaimScreen", { props: data[i]})
+
       }
     }
+  
   }
 
   function handleSearch (search) {
@@ -276,7 +270,6 @@ export default function MyClaimsScreen({ navigation }) {
     const period_from = new Date(item.period_from).toLocaleDateString("en-UK")
     const period_to = new Date(item.period_to).toLocaleDateString("en-UK")
     const travellingPeriod = period_from + " - " + period_to
-
     
     return (
       <Item 
@@ -288,8 +281,9 @@ export default function MyClaimsScreen({ navigation }) {
         claimId = {item.id}
         expense_type = {item.form_type}
 
-        onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
-        onMouseLeave={() => setSelectedId({...selectedId, id: null})}
+
+      onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
+      onMouseLeave={() => setSelectedId({...selectedId, id: null})}
 
         onPress={() => handleEditClaim(selectedId)}
         backgroundColor={backgroundColor}
