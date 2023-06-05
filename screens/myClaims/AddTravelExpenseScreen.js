@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 
-export default function AdminAddUserScreen({ navigation }) {        
+export default function AddTravelExpenseScreen({ navigation }) {        
 
 
   
@@ -19,30 +19,11 @@ export default function AdminAddUserScreen({ navigation }) {
 
   const expenseTypeDropdown = [
     {key:'0', value:'Entertainment and Gifts'},
-    {key:'1', value:'Taxi, C/park, ERP'},
-    {key:'2', value:'Fuel'},
-    {key:'3', value:'Vehical Repair'},
-    {key:'4', value:'Medical'},
-    {key:'5', value:'Others'},
+    {key:'1', value:'Transport'},
+    {key:'2', value:'Mobile'},
     ]
 
-  const departments = [
-    {key:'0', value:'EKTS'},
-    {key:'1', value:'EKTU'},
-    {key:'2', value:'EKTY'},
-    {key:'3', value:'EKJP'},
-    {key:'4', value:'EKTK'},
-    {key:'5', value:'IME'},
-    {key:'6', value:'Reefertec'},
-    {key:'7', value:'Smartz'},
-    {key:'8', value:'PCL'},
-    {key:'9', value:'Finance'},
-    {key:'10', value:'IT'},
-    {key:'11', value:'Marketing'},
-    {key:'12', value:'HR'},
-    {key:'13', value:'Eddie'},
-    {key:'14', value:'Paul'},
-    ]
+
 
 
 
@@ -342,7 +323,18 @@ export default function AdminAddUserScreen({ navigation }) {
 
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Amount before GST</Text>
+        <Text style={styles.normalBoldText}>Foriegn Currency, 1SGD = ?</Text>
+        <TextInput style={styles.textInput}
+          placeholder="eg. 5.6" 
+          value={newUser.email} 
+          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          autoCapitalize="none" 
+          autoCorrect={false} 
+        />
+        </View>
+
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Amount</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 20.34" 
           value={newUser.email} 
@@ -351,60 +343,6 @@ export default function AdminAddUserScreen({ navigation }) {
           autoCorrect={false} 
         />
         </View>
-
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Amount after GST</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
-
-        {newUser.company == 'Entertainment and Gifts' ? (
-        <View style={{width:'100%', alignItems:'center'}}>
-
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Place</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
-
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Customer Name</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
-
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Company</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
-
-            </View>
-
-        ):(
-            <View></View>
-        )}
-
         
 
         <View style={styles.inputContainer}>
