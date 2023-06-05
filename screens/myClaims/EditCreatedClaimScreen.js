@@ -2,7 +2,6 @@ import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, 
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import useAuth from '../../hooks/useAuth';
 import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 
@@ -210,7 +209,10 @@ export default function EditCreatedClaimScreen({ navigation }) {
   });
 
   function handleAddExpense () {
-    navigation.navigate("AddExpenseScreen")
+    navigation.navigate("AddTravelExpenseScreen")
+  }
+  function handleEditExpense() {
+    navigation.navigate("EditTravelExpenseScreen")
   }
 
 
@@ -264,7 +266,6 @@ export default function EditCreatedClaimScreen({ navigation }) {
         
         </View>
       
-
     </TouchableOpacity>
   );
 
@@ -286,7 +287,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
         onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
         onMouseLeave={() => setSelectedId({...selectedId, email: null})}
 
-        onPress={() => console.log(handleEditUser(selectedId))}
+        onPress={() => console.log(handleEditExpense(selectedId))}
         backgroundColor={backgroundColor}
         transform={transform}
       />
