@@ -13,31 +13,21 @@ export default function MyClaimsScreen({ navigation }) {
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
 
+
   useEffect(() => {
     //setIsLoading(true)
-    //fetchData()
-    setFullData(FULLDATA);
-        setData(FULLDATA);
+    const email = window.localStorage.getItem('session');
+    fetch(`http://localhost:5000/myClaims/${email}`)
+    .then((response) => response.json())
+    .then((data) => {
+      data = data.reverse()
+      setFullData(data);
+      setData(data);
+    });
+    
   }, []);
-
-  async function fetchData() {
-     
-    try {
-      await fetch("http://localhost:5000/admin")
-      .then((res) => res.json())
-      .then((data) => {
-        setFullData(data);
-        setData(data);
-      })
-      setIsLoading(false)
-    } catch (error) {
-      alert("Failed to load. Please check your internet connection!")
-      setIsLoading(false)
-    }
-
-  } 
   
-  
+  /* 
   const FULLDATA = [
     {
       claimId: '1234567',
@@ -84,7 +74,7 @@ export default function MyClaimsScreen({ navigation }) {
       status: 'In Progress',
       expense_type: 'Monthly'
     },
-  ]; 
+  ]; */
     
   
   const [selectedId, setSelectedId] = useState({claimId: ''});
@@ -188,7 +178,7 @@ export default function MyClaimsScreen({ navigation }) {
   });
 
 
-  const [userDepartments, setUserDepartments] = useState([]);
+  //const [userDepartments, setUserDepartments] = useState([]);
 
   /*
   useEffect(() => {
@@ -278,36 +268,33 @@ export default function MyClaimsScreen({ navigation }) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.claimId === selectedId.claimId ? '#EEEEEE' : 'white';
-    const transform = item.claimId === selectedId.claimId ? [{translateX: 2 }] : [{translateX: 0 }];
+    const backgroundColor = item.id === selectedId.id ? '#EEEEEE' : 'white';
+    const transform = item.id === selectedId.id ? [{translateX: 2 }] : [{translateX: 0 }];
+    const pay_period_from = new Date(item.pay_period_from).toLocaleDateString("en-UK")
+    const pay_period_to = new Date(item.pay_period_to).toLocaleDateString("en-UK")
+    const monthlyPeriod = pay_period_from + " - " + pay_period_to
+    const period_from = new Date(item.period_from).toLocaleDateString("en-UK")
+    const period_to = new Date(item.period_to).toLocaleDateString("en-UK")
+    const travellingPeriod = period_from + " - " + period_to
+
     
     return (
       <Item 
-        date={item.date} 
-        creator_Name = {item.creator_Name}
-        total = {item.total}
+        date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
+        creator_Name = {item.form_creator}
+        total = {item.total_amount}
         status = {item.status}
-        claimId = {item.claimId}
-        expense_type = {item.expense_type}
+        claimId = {item.id}
+        expense_type = {item.form_type}
 
-        onMouseEnter={() => setSelectedId({...selectedId, claimId: item.claimId})}
-        onMouseLeave={() => setSelectedId({...selectedId, claimId: null})}
+        onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
+        onMouseLeave={() => setSelectedId({...selectedId, id: null})}
 
         onPress={() => handleEditClaim(selectedId)}
         backgroundColor={backgroundColor}
         transform={transform}
       />
     )
-  }
-
-  const { logoutUser } = useAuth();
-
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   return (
@@ -347,9 +334,6 @@ export default function MyClaimsScreen({ navigation }) {
         keyExtractor={item => item.id}
       />
       </View>
-
-
-
       
 
 
