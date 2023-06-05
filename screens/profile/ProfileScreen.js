@@ -4,7 +4,6 @@ import useAuth from '../../hooks/useAuth';
 import ConfirmationButton from '../../components/ConfirmationButton';
 import BottomNavigator from '../../components/BottomNavigation';
 import { Ionicons } from "react-native-vector-icons";
-import exampleImage from '../../assets/profile.jpeg'
 import * as ImagePicker from 'expo-image-picker';
 
 export default function ProfileScreen({ navigation }) {
