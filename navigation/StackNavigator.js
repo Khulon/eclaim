@@ -16,7 +16,6 @@ const Stack = createStackNavigator();
 
 export default function StackNavigator() {
     
-    const { userProfile } = useAuth();
     const session = window.localStorage.getItem('session');
     const sessionType = window.localStorage.getItem('sessionType');
 

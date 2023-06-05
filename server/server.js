@@ -92,10 +92,6 @@ app.get('/admin',(req, res) => {
 
 
 
-
-
-
-
 //Load all departments that the user belongs to
 app.post('/admin/editUser',(req, res) => {
   let email = req.body.email;
@@ -109,6 +105,9 @@ app.post('/admin/editUser',(req, res) => {
   });
 
 });
+
+
+
 
 
 //Admin edits user details
@@ -252,6 +251,9 @@ app.post('/login', async (req, res) => {
 });
 
 
+
+
+
 //User to add claim
 app.post('/addClaim', async (req, res) => {
   let formCreator = req.body.creator;
@@ -267,12 +269,19 @@ app.post('/addClaim', async (req, res) => {
   }
   let note = req.body.note;
 
+  //Adding monthly claim
   if (expenseType == "Monthly") {
   
   try {
 
-    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count FROM Claims")
-    const newFormId = result.recordset[0].count + 1;
+    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count, MAX(id) as id FROM Claims")
+
+    if (result.recordset[0].count == 0) {
+      var newFormId = 1;
+    } else {
+      var newFormId = result.recordset[0].id + 1;
+    }
+    
     const fromDate = await request.query("SELECT PARSE('"+payPeriodFrom+"' as date USING 'AR-LB') AS fromDate")
     const toDate = await request.query("SELECT PARSE('"+payPeriodTo+"' as date USING 'AR-LB') AS toDate")
     
@@ -311,6 +320,7 @@ app.post('/addClaim', async (req, res) => {
     res.send({message: "Failed to add claim!"});
   }
 
+//Adding travelling claim
 } else {
 
   try {
@@ -322,15 +332,18 @@ app.post('/addClaim', async (req, res) => {
 
     var request = new sql.Request();
 
-    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count FROM Claims")
-    const newFormId = result.recordset[0].count + 1;
+    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count, MAX(id) as id FROM Claims")
+    if (result.recordset[0].count == 0) {
+      var newFormId = 1;
+    } else {
+      var newFormId = result.recordset[0].id + 1;
+    }
     const fromDate = await request.query("SELECT PARSE('"+dateFrom+"' as date USING 'AR-LB') AS fromDate")
     const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + "INSERT INTO TravellingGeneral VALUES(@country, @exchangerate, @period_from, @period_to, @note, @formid);"
-    " INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', @expense_type, "
-      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd); COMMIT TRANSACTION";
+    + " INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd);"
+    + "INSERT INTO TravellingGeneral VALUES(@country, @exchangerate, @period_from, @period_to, @note, @formid); COMMIT TRANSACTION";
         
     request.input('id', sql.Int, newFormId);
     request.input('expense_type', sql.Text, expenseType)
@@ -352,6 +365,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('note', sql.Text, note);
     request.input('formid', sql.Int, newFormId);
 
+    console.log(query)
     await request.query(query);
 
     res.send({message: "Travelling claim added successfully!", user: formCreator});
@@ -363,6 +377,8 @@ app.post('/addClaim', async (req, res) => {
 
   }
 });
+
+
 
 app.post('/joinClaim', async (req, res) => {
   let formId = req.body.formId;
@@ -403,4 +419,29 @@ app.post('/uploadImage', async (req, res) => {
   }
 
 });
+
+
+
+//Load all user's claims on MyClaims page
+app.get('/myClaims/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    var request = new sql.Request();
+  
+    const queryString = 'SELECT C.id, form_creator, total_amount, status, form_type, pay_period_from, pay_period_to,'
+    + 'period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id' 
+    + ' WHERE form_creator = @email';
+
+    request.input('email', sql.VarChar, email);
+    const result = await request.query(queryString);
+    res.send(result.recordset);
+
+  } catch(err) {
+      console.log(err)
+      res.send({message: "Error!"});
+  }
+
+});
+
+
 

@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
 import React, { useEffect, useState} from "react";
-import useAuth from '../../hooks/useAuth';
 import BottomNavigator from '../../components/BottomNavigation';
 
 export default function HomeScreen({ navigation }) {
