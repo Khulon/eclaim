@@ -8,7 +8,7 @@ import MultiSelect from 'react-native-multiple-select';
 
 
 
-export default function AdminAddUserScreen({ navigation }) {        
+export default function AddExpenseScreen({ navigation }) {        
 
 
   
@@ -272,7 +272,7 @@ export default function AdminAddUserScreen({ navigation }) {
           <Text style={styles.bigText}>Add</Text>
         </View>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>User</Text>
+          <Text style={styles.bigText}>Expense</Text>
         </View>
         </View>
         </View>
@@ -315,23 +315,17 @@ export default function AdminAddUserScreen({ navigation }) {
               selectText="Select department(s)"
               searchInputPlaceholderText="Search Items..."
               onChangeInput={ (text)=> console.log(text)}
-              styleInputGroup={{borderBottomWidth:'1px', borderColor:'#DADADA'}}
-              styleSelectorContainer={{borderWidth:'1px', borderColor:'#DADADA' , borderRadius:'12px'}}
-              styleRowList={{padding:'5px', backgroundColor:'white'}}
-              styleDropdownMenuSubsection={{borderWidth:'1px', borderRadius:'12px', height:'45px', borderColor:'#DADADA', paddingLeft:'20px'}}
-              styleTextDropdown={{color:'#6A6A6A'}}
-
-              searchInputStyle={{height:'45px'}}
-              altFontFamily='inherit'
-              tagRemoveIconColor="#6A6A6A"
-              tagBorderColor="#6A6A6A"
-              tagTextColor="#6A6A6A"
-              selectedItemTextColor="#45B097"
-              selectedItemIconColor="#6A6A6A"
-              itemTextColor="#6A6A6A"
+              altFontFamily="ProximaNova-Light"
+              tagRemoveIconColor="#CCC"
+              tagBorderColor="#CCC"
+              tagTextColor="#CCC"
+              selectedItemTextColor="#CCC"
+              selectedItemIconColor="#CCC"
+              itemTextColor="#000"
               displayKey="value"
-              hideSubmitButton
-              hideDropdown
+              searchInputStyle={{ color: '#CCC' }}
+              submitButtonColor="#CCC"
+              submitButtonText="Submit"
         />
         </View>
         <View style={styles.inputContainer}>

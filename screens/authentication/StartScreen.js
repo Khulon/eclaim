@@ -75,8 +75,7 @@ const styles = StyleSheet.create({
         fontSize: "16px",
         fontWeight: "700",
         
-        width: "90%",
-        maxWidth: "400px",
+        width: "100%",
         height: "40px",
         borderRadius: "14px",
     
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
         </View>
 
         <View style={{width: "100%", height: "30%", alignItems: 'center',justifyContent: 'center'}}>
-          <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: loginButtonHover }]}}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(loginButtonHover)} onMouseLeave={() => MovePosAnimation(loginButtonHover)} style={{width: "90%", maxWidth: "400px", transform: [{translateY: loginButtonHover }]}}>
           <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}  style={styles.defaultButton} > Login </TouchableOpacity>
           </Animated.View>
           <View style={{flexDirection: "row" , paddingTop: "10px"}}>

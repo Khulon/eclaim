@@ -80,6 +80,46 @@ export default function ManagementScreen({ navigation }) {
       status: 'In Progress',
       expense_type: 'Monthly'
     },
+    {
+      claimId: '6234567',
+      creator: 'Paul Toh',
+      total: '43.23',
+      date: '01 May 23 - 31 May 23',
+      status: 'In Progress',
+      expense_type: 'Monthly'
+    },
+    {
+      claimId: '7234567',
+      creator: 'Paul Chan',
+      total: '43.23',
+      date: '01 May 23 - 31 May 23',
+      status: 'In Progress',
+      expense_type: 'Monthly'
+    },
+    {
+      claimId: '8234567',
+      creator: 'Paul Goh',
+      total: '43.23',
+      date: '01 May 23 - 31 May 23',
+      status: 'In Progress',
+      expense_type: 'Monthly'
+    },
+    {
+      claimId: '9234567',
+      creator: 'Paul Liu',
+      total: '43.23',
+      date: '01 May 23 - 31 May 23',
+      status: 'In Progress',
+      expense_type: 'Monthly'
+    },
+    {
+      claimId: '1239567',
+      creator: 'Paul Tay',
+      total: '43.23',
+      date: '01 May 23 - 31 May 23',
+      status: 'In Progress',
+      expense_type: 'Monthly'
+    },
   ]; 
     
   

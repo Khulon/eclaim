@@ -1,4 +1,4 @@
-import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
+import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
@@ -41,29 +41,44 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
   const FULLDATA = [
     {
-      email: 'karenlim@gmail.com',
-      email: 'karenlim@gmail.com',
-      name: 'Karen Lim',
-      company_prefix: 'EKCA',
-      department: ['EKA','EGK'],
-      supervisor: '0',
-      approver: '0',
-      processor: '1',
+        email: 'karenlim@gmail.com',
+        email: 'karenlim@gmail.com',
+        name: 'Karen Lim',
+        company_prefix: 'EKCA',
+        department: ['EKA','EGK'],
+        supervisor: '0',
+        approver: '0',
+        processor: '1',
+        checked: 'Yes',
+        reciept: 'something'
     },
     {
-      email: 'karentan@gmail.com',
-      email: 'karentan@gmail.com',
-      name: 'Karen Tan',
-      company_prefix: 'EKCA',
-      department: ['EKA','EGK','EEE'],
-      supervisor: '0',
-      approver: '0',
-      processor: '1',
+        email: 'karentan@gmail.com',
+        email: 'karentan@gmail.com',
+        name: 'Karen Tan',
+        company_prefix: 'EKCA',
+        department: ['EKA','EGK','EEE'],
+        supervisor: '0',
+        approver: '0',
+        processor: '1',
+        checked: 'No',
+        reciept: 'something'
+    },
+    {
+        email: 'weijietan@gmail.com',
+        email: 'weijietan@gmail.com',
+        name: 'Wei Jie Tan',
+        company_prefix: 'EKCA',
+        department: ['EKA','EGK','EEE'],
+        supervisor: '0',
+        approver: '0',
+        processor: '1',
+        checked: 'No',
+        reciept: null
     },
   ]; 
 
-  
-  
+
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const [selectedId, setSelectedId] = useState({email: ''});
   const [search, setSearch] = useState('')
@@ -194,6 +209,10 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
   });
 
+  function handleAddExpense () {
+    navigation.navigate("AddExpenseScreen")
+  }
+
 
   function handleSearch (search) {
     setSearch(search)
@@ -213,7 +232,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
   }
 
 
-  const Item = ({name, email, approver, processor, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+  const Item = ({reciept, checked, name, email, approver,processor, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
       <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
@@ -226,6 +245,26 @@ export default function EditCreatedClaimScreen({ navigation }) {
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Processor: {processor}</Text>
       </View>
       
+        <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
+            <View style={{width:'15%', height:'100%'}}></View>
+
+            {checked == 'No' ? (
+                <View style={{width:'30px', flexDirection:'row-reverse'}}>
+                <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="22px"></Ionicons></Text>
+                </View>
+            ):(
+                <View></View>
+            )}
+            
+            {reciept != null ? (
+                <Text><Ionicons name="document-attach-outline" color="#444" size="20px"></Ionicons></Text>
+            ):(
+                <View></View>
+            )}
+        
+        </View>
+      
+
     </TouchableOpacity>
   );
 
@@ -237,6 +276,8 @@ export default function EditCreatedClaimScreen({ navigation }) {
     
     return (
       <Item 
+        reciept={item.reciept}
+        checked={item.checked}
         name={item.name} 
         email = {item.email}
         approver = {item.approver_name != null ? item.approver_name : 'None'}
@@ -252,15 +293,6 @@ export default function EditCreatedClaimScreen({ navigation }) {
     )
   }
 
-  const { logoutUser } = useAuth();
-
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <View style={styles.page}>
@@ -328,7 +360,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => handleAdd()} style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleAddExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
