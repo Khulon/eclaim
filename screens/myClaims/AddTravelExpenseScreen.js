@@ -208,12 +208,14 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
   });
 
+  const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
-  const [expense, setExpense] = useState({id: claim.id, claimee: claim.email, type: null, amount: null, date: null, description: null, receipt: null});
+  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, amount: null, date: null, description: null, receipt: null});
 
   function addExpense() {
+    console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://localhost:3000/addTravellingExpense', {
+    fetch('http://localhost:5000/addTravellingExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})
@@ -369,7 +371,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to add this expense?', () => addExpense())}> Add </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to add this expense?', 'OK to confirm',() => addExpense())}> Add </TouchableOpacity>
         </Animated.View>
         </View>
         </View>

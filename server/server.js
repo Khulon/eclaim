@@ -473,8 +473,38 @@ try {
 });
 
 
-/*Add travelling expense
+//Add travelling expense
 app.post('/addTravellingExpense', async (req, res) => {
-  let 
+  let id = req.body.id;
+  let claimee = req.body.claimee;
+  let amount = req.body.amount;
+  let type = req.body.type;
+  let date = req.body.date;
+  let description = req.body.description;
+  let receipt = req.body.receipt;
 
-});*/
+  try {
+    var request = new sql.Request();
+    const count = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
+    let item_number = count.recordset[0].count + 1;
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
+    const query = ("INSERT INTO TravellingExpenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @description, @receipt, @amount, @da, @lm )");
+    request.input('id', sql.Int, id)
+    request.input('count', sql.Int, item_number);
+    request.input('date', sql.Date, expense_date.recordset[0].date)
+    request.input('description', sql.Text, description);
+    request.input('receipt', sql.VarChar, null);
+    request.input('amount', sql.Numeric, amount);
+    request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
+
+    await request.query(query);
+
+    res.send({message: "Success!"});
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Failed to add travelling expense!"});
+  }
+
+});

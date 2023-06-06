@@ -6,6 +6,7 @@ import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 
 
+
 export default function EditCreatedClaimScreen({ navigation, route }) {
   const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
@@ -157,7 +158,6 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   
       cursor: "pointer"
     },
-    
     userCard: {
       backgroundColor: 'white',
       height:"80px",
@@ -172,19 +172,12 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   });
 
   function addExpense () {
-    if (claim.form_type == 'Travelling') {
-      navigation.navigate("AddTravelExpenseScreen",{props: claim})
-    } else {
-      navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
-    }
+    claim.form_type == 'Travelling' ? navigation.navigate("AddTravelExpenseScreen",
+     {props: claim}) : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
   }
 
   function handleEditExpense() {
-    if (claim.form_type == 'Travelling') {
-      navigation.navigate("EditTravelExpenseScreen")
-    } else {
-      navigation.navigate("EditMonthlyExpenseScreen")
-    }
+    navigation.navigate("EditTravelExpenseScreen")
   }
 
 
