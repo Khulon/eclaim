@@ -452,6 +452,7 @@ app.get('/getExpenses/:type/:id', async (req, res) => {
 
 try {
   if(type == 'Monthly') {
+
     const queryString = 'SELECT name, email, total_amount, expense_type, date_of_expense, item_number, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
     request.input('id', sql.Int, id);
     const result = await request.query(queryString);
