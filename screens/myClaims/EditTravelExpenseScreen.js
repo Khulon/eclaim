@@ -166,6 +166,14 @@ export default function EditTravelExpenseScreen({ navigation }) {
     alignItems:'center'
     },
 
+    recieptImage: {
+      width:'100%',
+      height: "400px",
+      borderRadius:'12px',
+      borderWidth:'1px',
+      borderColor:'#DADADA' 
+    },
+
     inputContainer: {
     paddingVertical:'5px',
     width:'90%',
@@ -360,7 +368,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Reciept</Text>
         <TouchableOpacity onPress={()=> pickImage()}>
-          <Image style={{width: 170, height: 170, borderRadius:85 }}
+          <Image style={styles.recieptImage}
             source={image}
           />
           <View style={[styles.imageInput]}>

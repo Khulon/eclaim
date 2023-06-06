@@ -150,7 +150,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
     imageInput: {
     width:'100%',
-    height: "100px",
+    height: "400px",
     color: "#6A6A6A",
     borderWidth: "1px",
     borderRadius: "12px",
@@ -161,6 +161,14 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
     zIndex:-1,
     justifyContent:'center',
     alignItems:'center'
+    },
+
+    recieptImage: {
+      width:'100%',
+      height: "400px",
+      borderRadius:'12px',
+      borderWidth:'1px',
+      borderColor:'#DADADA' 
     },
 
     inputContainer: {
@@ -334,7 +342,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Receipt</Text>
         <TouchableOpacity onPress={()=> pickImage()}>
-          <Image style={{width: 170, height: 170, borderRadius:85 }}
+          <Image style={styles.recieptImage}
             source={expense.receipt}
           />
           <View style={[styles.imageInput]}>
