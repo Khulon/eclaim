@@ -1,6 +1,6 @@
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
-import EditCreatedClaimScreen from '../screens/myClaims/EditCreatedClaimScreen';
+import EditCreatedClaimScreen from '../screens/myClaims/EditClaimScreen';
 import MyClaimsScreen from '../screens/myClaims/MyClaimsScreen';
 import AddMonthlyExpenseScreen from '../screens/myClaims/AddMonthlyExpenseScreen';
 import EditMonthlyExpenseScreen from '../screens/myClaims/EditMonthlyExpenseScreen';
