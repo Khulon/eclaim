@@ -1,7 +1,6 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "react-native-vector-icons";
-import useAuth from '../../hooks/useAuth';
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
 
@@ -14,10 +13,8 @@ export default function MyClaimsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);  
 
   useEffect(() => {
-    setFullData(FULLDATA);
-    setData(FULLDATA);
     //setIsLoading(true)
-    /*
+    
     const email = window.localStorage.getItem('session');
     fetch(`http://localhost:5000/myClaims/${email}`)
     .then((response) => response.json())
@@ -26,7 +23,7 @@ export default function MyClaimsScreen({ navigation }) {
       setFullData(data);
       setData(data);
     });
-    */
+    
     
   }, []);
   
@@ -205,7 +202,8 @@ export default function MyClaimsScreen({ navigation }) {
     for (var i = 0; i < data.length; i++) {
       if (data[i].id == selectedId.id) {
         console.log(data[i].id)
-        navigation.navigate("EditCreatedClaimScreen")
+        navigation.navigate("EditCreatedClaimScreen", { props: data[i]})
+
       }
     }
   
@@ -231,7 +229,7 @@ export default function MyClaimsScreen({ navigation }) {
   }
 
 
-  const Item = ({date, creator_Name, total, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+  const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
         {expense_type == 'Travelling' ? (
@@ -244,7 +242,8 @@ export default function MyClaimsScreen({ navigation }) {
       <View style={{height:"100%", width:"50%", minWidth:"180px", justifyContent:"center"}}>
       <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: {total}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: ${total}</Text>
       </View>
 
       <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
@@ -272,12 +271,14 @@ export default function MyClaimsScreen({ navigation }) {
     
     return (
       <Item 
-      date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
-      creator_Name = {item.form_creator}
-      total = {item.total_amount}
-      status = {item.status}
-      claimId = {item.id}
-      expense_type = {item.form_type}
+        date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
+        creator_Name = {item.form_creator}
+        total = {item.total_amount}
+        claimees = {item.claimees}
+        status = {item.status}
+        claimId = {item.id}
+        expense_type = {item.form_type}
+
 
       onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
       onMouseLeave={() => setSelectedId({...selectedId, id: null})}

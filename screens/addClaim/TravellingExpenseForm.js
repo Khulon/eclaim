@@ -279,7 +279,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
       <View style={[styles.inputContainer, {}]}>
           <Text style={styles.normalBoldText}>Date - From</Text>
           <TextInput style={styles.textInput}
-            placeholder="dd/mm/yy" 
+            placeholder="dd/mm/yyyy" 
             onChangeText={(val) => setClaim({...claim, dateFrom:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 
@@ -288,7 +288,7 @@ export default function TravellingExpenseForm({ navigation, route }) {
       <View style={[styles.inputContainer, {}]}>
           <Text style={styles.normalBoldText}>Date - To</Text>
           <TextInput style={styles.textInput}
-            placeholder="dd/mm/yy" 
+            placeholder="dd/mm/yyyy" 
             onChangeText={(val) => setClaim({...claim, dateTo:val})} 
             autoCapitalize="none" 
             autoCorrect={false} 

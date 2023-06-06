@@ -5,7 +5,10 @@ import { Ionicons } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 
-export default function EditCreatedClaimScreen({ navigation }) {        
+
+
+export default function EditCreatedClaimScreen({ navigation, route }) {
+  const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
@@ -15,29 +18,19 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
   useEffect(() => {
     //setIsLoading(true)
-    //fetchData()
-    setFullData(FULLDATA);
-        setData(FULLDATA);
+    const id = claim.id;
+    const type = claim.form_type;
+    fetch(`http://localhost:5000/getExpenses/${type}/${id}`)
+    .then((response) => response.json())
+    .then((data) => {
+      setFullData(data);
+      setData(data)
+    });
+    
   }, []);
-
-  async function fetchData() {
-     
-    try {
-      await fetch("http://localhost:5000/admin")
-      .then((res) => res.json())
-      .then((data) => {
-        setFullData(data);
-        setData(data);
-      })
-      setIsLoading(false)
-    } catch (error) {
-      alert("Failed to load. Please check your internet connection!")
-      setIsLoading(false)
-    }
-
-  } 
   
 
+  /*
   const FULLDATA = [
     {
         email: 'karenlim@gmail.com',
@@ -49,7 +42,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
         approver: '0',
         processor: '1',
         checked: 'Yes',
-        reciept: 'something'
+        receipt: 'something'
     },
     {
         email: 'karentan@gmail.com',
@@ -61,7 +54,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
         approver: '0',
         processor: '1',
         checked: 'No',
-        reciept: 'something'
+        receipt: 'something'
     },
     {
         email: 'weijietan@gmail.com',
@@ -73,9 +66,9 @@ export default function EditCreatedClaimScreen({ navigation }) {
         approver: '0',
         processor: '1',
         checked: 'No',
-        reciept: null
+        receipt: null
     },
-  ]; 
+  ]; */
 
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
@@ -208,9 +201,11 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
   });
 
-  function handleAddExpense () {
-    navigation.navigate("AddTravelExpenseScreen")
+  function addExpense () {
+    claim.form_type == 'Travelling' ? navigation.navigate("AddTravelExpenseScreen",
+     {props: claim}) : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
   }
+
   function handleEditExpense() {
     navigation.navigate("EditTravelExpenseScreen")
   }
@@ -234,17 +229,17 @@ export default function EditCreatedClaimScreen({ navigation }) {
   }
 
 
-  const Item = ({reciept, checked, name, email, approver,processor, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+  const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
       <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
-      <Text style={{fontSize: "13px", fontWeight:"700"}}>{name}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Email: {email}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Approver: {approver}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Processor: {processor}</Text>
+      <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Name: {name}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Type: {type}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Cost: ${amount}</Text>
       </View>
       
         <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
@@ -258,7 +253,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
                 <View></View>
             )}
             
-            {reciept != null ? (
+            {receipt != null ? (
                 <Text><Ionicons name="document-attach-outline" color="#444" size="20px"></Ionicons></Text>
             ):(
                 <View></View>
@@ -277,12 +272,12 @@ export default function EditCreatedClaimScreen({ navigation }) {
     
     return (
       <Item 
-        reciept={item.reciept}
-        checked={item.checked}
-        name={item.name} 
-        email = {item.email}
-        approver = {item.approver_name != null ? item.approver_name : 'None'}
-        processor = {item.processor_email != null ? item.processor_email : 'None'}
+        receipt = {item.receipt}
+        date = {claim.form_type == 'Travelling' ? convertDate(item.date) : convertDate(item.date_of_expense)}
+        checked = {item.checked}
+        name = {item.name} 
+        type = {item.expense_type}
+        amount = {claim.form_type == 'Monthly' ? item.total_amount : item.amount}
 
         onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
         onMouseLeave={() => setSelectedId({...selectedId, email: null})}
@@ -294,6 +289,14 @@ export default function EditCreatedClaimScreen({ navigation }) {
     )
   }
 
+
+  const monthlyPeriod = convertDate(claim.pay_period_from) + " - " + convertDate(claim.pay_period_to)
+  const travellingPeriod = convertDate(claim.period_from) + " - " + convertDate(claim.period_to)
+
+  function convertDate(date) {
+    const newDate = new Date(date).toLocaleDateString("en-UK")
+    return newDate
+  }
 
   return (
     <View style={styles.page}>
@@ -312,11 +315,11 @@ export default function EditCreatedClaimScreen({ navigation }) {
             </TouchableOpacity>
           </View>
             <View style={{width:'100%', alignItems:"center"}}>
-            <Text style={{fontSize:'16px', fontWeight:'600'}}>10 Jan 23 - 31 Jan 23</Text>
-            <Text style={{fontSize:'12px'}}>Creator: Paul Lim</Text>
+            <Text style={{fontSize:'16px', fontWeight:'600'}}>{claim.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod}</Text>
+            <Text style={{fontSize:'12px'}}>Creator: {claim.form_creator}</Text>
             </View>
           </View>
-        <Text style={{fontFamily:"inherit", fontSize: "26px", fontWeight:"700"}}>Something Claim</Text>
+        <Text style={{fontFamily:"inherit", fontSize: "26px", fontWeight:"700"}}>{claim.form_type} Claim</Text>
         <View style={styles.inputContainer}>
           <TextInput style={styles.textInput}
             placeholder="Search" 
@@ -347,10 +350,10 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
       <View style={styles.bottomCard}>
         <View style={{position:'absolute', width:'100%', height:'100%', flexDirection:'row-reverse'}}>
-            <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: 123456</Text>
+            <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.id}</Text>
         </View>
         <Text style={{paddingTop:"15px"}}>Total:</Text>
-        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>$43.50</Text>
+        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${claim.total_amount}</Text>
         
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
@@ -361,7 +364,7 @@ export default function EditCreatedClaimScreen({ navigation }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => handleAddExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
         </View>
         </View>

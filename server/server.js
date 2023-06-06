@@ -422,13 +422,14 @@ app.post('/uploadImage', async (req, res) => {
 
 
 
+
 //Load all user's claims on MyClaims page
 app.get('/myClaims/:email', async (req, res) => {
   try {
     const { email } = req.params;
     var request = new sql.Request();
   
-    const queryString = 'SELECT C.id, form_creator, total_amount, status, form_type, pay_period_from, pay_period_to,'
+    const queryString = 'SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to,'
     + 'period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id' 
     + ' WHERE form_creator = @email';
 
@@ -444,4 +445,36 @@ app.get('/myClaims/:email', async (req, res) => {
 });
 
 
+//get expenses for claim
+app.get('/getExpenses/:type/:id', async (req, res) => {
+  const { id, type } = req.params;
+  var request = new sql.Request();
 
+try {
+  if(type == 'Monthly') {
+
+    const queryString = 'SELECT name, email, total_amount, expense_type, date_of_expense, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
+    request.input('id', sql.Int, id);
+    const result = await request.query(queryString);
+    res.send(result.recordset);
+
+  } else { 
+    const queryString = 'SELECT name, email, amount, expense_type, date FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
+    request.input('id', sql.Int, id);
+    const result = await request.query(queryString);
+    res.send(result.recordset);
+  }
+  
+} catch(err) {
+  console.log(err)
+  res.send({message: "Error!"});
+}
+
+});
+
+
+/*Add travelling expense
+app.post('/addTravellingExpense', async (req, res) => {
+  let 
+
+});*/
