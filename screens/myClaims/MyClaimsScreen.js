@@ -27,7 +27,7 @@ export default function MyClaimsScreen({ navigation }) {
     
   }, []);
   
-  
+  /*
   const FULLDATA = [
     {
       id: '1234567',
@@ -62,7 +62,7 @@ export default function MyClaimsScreen({ navigation }) {
       status: 'Rejected',
       form_type: 'Travelling'
     },
-  ]; 
+  ];  */
     
   
   const [selectedId, setSelectedId] = useState({id: ''});

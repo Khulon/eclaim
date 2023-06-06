@@ -223,6 +223,11 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
       .then(response => response.json())
       .then(data => {
         console.log(data);
+        if(data.message == "Success!") {
+          alert("Expense added successfully!")
+        } else {
+          alert("Error!")
+        }
       })
   }
 
