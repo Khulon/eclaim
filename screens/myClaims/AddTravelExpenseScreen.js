@@ -17,13 +17,27 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
 
-  const expenseTypeDropdown = [
-    {key:'0', value:'Entertainment and Gifts'},
-    {key:'1', value:'Transport'},
-    {key:'2', value:'Mobile'},
-    {key:'3', value:'Others'},
-    ]
+  var expenseTypeDropdown = []
 
+  useEffect(() => {
+    fetchExpenseTypes();
+    
+  }, []);
+
+
+  async function fetchExpenseTypes() {
+    await fetch('http://localhost:5000/getTravellingExpenseTypes')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        for(var i = 0; i < data.length; i++) {
+          expenseTypeDropdown.push({value: data[i].type})
+        }
+        expenseTypeDropdown.push({value: 'Others'})
+      }
+      );
+  }
+  
 
   const styles = StyleSheet.create({
     page: {
@@ -230,7 +244,6 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
           alert("Error!")
         }
       })
-    navigation.navigation()
   }
 
 

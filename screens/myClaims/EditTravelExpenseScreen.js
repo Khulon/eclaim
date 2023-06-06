@@ -26,8 +26,6 @@ export default function EditTravelExpenseScreen({ navigation }) {
 
 
 
-
-
   const styles = StyleSheet.create({
     page: {
       height: "100%",
@@ -212,14 +210,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
 
   });
 
-  const image = window.localStorage.getItem('image')
-  const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
-
-  useEffect(() => {
-    setNewUser({...newUser, department: userDepartments});
-  }, [userDepartments]);
+  
 
 
   function addUser (){
@@ -329,7 +320,6 @@ export default function EditTravelExpenseScreen({ navigation }) {
           autoCorrect={false} 
         />
         </View>
-
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Amount</Text>
