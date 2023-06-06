@@ -210,7 +210,8 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
-  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, amount: null, date: null, description: null, receipt: null});
+  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
+    amount: null, date: null, description: null, receipt: null});
 
   function addExpense() {
     console.log(expense)
@@ -297,7 +298,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         <TextInput style={styles.textInput}
           placeholder="eg. Overtime meal" 
           //value={expense.type} 
-          onChangeText={(type) => setExpense({...expense, type: type})}
+          onChangeText={(type) => setExpense({...expense, otherType: type})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
