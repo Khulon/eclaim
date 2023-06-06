@@ -21,6 +21,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
     {key:'0', value:'Entertainment and Gifts'},
     {key:'1', value:'Transport'},
     {key:'2', value:'Mobile'},
+    {key:'3', value:'Others'},
     ]
 
 
@@ -213,10 +214,10 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
     amount: null, date: null, description: null, receipt: null});
 
-  function addExpense() {
+  async function addExpense() {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://localhost:5000/addTravellingExpense', {
+    await fetch('http://localhost:5000/addTravellingExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})
@@ -229,6 +230,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
           alert("Error!")
         }
       })
+    navigation.navigation()
   }
 
 
@@ -297,17 +299,21 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
                 search = {false}
             />  
         </View>
-        
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>If others, state type</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. Overtime meal" 
-          //value={expense.type} 
-          onChangeText={(type) => setExpense({...expense, otherType: type})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
+
+        {expense.type == 'Others' ? (
+          <View style={styles.inputContainer}>
+          <Text style={styles.normalBoldText}>If others, state type</Text>
+          <TextInput style={styles.textInput}
+            placeholder="eg. Overtime meal" 
+            //value={expense.type} 
+            onChangeText={(type) => setExpense({...expense, otherType: type})}
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+          </View>
+        ) : (
+          <View></View>
+        )}
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Date</Text>
