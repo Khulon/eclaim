@@ -294,7 +294,7 @@ app.post('/addClaim', async (req, res) => {
         
     request.input('id', sql.Int, newFormId);
     request.input('expense_type', sql.Text, expenseType)
-    request.input('total_amount', sql.Numeric, 0);
+    request.input('total_amount', sql.Numeric(18,2), 0);
     request.input('levels', sql.Int, 1);
     request.input('claimees', sql.Int, 1);
     request.input('status', sql.VarChar, "In Progress");
@@ -347,7 +347,7 @@ app.post('/addClaim', async (req, res) => {
         
     request.input('id', sql.Int, newFormId);
     request.input('expense_type', sql.Text, expenseType)
-    request.input('total_amount', sql.Numeric, 0);
+    request.input('total_amount', sql.Numeric(18,2), 0);
     request.input('levels', sql.Int, 1);
     request.input('claimees', sql.Int, 1);
     request.input('status', sql.VarChar, "In Progress");
@@ -359,7 +359,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('lpd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
     request.input('country', sql.VarChar, country);
-    request.input('exchangerate', sql.Numeric, exchangeRate);
+    request.input('exchangerate', sql.Decimal(19,9), exchangeRate);
     request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
     request.input('period_to', sql.Date, toDate.recordset[0].toDate);
     request.input('note', sql.Text, note);
@@ -459,7 +459,7 @@ try {
     res.send(result.recordset);
 
   } else { 
-    const queryString = 'SELECT name, email, amount, expense_type, item_number, date FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
+    const queryString = 'SELECT name, email, amount, expense_type, date, item_number FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
     request.input('id', sql.Int, id);
     const result = await request.query(queryString);
     res.send(result.recordset);
@@ -479,25 +479,50 @@ app.post('/addTravellingExpense', async (req, res) => {
   let claimee = req.body.claimee;
   let amount = req.body.amount;
   let type = req.body.type;
-  let date = req.body.date;
-  let description = req.body.description;
+  let otherType = req.body.otherType;
   let receipt = req.body.receipt;
 
   try {
+
+    if(otherType = "") {
+      otherType = null;
+    }
+
+    if(type != null && otherType != null) {
+      throw new Error("Cannot have both type and otherType");
+    }
+
+
+    if(type == null && otherType != null) {
+      type = req.body.otherType;
+    }
+
+    let date = req.body.date;
+    var description = req.body.description;
+
+    if(description == "") {
+      description = null;
+    }
+
+    
     var request = new sql.Request();
+    const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
+    if(checkType.recordset[0].count == 0) {
+      await request.query("INSERT INTO TravellingExpenseTypes VALUES('"+type+"')")
+    }
     const count = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
-    const query = ("INSERT INTO TravellingExpenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @description, @receipt, @amount, @da, @lm )");
+    const query = ("INSERT INTO TravellingExpenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @description, '"+receipt+"', @amount, @da, @lm )");
     request.input('id', sql.Int, id)
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarChar, null);
-    request.input('amount', sql.Numeric, amount);
+    request.input('amount', sql.Numeric(18,2), amount);
     request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
+
 
     await request.query(query);
 

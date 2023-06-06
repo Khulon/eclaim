@@ -211,7 +211,8 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
-  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, amount: null, date: null, description: null, receipt: null});
+  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
+    amount: null, date: null, description: null, receipt: null});
 
   async function addExpense() {
     console.log(expense)
@@ -223,6 +224,11 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
       .then(response => response.json())
       .then(data => {
         console.log(data);
+        if(data.message == "Success!") {
+          alert("Expense added successfully!")
+        } else {
+          alert("Error!")
+        }
       })
     navigation.navigation()
   }
@@ -293,13 +299,14 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
                 search = {false}
             />  
         </View>
+
         {expense.type == 'Others' ? (
           <View style={styles.inputContainer}>
           <Text style={styles.normalBoldText}>If others, state type</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. Overtime meal" 
             //value={expense.type} 
-            onChangeText={(type) => setExpense({...expense, type: type})}
+            onChangeText={(type) => setExpense({...expense, otherType: type})}
             autoCapitalize="none" 
             autoCorrect={false} 
           />
