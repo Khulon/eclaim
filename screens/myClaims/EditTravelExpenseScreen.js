@@ -25,8 +25,6 @@ export default function EditTravelExpenseScreen({ navigation }) {
 
 
 
-
-
   const styles = StyleSheet.create({
     page: {
       height: "100%",
@@ -211,14 +209,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
 
   });
 
-  const image = window.localStorage.getItem('image')
-  const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
-
-  useEffect(() => {
-    setNewUser({...newUser, department: userDepartments});
-  }, [userDepartments]);
+  
 
 
   function addUser (){
@@ -282,7 +273,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>Add</Text>
+          <Text style={styles.bigText}>Edit</Text>
         </View>
         <View style={{paddingHorizontal: '7px'}}>
           <Text style={styles.bigText}>Expense</Text>
@@ -324,18 +315,6 @@ export default function EditTravelExpenseScreen({ navigation }) {
           placeholder="dd/mm/yy" 
           value={newUser.name} 
           onChangeText={(name) => setNewUser({...newUser, name:name})} 
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
-
-        
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Foriegn Currency, 1SGD = ?</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 5.6" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
