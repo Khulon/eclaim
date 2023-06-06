@@ -21,6 +21,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
     {key:'0', value:'Entertainment and Gifts'},
     {key:'1', value:'Transport'},
     {key:'2', value:'Mobile'},
+    {key:'3', value:'Others'},
     ]
 
 
@@ -282,7 +283,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>Add</Text>
+          <Text style={styles.bigText}>Edit</Text>
         </View>
         <View style={{paddingHorizontal: '7px'}}>
           <Text style={styles.bigText}>Expense</Text>
@@ -329,17 +330,6 @@ export default function EditTravelExpenseScreen({ navigation }) {
         />
         </View>
 
-        
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Foriegn Currency, 1SGD = ?</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 5.6" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Amount</Text>
