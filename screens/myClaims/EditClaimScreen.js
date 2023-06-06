@@ -143,21 +143,23 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
       flexDirection:'row-reverse'
     },
     defaultButton: {
-      fontFamily: "inherit",
       backgroundColor: "#E04F4F",
       border: "none",
-  
-      padding: "10px",
-      color: "white",
-      textAlign: "center",
-      fontSize: "16px",
-      fontWeight: "700",
       
       height: "40px",
       borderRadius: "14px",
   
       cursor: "pointer"
     },
+    buttonText: {
+      fontFamily: "inherit",
+      padding: "10px",
+      color: "white",
+      textAlign: "center",
+      fontSize: "16px",
+      fontWeight: "700",
+    },
+
     userCard: {
       backgroundColor: 'white',
       height:"80px",
@@ -206,10 +208,10 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
-      <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Name: {name}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Type: {type}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Cost: ${amount}</Text>
+        <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
+        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Name: {name}</Text>
+        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Type: {type}</Text>
+        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Cost: ${amount}</Text>
       </View>
       
         <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
@@ -315,7 +317,6 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
         showsVerticalScrollIndicator={false}
         data={data}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
       />
       </View>
 
@@ -333,13 +334,13 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => deleteUser(userDetails))}> Submit </TouchableOpacity>
+          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => deleteUser(userDetails))}> <Text style={styles.buttonText}>Submit</Text> </TouchableOpacity>
           </Animated.View>
           </View>
   
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
+          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > <Text style={styles.buttonText}>Add</Text> </TouchableOpacity>
           </Animated.View>
           </View>
           </View>
@@ -347,7 +348,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={[styles.buttonContainer,{width:'100%'}]}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
+          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > <Text style={styles.buttonText}>Add</Text> </TouchableOpacity>
           </Animated.View>
           </View>
           </View>

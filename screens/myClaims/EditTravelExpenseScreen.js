@@ -21,6 +21,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
     {key:'0', value:'Entertainment and Gifts'},
     {key:'1', value:'Transport'},
     {key:'2', value:'Mobile'},
+    {key:'3', value:'Others'},
     ]
 
 
