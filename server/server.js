@@ -453,13 +453,13 @@ app.get('/getExpenses/:type/:id', async (req, res) => {
 try {
   if(type == 'Monthly') {
 
-    const queryString = 'SELECT name, email, total_amount, expense_type, date_of_expense, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
+    const queryString = 'SELECT name, email, total_amount, expense_type, date_of_expense, item_number, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
     request.input('id', sql.Int, id);
     const result = await request.query(queryString);
     res.send(result.recordset);
 
   } else { 
-    const queryString = 'SELECT name, email, amount, expense_type, date FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
+    const queryString = 'SELECT name, email, amount, expense_type, item_number, date FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
     request.input('id', sql.Int, id);
     const result = await request.query(queryString);
     res.send(result.recordset);
