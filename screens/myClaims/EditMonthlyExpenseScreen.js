@@ -186,7 +186,8 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
     },
 
     recieptImage: {
-      aspectRatio: 1,
+      width:'100%',
+      height: "400px",
       borderRadius:'12px',
       borderWidth:'1px',
       borderColor:'#DADADA' 
