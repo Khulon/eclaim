@@ -6,7 +6,6 @@ import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 
 
-
 export default function EditCreatedClaimScreen({ navigation, route }) {
   const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
@@ -29,47 +28,6 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
     
   }, []);
   
-
-  /*
-  const FULLDATA = [
-    {
-        email: 'karenlim@gmail.com',
-        email: 'karenlim@gmail.com',
-        name: 'Karen Lim',
-        company_prefix: 'EKCA',
-        department: ['EKA','EGK'],
-        supervisor: '0',
-        approver: '0',
-        processor: '1',
-        checked: 'Yes',
-        receipt: 'something'
-    },
-    {
-        email: 'karentan@gmail.com',
-        email: 'karentan@gmail.com',
-        name: 'Karen Tan',
-        company_prefix: 'EKCA',
-        department: ['EKA','EGK','EEE'],
-        supervisor: '0',
-        approver: '0',
-        processor: '1',
-        checked: 'No',
-        receipt: 'something'
-    },
-    {
-        email: 'weijietan@gmail.com',
-        email: 'weijietan@gmail.com',
-        name: 'Wei Jie Tan',
-        company_prefix: 'EKCA',
-        department: ['EKA','EGK','EEE'],
-        supervisor: '0',
-        approver: '0',
-        processor: '1',
-        checked: 'No',
-        receipt: null
-    },
-  ]; */
-
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const [selectedId, setSelectedId] = useState({email: ''});
@@ -202,12 +160,19 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   });
 
   function addExpense () {
-    claim.form_type == 'Travelling' ? navigation.navigate("AddTravelExpenseScreen",
-     {props: claim}) : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
+    if (claim.form_type == 'Travelling') {
+      navigation.navigate("AddTravelExpenseScreen",{props: claim})
+    } else {
+      navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
+    }
   }
 
   function handleEditExpense() {
-    navigation.navigate("EditTravelExpenseScreen")
+    if (claim.form_type == 'Travelling') {
+      navigation.navigate("EditTravelExpenseScreen")
+    } else {
+      navigation.navigate("EditMonthlyExpenseScreen")
+    }
   }
 
 
