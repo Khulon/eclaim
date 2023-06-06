@@ -30,6 +30,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   }, []);
   
 
+  /*
   const FULLDATA = [
     {
         email: 'karenlim@gmail.com',
@@ -67,7 +68,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
         checked: 'No',
         receipt: null
     },
-  ]; 
+  ]; */
 
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
@@ -200,9 +201,11 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
 
   });
 
-  function handleAddExpense () {
-    navigation.navigate("AddTravelExpenseScreen")
+  function addExpense () {
+    claim.form_type == 'Travelling' ? navigation.navigate("AddTravelExpenseScreen",
+     {props: claim}) : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
   }
+
   function handleEditExpense() {
     navigation.navigate("EditTravelExpenseScreen")
   }
@@ -274,7 +277,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
         checked = {item.checked}
         name = {item.name} 
         type = {item.expense_type}
-        amount = {item.amount}
+        amount = {claim.form_type == 'Monthly' ? item.total_amount : item.amount}
 
         onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
         onMouseLeave={() => setSelectedId({...selectedId, email: null})}
@@ -361,7 +364,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => handleAddExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
         </View>
         </View>

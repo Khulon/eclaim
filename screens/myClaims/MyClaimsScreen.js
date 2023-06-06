@@ -13,10 +13,8 @@ export default function MyClaimsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);  
 
   useEffect(() => {
-    setFullData(FULLDATA);
-    setData(FULLDATA);
     //setIsLoading(true)
-    /*
+    
     const email = window.localStorage.getItem('session');
     fetch(`http://localhost:5000/myClaims/${email}`)
     .then((response) => response.json())
@@ -25,7 +23,7 @@ export default function MyClaimsScreen({ navigation }) {
       setFullData(data);
       setData(data);
     });
-    */
+    
     
   }, []);
   

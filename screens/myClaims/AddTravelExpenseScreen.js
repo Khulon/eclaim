@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 
-export default function AddTravelExpenseScreen({ navigation }) {        
+export default function AddTravelExpenseScreen({ navigation, route }) {        
 
 
   
@@ -22,9 +22,6 @@ export default function AddTravelExpenseScreen({ navigation }) {
     {key:'1', value:'Transport'},
     {key:'2', value:'Mobile'},
     ]
-
-
-
 
 
   const styles = StyleSheet.create({
@@ -203,35 +200,21 @@ export default function AddTravelExpenseScreen({ navigation }) {
 
   });
 
-  const image = window.localStorage.getItem('image')
-  const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
+  const claim  = route.params.props;
+  const [expense, setExpense] = useState({id: claim.id, claimee: claim.email, type: null, amount: null, date: null, description: null, receipt: null});
 
-  useEffect(() => {
-    setNewUser({...newUser, department: userDepartments});
-  }, [userDepartments]);
-
-
-  function addUser (){
+  function addExpense() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    console.log(userDepartments);
-    console.log(newUser);
-    fetch('http://localhost:5000/admin/addUser', {
-      method: 'POST', 
+    fetch('http://localhost:3000/addTravellingExpense', {
+      method: 'POST',
       headers: header,
-      body: JSON.stringify(newUser)})
-      .then((response) => response.json())
-      .then((resp) => { 
-        console.log(resp);
-        if(resp.message == 'User Added!') {
-          alert('User Added!');
-          window.location.reload(false);
-        } else {
-          alert('Failed to add user!');
-        }
-      });
-  }; 
+      body: JSON.stringify(expense)})
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+      })
+  }
+
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -245,7 +228,7 @@ export default function AddTravelExpenseScreen({ navigation }) {
     console.log(result.uri);
 
     if (!result.canceled) {
-      window.localStorage.setItem('image', result.uri);
+      setExpense({...expense, receipt: result.uri});
     }
 }
 
@@ -291,7 +274,7 @@ export default function AddTravelExpenseScreen({ navigation }) {
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles} 
-                setSelected={(company) => setNewUser({...newUser, company:company})}
+                setSelected={(type) => setExpense({...expense, type: type})}
                 data={expenseTypeDropdown} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
@@ -302,9 +285,9 @@ export default function AddTravelExpenseScreen({ navigation }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>If others, state type</Text>
         <TextInput style={styles.textInput}
-          placeholder="eg. overtime meal" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
+          placeholder="eg. Overtime meal" 
+          //value={expense.type} 
+          onChangeText={(type) => setExpense({...expense, type: type})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -313,32 +296,21 @@ export default function AddTravelExpenseScreen({ navigation }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Date</Text>
         <TextInput style={styles.textInput}
-          placeholder="dd/mm/yy" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
+          placeholder="dd/mm/yyyy" 
+          value={expense.date} 
+          onChangeText={(date) => setExpense({...expense, date:date})} 
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
 
-        
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Foriegn Currency, 1SGD = ?</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. 5.6" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Amount</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 20.34" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.amount}
+          onChangeText={(amount) => setExpense({...expense, amount: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -348,20 +320,20 @@ export default function AddTravelExpenseScreen({ navigation }) {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Description</Text>
         <TextInput style={[styles.textInput,{height:'100px'}]}
-          placeholder="Desciption of expense" 
-          value={newUser.email} 
+          placeholder="Optional" 
+          value={expense.description}
           multiline={true}
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          onChangeText={(description) => setExpense({...expense, description: description})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Reciept</Text>
+        <Text style={styles.normalBoldText}>Receipt</Text>
         <TouchableOpacity onPress={()=> pickImage()}>
           <Image style={{width: 170, height: 170, borderRadius:85 }}
-            source={image}
+            source={expense.receipt}
           />
           <View style={[styles.imageInput]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
@@ -383,13 +355,13 @@ export default function AddTravelExpenseScreen({ navigation }) {
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
-        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to leave?', 'User information will not be saved', () => navigation.goBack())} style={styles.defaultButton} > Cancel </TouchableOpacity>
+        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to cancel?', 'This expense will not be saved', () => navigation.goBack())} style={styles.defaultButton} > Cancel </TouchableOpacity>
         </Animated.View>
         </View>
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Confirm user creation?', 'User details can still be updated once created', () => addUser())}> Save </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to add this expense?', () => addExpense())}> Add </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
