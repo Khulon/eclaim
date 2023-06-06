@@ -11,22 +11,33 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
+  const userDetails = JSON.parse(window.localStorage.getItem('details'))
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    //setIsLoading(true)
-    const id = claim.id;
-    const type = claim.form_type;
-    fetch(`http://localhost:5000/getExpenses/${type}/${id}`)
-    .then((response) => response.json())
-    .then((data) => {
-      setFullData(data);
-      setData(data)
-    });
-    
+    setIsLoading(true)
+    fetchData()
   }, []);
+
+  async function fetchData() {
+    try {
+      const id = claim.id;
+      const type = claim.form_type;
+      await fetch(`http://localhost:5000/getExpenses/${type}/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setFullData(data);
+        setData(data)
+      });
+      setIsLoading(false)
+    } catch (error) {
+      alert("Failed to load. Please check your internet connection!")
+      setIsLoading(false)
+    }
+
+  } 
   
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
@@ -146,6 +157,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   
       cursor: "pointer"
     },
+    
     userCard: {
       backgroundColor: 'white',
       height:"80px",
@@ -320,19 +332,32 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${claim.total_amount}</Text>
         
-        <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
-        <View style={styles.buttonContainer}>
-        <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => deleteUser(userDetails))}> Submit </TouchableOpacity>
-        </Animated.View>
-        </View>
 
-        <View style={styles.buttonContainer}>
-        <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
-        </Animated.View>
-        </View>
-        </View>
+        {claim.form_creator == userDetails.email ? (
+          <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+          <View style={styles.buttonContainer}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
+          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => deleteUser(userDetails))}> Submit </TouchableOpacity>
+          </Animated.View>
+          </View>
+  
+          <View style={styles.buttonContainer}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
+          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
+          </Animated.View>
+          </View>
+          </View>
+        ):(
+          <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+          <View style={[styles.buttonContainer,{width:'100%'}]}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
+          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > Add </TouchableOpacity>
+          </Animated.View>
+          </View>
+          </View>
+        )}
+
+      
 
       </View>
 

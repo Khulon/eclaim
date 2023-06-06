@@ -8,7 +8,6 @@ import AddClaimStack from './AddClaimStack';
 import MyClaimsStack from './MyClaimsStack';
 import ProfileStack from './ProfileStack';
 import StackFilter from './StackFilter';
-import useAuth from '../hooks/useAuth';
 
 
 const Stack = createStackNavigator();

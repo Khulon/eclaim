@@ -150,7 +150,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
     imageInput: {
     width:'100%',
-    height: "100px",
+    height: "400px",
     color: "#6A6A6A",
     borderWidth: "1px",
     borderRadius: "12px",
@@ -164,7 +164,8 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
     },
 
     recieptImage: {
-      aspectRatio: 1,
+      width:'100%',
+      height: "400px",
       borderRadius:'12px',
       borderWidth:'1px',
       borderColor:'#DADADA' 
