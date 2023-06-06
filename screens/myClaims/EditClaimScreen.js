@@ -42,7 +42,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [selectedId, setSelectedId] = useState({email: ''});
+  const [selectedId, setSelectedId] = useState({emailAndItemNumber: ''});
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -237,11 +237,14 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.email === selectedId.email ? '#EEEEEE' : 'white';
-    const transform = item.email === selectedId.email ? [{translateX: 2 }] : [{translateX: 0 }];
+    const backgroundColor = item.email === selectedId.emailAndItemNumber[0] ? item.item_number === selectedId.emailAndItemNumber[1] ? '#EEEEEE' : 'white' : 'white';
+    const transform = selectedId.emailAndItemNumber[0] ? item.item_number === selectedId.emailAndItemNumber[1] ? [{translateX: 2 }] : [{translateX: 0 }] : [{translateX: 0 }];
     
+
     return (
       <Item 
+        email = {item.email}
+        item_number = {item.item_number}
         receipt = {item.receipt}
         date = {claim.form_type == 'Travelling' ? convertDate(item.date) : convertDate(item.date_of_expense)}
         checked = {item.checked}
@@ -249,8 +252,8 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
         type = {item.expense_type}
         amount = {claim.form_type == 'Monthly' ? item.total_amount : item.amount}
 
-        onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
-        onMouseLeave={() => setSelectedId({...selectedId, email: null})}
+        onMouseEnter={() => setSelectedId({...selectedId, emailAndItemNumber: [item.email, item.item_number,]})}
+        onMouseLeave={() => setSelectedId({...selectedId, emailAndItemNumber: ['','']})}
 
         onPress={() => console.log(handleEditExpense(selectedId))}
         backgroundColor={backgroundColor}
