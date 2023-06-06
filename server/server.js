@@ -484,17 +484,18 @@ app.post('/addTravellingExpense', async (req, res) => {
 
   try {
 
-    if(otherType == "") {
-      otherType = null;
-    }
+    if(type == "Others") {
 
-    if(type != null && otherType != null) {
-      throw new Error("Cannot have both type and otherType");
-    }
+      if(otherType == "") {
+        otherType = null;
+      }
 
+      if(otherType == "Others") {
+        throw new Error("Please enter a valid expense type!")
+      }
 
-    if(type == null && otherType != null) {
       type = otherType;
+
     }
 
     let date = req.body.date;
@@ -508,7 +509,9 @@ app.post('/addTravellingExpense', async (req, res) => {
     var request = new sql.Request();
     const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
     if(checkType.recordset[0].count == 0) {
-      await request.query("INSERT INTO TravellingExpenseTypes VALUES('"+type+"')")
+      const query = "INSERT INTO TravellingExpenseTypes VALUES(@type)"
+      request.input('type', sql.VarChar, type)
+      await request.query(query);
     }
     const count = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
