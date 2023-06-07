@@ -202,7 +202,7 @@ export default function MyClaimsScreen({ navigation }) {
     for (var i = 0; i < data.length; i++) {
       if (data[i].id == selectedId.id) {
         console.log(data[i].id)
-        navigation.navigate("EditCreatedClaimScreen", { props: data[i]})
+        navigation.navigate("EditClaimScreen", { props: data[i]})
 
       }
     }

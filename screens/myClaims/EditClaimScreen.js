@@ -1,13 +1,13 @@
 import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext, createContext } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 
 
+export default function EditClaimScreen({ navigation, route}) {
 
-export default function EditCreatedClaimScreen({ navigation, route }) {
   const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
@@ -174,8 +174,11 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   });
 
   function addExpense () {
-    claim.form_type == 'Travelling' ? navigation.navigate("AddTravelExpenseScreen",
-     {props: claim}) : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
+    if (claim.form_type == 'Travelling') {
+      navigation.navigate("AddTravelExpenseScreen",{props: claim}) 
+    } else {
+      navigation.navigate("AddMonthlyExpenseScreen",{props: claim})
+    }
   }
 
   function handleEditExpense() {
@@ -204,7 +207,23 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
-      <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
+        <Text>
+        {type=='Transport'?(
+          <Ionicons  name="car-outline" color="#444" size="25px"/>
+        ):type=='Entertainment'?(
+          <Ionicons  name="gift-outline" color="#444" size="25px"/>
+        ):type=='Mobile'?(
+          <Ionicons  name="call-outline" color="#444" size="25px"/>
+        ):type=='Fuel'?(
+          <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
+        ):type=='Vehicle_repair'?(
+          <Ionicons  name="construct-outline" color="#444" size="25pxe"/>
+        ):type=='Medical'?(
+          <Ionicons  name="medkit-outline" color="#444" size="25px"/>
+        ):(
+          <Ionicons  name="reader-outline" color="#444" size="25px"/>
+        )}
+      </Text>
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
@@ -360,7 +379,11 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
 
 
       </View>
+
     </View>
+    
+
+
     
   );
 }
