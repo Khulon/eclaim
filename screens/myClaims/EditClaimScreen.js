@@ -379,6 +379,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
         showsVerticalScrollIndicator={false}
         data={data}
         renderItem={renderItem}
+        keyExtractor={item => item.id}
       />
       </View>
 
