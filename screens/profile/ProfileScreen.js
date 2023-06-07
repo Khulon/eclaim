@@ -189,7 +189,7 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.displayContainer}>
           <View style={styles.circle}>
           <TouchableOpacity onPress={()=> pickImage()}>
-          <Image style={{width: 170, height: 170, borderRadius:85 }}
+          <Image style={{width: 170, height: 170, borderRadius:85, borderWidth:'1px', borderColor:'#444' }}
             source={image}
           />
           <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
