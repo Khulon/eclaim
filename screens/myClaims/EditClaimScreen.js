@@ -1,13 +1,14 @@
 import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext, createContext } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
-import { Ionicons } from "react-native-vector-icons";
+import { Ionicons, Feather } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
+import { useIsFocused } from "@react-navigation/native";
 
 
-
-export default function EditCreatedClaimScreen({ navigation, route }) {
+export default function EditClaimScreen({ navigation, route, props}) {
+  const isFocused = useIsFocused();
   const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
@@ -18,9 +19,12 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   const AddButtonHover = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    setIsLoading(true)
-    fetchData()
-  }, []);
+    if (isFocused) {
+      setIsLoading(true)
+      fetchData()
+    }
+    
+  }, [props, isFocused]);
 
   async function fetchData() {
     try {
@@ -42,6 +46,7 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
+  const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
   const [selectedId, setSelectedId] = useState({emailAndItemNumber: ''});
   const [search, setSearch] = useState('')
 
@@ -96,6 +101,12 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
       borderRadius: "14px",
 
       cursor: "pointer"
+    },
+    deleteButton: {
+      width:'40px',
+      height:'40px',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
 
     bottomCard: {
@@ -174,8 +185,11 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
   });
 
   function addExpense () {
-    claim.form_type == 'Travelling' ? navigation.navigate("AddTravelExpenseScreen",
-     {props: claim}) : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
+    if (claim.form_type == 'Travelling') {
+      navigation.navigate("AddTravelExpenseScreen",{props: claim}) 
+    } else {
+      navigation.navigate("AddMonthlyExpenseScreen",{props: claim})
+    }
   }
 
   function handleEditExpense() {
@@ -200,11 +214,32 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
     return false
   }
 
+  function handleDeleteClaim () {
+    //handle
+    window.location.reload(false)
+  }
+
 
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
-      <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
+        <Text>
+        {type=='Transport'?(
+          <Ionicons  name="car-outline" color="#444" size="25px"/>
+        ):type=='Entertainment'?(
+          <Ionicons  name="gift-outline" color="#444" size="25px"/>
+        ):type=='Mobile'?(
+          <Ionicons  name="call-outline" color="#444" size="25px"/>
+        ):type=='Fuel'?(
+          <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
+        ):type=='Vehicle_repair'?(
+          <Ionicons  name="construct-outline" color="#444" size="25pxe"/>
+        ):type=='Medical'?(
+          <Ionicons  name="medkit-outline" color="#444" size="25px"/>
+        ):(
+          <Ionicons  name="reader-outline" color="#444" size="25px"/>
+        )}
+      </Text>
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
@@ -282,13 +317,31 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
       <View style={styles.pageDefault}>
       <View style={styles.topCard}>
         <View style={{width:'100%', flexDirection:'row',paddingBottom:"10px"}}>
-          <View style={{width:'23%', position:'absolute', alignItems:'center', zIndex:999}}>
+
+          <View style={{width:'100%', position:'absolute',zIndex:999, justifyContent:'space-between', flexDirection:'row'}}>
+          <View style={{width:'23%', alignItems:'center'}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => navigation.goBack()}>
             <View style={styles.backButton}>
             <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
             </View>
             </TouchableOpacity>
           </View>
+          <View style={{width:'23%', alignItems:'center'}}>
+            <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
+            onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim())}>
+            <View style={styles.deleteButton}>
+              {isDeleteButtonHover?(
+                <Text><Feather name="trash-2" color="#9C2424" size="27px"/></Text>
+              ):(
+                <Text><Feather name="trash" color="#9C2424" size="25px"/></Text>
+              )}
+            
+            </View>
+            </TouchableOpacity>
+          </View>
+          </View>
+
+
             <View style={{width:'100%', alignItems:"center"}}>
             <Text style={{fontSize:'16px', fontWeight:'600'}}>{claim.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod}</Text>
             <Text style={{fontSize:'12px'}}>Creator: {claim.form_creator}</Text>
@@ -360,7 +413,11 @@ export default function EditCreatedClaimScreen({ navigation, route }) {
 
 
       </View>
+
     </View>
+    
+
+
     
   );
 }
