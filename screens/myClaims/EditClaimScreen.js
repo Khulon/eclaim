@@ -5,6 +5,7 @@ import { Ionicons, Feather } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 import { useIsFocused } from "@react-navigation/native";
+import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
 
 export default function EditClaimScreen({ navigation, route, props}) {
@@ -296,7 +297,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
         email = {item.email}
         item_number = {item.item_number}
         receipt = {item.receipt}
-        date = {claim.form_type == 'Travelling' ? convertDate(item.date) : convertDate(item.date_of_expense)}
+        date = {claim.form_type == 'Travelling' ? parseDate(item.date) : parseDate(item.date_of_expense)}
         checked = {item.checked}
         name = {item.name} 
         type = {item.expense_type}
@@ -312,14 +313,9 @@ export default function EditClaimScreen({ navigation, route, props}) {
     )
   }
 
+  const monthlyPeriod = parseDatePeriod(claim.pay_period_from, claim.pay_period_to)
+  const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
 
-  const monthlyPeriod = convertDate(claim.pay_period_from) + " - " + convertDate(claim.pay_period_to)
-  const travellingPeriod = convertDate(claim.period_from) + " - " + convertDate(claim.period_to)
-
-  function convertDate(date) {
-    const newDate = new Date(date).toLocaleDateString("en-UK")
-    return newDate
-  }
 
   return (
     <View style={styles.page}>

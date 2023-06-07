@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
+import { parseDatePeriod } from '../../functions/Parsers';
 
 export default function MyClaimsScreen({ navigation }) {        
 
@@ -14,7 +15,7 @@ export default function MyClaimsScreen({ navigation }) {
 
   useEffect(() => {
     setIsLoading(true)
-    fetchData();
+    fetchData()
     
   }, []);
 
@@ -27,7 +28,6 @@ export default function MyClaimsScreen({ navigation }) {
       setFullData(data);
       setData(data);
     });
-    
     setIsLoading(false);
   }
   
@@ -170,7 +170,6 @@ export default function MyClaimsScreen({ navigation }) {
   });
 
 
-
   async function handleEditClaim (selectedId) {
 
     for (var i = 0; i < data.length; i++) {
@@ -201,6 +200,7 @@ export default function MyClaimsScreen({ navigation }) {
     }
     return false
   }
+
 
 
   const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
@@ -236,13 +236,10 @@ export default function MyClaimsScreen({ navigation }) {
 
     const backgroundColor = item.id === selectedId.id ? '#EEEEEE' : 'white';
     const transform = item.id === selectedId.id ? [{translateX: 2 }] : [{translateX: 0 }];
-    const pay_period_from = new Date(item.pay_period_from).toLocaleDateString("en-UK")
-    const pay_period_to = new Date(item.pay_period_to).toLocaleDateString("en-UK")
-    const monthlyPeriod = pay_period_from + " - " + pay_period_to
-    const period_from = new Date(item.period_from).toLocaleDateString("en-UK")
-    const period_to = new Date(item.period_to).toLocaleDateString("en-UK")
-    const travellingPeriod = period_from + " - " + period_to
-    
+
+    const monthlyPeriod = parseDatePeriod(item.pay_period_from, item.pay_period_to)
+    const travellingPeriod = parseDatePeriod(item.period_from, item.period_to)
+
     return (
       <Item 
         date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
