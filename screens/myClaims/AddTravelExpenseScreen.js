@@ -243,7 +243,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         }
       })
 
-      navigation.navigate("EditClaimScreen",{props: claim}) 
+      navigation.goBack()
   }
 
 
