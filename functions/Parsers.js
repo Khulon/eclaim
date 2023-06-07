@@ -8,8 +8,8 @@ export function parseDate (date) {
     var month = parseInt(date.substring(3,5))
     month = months[month-1]
     var year = date.substring(8,10)
-    console.log(date)
-    console.log(day + ' ' + month + ' ' + year)
+    //console.log(date)
+    //console.log(day + ' ' + month + ' ' + year)
     return day + ' ' + month + ' ' + year
   }
 

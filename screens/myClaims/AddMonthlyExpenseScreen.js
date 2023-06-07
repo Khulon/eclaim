@@ -172,7 +172,7 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
 
     imageInput: {
     width:'100%',
-    height: "100px",
+    height: "400px",
     color: "#6A6A6A",
     borderWidth: "1px",
     borderRadius: "12px",
