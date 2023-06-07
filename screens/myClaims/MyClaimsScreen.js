@@ -31,43 +31,6 @@ export default function MyClaimsScreen({ navigation }) {
     setIsLoading(false);
   }
   
-  /*
-  const FULLDATA = [
-    {
-      id: '1234567',
-      form_creator: 'janelim@gmailcom',
-      total_amount: '43.23',
-      pay_period_from: '2023-05-01',
-      pay_period_to:'2023-05-31',
-      period_from: '2023-05-01',
-      period_to: '2023-05-31',
-      status: 'In Progress',
-      form_type: 'Travelling'
-    },
-    {
-      id: '1234568',
-      form_creator: 'janeTan@gmailcom',
-      total_amount: '43.23',
-      pay_period_from: '2023-05-01',
-      pay_period_to:'2023-05-31',
-      period_from: '2023-05-01',
-      period_to: '2023-05-31',
-      status: 'Submitted',
-      form_type: 'Travelling'
-    },
-    {
-      id: '1234569',
-      form_creator: 'janeliu@gmailcom',
-      total_amount: '43.23',
-      pay_period_from: '2023-05-01',
-      pay_period_to:'2023-05-31',
-      period_from: '2023-05-01',
-      period_to: '2023-05-31',
-      status: 'Rejected',
-      form_type: 'Travelling'
-    },
-  ];  */
-    
   
   const [selectedId, setSelectedId] = useState({id: ''});
   const [search, setSearch] = useState('')

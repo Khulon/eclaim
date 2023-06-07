@@ -32,7 +32,8 @@ export default function EditClaimScreen({ navigation, route, props}) {
     try {
       const id = claim.id;
       const type = claim.form_type;
-      await fetch(`http://localhost:5000/getExpenses/${type}/${id}`)
+      const user = window.localStorage.getItem('session');
+      await fetch(`http://localhost:5000/getExpenses/${user}/${type}/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);
@@ -230,9 +231,24 @@ export default function EditClaimScreen({ navigation, route, props}) {
     return false
   }
 
-  function handleDeleteClaim () {
-    //handle
-    window.location.reload(false)
+  function handleDeleteClaim (claim) {
+    fetch('http://localhost:5000/deleteClaim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(claim)})
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if(data.message = "Claim deleted successfully!") {
+          alert("Claim deleted successfully!")
+          window.location.reload(false)
+        } else {
+          alert("Claim could not be deleted!")
+        }
+      })
+    
   }
 
 
@@ -340,7 +356,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
           {userDetails.email == claim.form_creator ? (
             <View style={{width:'23%', alignItems:'center'}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
-            onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim())}>
+            onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim(claim))}>
             <View style={styles.deleteButton}>
               {isDeleteButtonHover?(
                 <Text><Feather name="trash-2" color="#9C2424" size="27px"/></Text>
