@@ -11,14 +11,13 @@ export default function MyClaimsScreen({ navigation }) {
 
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false); 
 
   useEffect(() => {
     setIsLoading(true)
     fetchData()
     
   }, []);
-
 
   async function fetchData() {
     const email = window.localStorage.getItem('session');
@@ -29,7 +28,7 @@ export default function MyClaimsScreen({ navigation }) {
       setFullData(data);
       setData(data);
     });
-    setIsLoading(false)
+    setIsLoading(false);
   }
   
   /*
@@ -169,8 +168,6 @@ export default function MyClaimsScreen({ navigation }) {
     },
 
   });
-
-
 
 
   async function handleEditClaim (selectedId) {
