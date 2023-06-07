@@ -192,10 +192,11 @@ export default function MyClaimsScreen({ navigation }) {
     //console.log(filteredData)
   }
 
-  const contains = ({creator, date}, query) => {
-    creator = creator.toLowerCase()
-    date = date.toLowerCase()
-    if (creator.includes(query) || date.includes(query)) {
+  const contains = ({form_creator}, query) => {
+    console.log(form_creator)
+    console.log(query)
+    form_creator = form_creator.toLowerCase()
+    if (form_creator.includes(query)) {
       return true
     }
     return false

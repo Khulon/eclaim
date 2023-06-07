@@ -214,15 +214,17 @@ export default function EditClaimScreen({ navigation, route, props}) {
   function handleSearch (search) {
     setSearch(search)
     const formattedQuery = search.toLowerCase();
-    const filteredData = filter(fullData, (person)=> {
-      return contains(person, formattedQuery)
+    const filteredData = filter(fullData, (expense)=> {
+      return contains(expense, formattedQuery)
     })
     setData(filteredData)
-    console.log(filteredData)
+    //console.log(filteredData)
   }
 
-  const contains = ({name,email}, query) => {
-    if (name.includes(query) || email.includes(query)) {
+  const contains = ({name, expense_type}, query) => {
+    name = name.toLowerCase()
+    expense_type = expense_type.toLowerCase()
+    if (name.includes(query) || expense_type.includes(query)) {
       return true
     }
     return false
@@ -288,8 +290,8 @@ export default function EditClaimScreen({ navigation, route, props}) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.email === selectedId.emailAndItemNumber[0] ? item.item_number === selectedId.emailAndItemNumber[1] ? '#EEEEEE' : 'white' : 'white';
-    const transform = selectedId.emailAndItemNumber[0] ? item.item_number === selectedId.emailAndItemNumber[1] ? [{translateX: 2 }] : [{translateX: 0 }] : [{translateX: 0 }];
+    const backgroundColor = item.email == selectedId.emailAndItemNumber[0] ? item.item_number == selectedId.emailAndItemNumber[1] ? '#EEEEEE' : 'white' : 'white';
+    const transform = item.email == selectedId.emailAndItemNumber[0] ? item.item_number == selectedId.emailAndItemNumber[1] ? [{translateX: 2 }] : [{translateX: 0 }] : [{translateX: 0 }];
     
 
     return (
