@@ -7,9 +7,8 @@ import ConfirmationButton from '../../components/ConfirmationButton';
 import * as ImagePicker from 'expo-image-picker';
 
 
-
 export default function AddTravelExpenseScreen({ navigation, route }) {        
-
+  
   const[isLoading, setIsLoading] = useState(false);
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
@@ -216,7 +215,8 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
     amount: null, date: null, description: null, receipt: null});
 
-  async function addExpense() {
+
+  async function handleAddExpense() {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     await fetch('http://localhost:5000/addTravellingExpense', {
@@ -232,6 +232,8 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
           alert("Error!")
         }
       })
+
+      navigation.goBack()
   }
 
 
@@ -388,7 +390,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to add this expense?', 'OK to confirm',() => addExpense())}> Add </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to add this expense?', 'OK to confirm',() => handleAddExpense())}> Add </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
