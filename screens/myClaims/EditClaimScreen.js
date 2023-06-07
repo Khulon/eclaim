@@ -53,8 +53,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
 
   } 
   
-
-  const [isDeleteButtonHover, setIsDeleteButtonHover ] = useState(false)
+  const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const [selectedId, setSelectedId] = useState({emailAndItemNumber: []});
   const [search, setSearch] = useState('')
