@@ -15,8 +15,6 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
-
-
   const styles = StyleSheet.create({
     page: {
       height: "100%",

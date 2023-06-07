@@ -228,12 +228,13 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         console.log(data);
         if(data.message == "Success!") {
           alert("Expense added successfully!")
+          navigation.goBack()
         } else {
           alert("Error!")
         }
       })
 
-      navigation.goBack()
+      
   }
 
 

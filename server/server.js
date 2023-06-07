@@ -520,11 +520,12 @@ app.post('/addTravellingExpense', async (req, res) => {
     let item_number = count.recordset[0].count + 1;
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
-    const query = ("INSERT INTO TravellingExpenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @description, '"+receipt+"', @amount, @da, @lm )");
+    const query = ("INSERT INTO TravellingExpenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @description, @receipt, @amount, @da, @lm )");
     request.input('id', sql.Int, id)
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     request.input('description', sql.Text, description);
+    request.input('receipt', sql.VarChar, receipt);
     request.input('amount', sql.Numeric(18,2), amount);
     request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
