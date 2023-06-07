@@ -382,11 +382,23 @@ app.post('/addClaim', async (req, res) => {
 
 app.post('/joinClaim', async (req, res) => {
   let formId = req.body.formId;
-  let formCreator = req.body.creator;
+  let formCreator = req.body.creator; //user
 
   try {
     var request = new sql.Request();
-    
+    const results = await request.query("SELECT form_type, form_creator FROM Claims WHERE id = "+formId+"")
+
+    if(results.recordset[0].form_type == "Travelling") {
+      throw new Error("Travelling claims cannot be joined!")
+    } else {
+      //Check same department and form_creator is supervisor
+      const form_creator = results.recordset[0].form_creator
+      const query = "SELECT COUNT(*) AS count FROM BelongsToDepartments WHERE email = '"+formCreator+"' AND department IN (SELECT department FROM Supervisors WHERE supervisor = '"+form_creator+"')"
+      const check = await request.query(query)
+      if(check.recordset[0].count == 0) {
+        throw new Error("This is not your supervisor's form!")
+      }
+    }
     //handles case where form creator joins claim as it will throw error
     await request.query("INSERT INTO Claimees VALUES('"+formId+"', '"+formCreator+"' )");
 
