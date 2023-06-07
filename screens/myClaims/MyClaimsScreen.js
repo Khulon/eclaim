@@ -8,6 +8,7 @@ import { parseDatePeriod } from '../../functions/Parsers';
 export default function MyClaimsScreen({ navigation }) {        
 
   window.localStorage.setItem('stackScreen', 'MyClaims');
+  const userDetails = JSON.parse(window.localStorage.getItem('details'))
 
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
@@ -181,7 +182,7 @@ export default function MyClaimsScreen({ navigation }) {
       <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: ${total}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: {total}</Text>
       </View>
 
       <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
@@ -208,7 +209,7 @@ export default function MyClaimsScreen({ navigation }) {
       <Item 
         date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
         creator_Name = {item.form_creator}
-        total = {item.total_amount}
+        total = {userDetails.email == item.form_creator ? '$' + (item.total_amount) : ('Hidden')}
         claimees = {item.claimees}
         status = {item.status}
         claimId = {item.id}
