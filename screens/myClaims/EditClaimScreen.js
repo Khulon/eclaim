@@ -193,6 +193,20 @@ export default function EditClaimScreen({ navigation, route, props}) {
 
   });
 
+  function totalAmount () {
+    if (userDetails.email == claim.form_creator) {
+      return '$' + (claim.total_amount)
+    } else {
+      var amount = 0
+      if(fullData != null){
+        for (var i = 0; i < fullData.length; i++) {
+          amount += (claim.form_type == 'Monthly' ? fullData[i].total_amount : fullData[i].amount)
+        }
+      }
+      return '$' + amount
+    }
+  }
+
   function addExpense () {
     claim.form_type == 'Travelling' 
     ? navigation.navigate("AddTravelExpenseScreen",
@@ -413,7 +427,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
             <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.id}</Text>
         </View>
         <Text style={{paddingTop:"15px"}}>Total:</Text>
-        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${claim.total_amount}</Text>
+        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
         
 
         {claim.form_creator == userDetails.email ? (
