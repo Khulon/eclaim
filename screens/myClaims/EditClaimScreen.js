@@ -255,7 +255,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        if(data.message = "Claim deleted successfully!") {
+        if(data.message = "Claim deleted!") {
           alert("Claim deleted successfully!")
           window.location.reload(false)
         } else {

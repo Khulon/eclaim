@@ -665,7 +665,20 @@ app.post('/deleteTravellingExpense', async (req, res) => {
 });
 
 
-/*
+
 //Delete claim
 app.post('/deleteClaim', async (req, res) => {
-*/
+  let id = req.body.id;
+
+  try {
+    var request = new sql.Request();
+    const query = "DELETE FROM Claims WHERE id = @id";
+    request.input('id', sql.Int, id)
+    await request.query(query);
+    res.send({message: "Claim deleted!"})
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+});
