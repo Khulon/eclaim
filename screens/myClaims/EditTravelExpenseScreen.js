@@ -8,21 +8,12 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 
-export default function EditTravelExpenseScreen({ navigation }) {        
-
+export default function EditTravelExpenseScreen({ navigation, route }) {        
 
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
-
-
-  const expenseTypeDropdown = [
-    {key:'0', value:'Entertainment and Gifts'},
-    {key:'1', value:'Transport'},
-    {key:'2', value:'Mobile'},
-    {key:'3', value:'Others'},
-    ]
 
 
 
@@ -165,7 +156,7 @@ export default function EditTravelExpenseScreen({ navigation }) {
     alignItems:'center'
     },
 
-    recieptImage: {
+    receiptImage: {
       width:'100%',
       height: "400px",
       borderRadius:'12px',
@@ -210,29 +201,6 @@ export default function EditTravelExpenseScreen({ navigation }) {
 
   });
 
-  
-
-
-  function addUser (){
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    console.log(userDepartments);
-    console.log(newUser);
-    fetch('http://localhost:5000/admin/addUser', {
-      method: 'POST', 
-      headers: header,
-      body: JSON.stringify(newUser)})
-      .then((response) => response.json())
-      .then((resp) => { 
-        console.log(resp);
-        if(resp.message == 'User Added!') {
-          alert('User Added!');
-          window.location.reload(false);
-        } else {
-          alert('Failed to add user!');
-        }
-      });
-  }; 
-
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -245,11 +213,55 @@ export default function EditTravelExpenseScreen({ navigation }) {
     console.log(result.uri);
 
     if (!result.canceled) {
-      window.localStorage.setItem('image', result.uri);
+      setNewExpense({...expense, receipt: result.uri})
     }
 }
 
 
+function updateExpense(expense) {
+  const header = {'Content-Type': 'application/json' };
+  fetch('http://localhost:5000/editTravellingExpense', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify(expense)})
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          if(data.message == "Expense updated!") {
+            alert("Expense updated!")
+            navigation.goBack();
+          } else {
+            alert("Failed to update expense!")
+          }
+          })
+
+}
+
+function deleteExpense(expense) {
+  const header = {'Content-Type': 'application/json' };
+  fetch('http://localhost:5000/deleteTravellingExpense', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify(expense)})
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          if(data.message == "Expense deleted!") {
+            alert("Expense deleted!")
+            navigation.goBack();
+          } else {
+            alert("Failed to delete expense!")
+          }
+          })
+}
+
+
+const expenseDetails = route.params.expense
+const date = new Date(expenseDetails.date).toLocaleDateString("en-UK");
+const expenseTypeDropdown = route.params.travellingExpenseTypes
+const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email, 
+  item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
+   amount: expenseDetails.amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
 
   return (
     <View style={styles.page}>
@@ -291,31 +303,36 @@ export default function EditTravelExpenseScreen({ navigation }) {
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles} 
-                setSelected={(company) => setNewUser({...newUser, company:company})}
+                setSelected={(type) => setNewExpense({...expense, type: type})}
                 data={expenseTypeDropdown} 
+                placeholder = {expense.type}
                 save="value"
                 showsVerticalScrollIndicator = {false}
                 search = {false}
             />  
         </View>
         
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>If others, state type</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. overtime meal" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
+        {expense.type == 'Others' ? (
+          <View style={styles.inputContainer}>
+          <Text style={styles.normalBoldText}>If others, state type</Text>
+          <TextInput style={styles.textInput}
+            placeholder="eg. Overtime meal" 
+            //value={expense.type} 
+            onChangeText={(type) => setNewExpense({...expense, otherType: type})}
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+          </View>
+        ) : (
+          <View></View>
+        )}
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Date</Text>
         <TextInput style={styles.textInput}
-          placeholder="dd/mm/yy" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
+          placeholder="dd/mm/yyyy" 
+          value={expense.date} 
+          onChangeText={(date) => setNewExpense({...expense, date: date})} 
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -325,8 +342,8 @@ export default function EditTravelExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Amount</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 20.34" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.amount} 
+          onChangeText={(amount) => setNewExpense({...expense, amount: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -337,19 +354,19 @@ export default function EditTravelExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Description</Text>
         <TextInput style={[styles.textInput,{height:'100px'}]}
           placeholder="Desciption of expense" 
-          value={newUser.email} 
+          value={expense.description} 
           multiline={true}
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          onChangeText={(description) => setNewExpense({...expense, description: description})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Reciept</Text>
+        <Text style={styles.normalBoldText}>Receipt</Text>
         <TouchableOpacity onPress={()=> pickImage()}>
-          <Image style={styles.recieptImage}
-            source={image}
+          <Image style={styles.receiptImage}
+            source={expense.receipt}
           />
           <View style={[styles.imageInput]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
@@ -370,13 +387,13 @@ export default function EditTravelExpenseScreen({ navigation }) {
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
-        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to leave?', 'User information will not be saved', () => navigation.goBack())} style={styles.defaultButton} > Delete </TouchableOpacity>
+        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to delete this expense?', 'Click ok to confirm deletion.', () => deleteExpense(expense))} style={styles.defaultButton} > Delete </TouchableOpacity>
         </Animated.View>
         </View>
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Confirm user creation?', 'User details can still be updated once created', () => addUser())}> Save </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to save these changes?', 'Expense details will be updated', () => updateExpense(expense))}> Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>

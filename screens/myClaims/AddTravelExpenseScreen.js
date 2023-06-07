@@ -1,4 +1,4 @@
-import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
@@ -10,33 +10,10 @@ import * as ImagePicker from 'expo-image-picker';
 
 export default function AddTravelExpenseScreen({ navigation, route }) {        
 
-
-  
+  const[isLoading, setIsLoading] = useState(false);
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
-
-
-  var expenseTypeDropdown = []
-
-  useEffect(() => {
-    fetchExpenseTypes();
-    
-  }, []);
-
-
-  async function fetchExpenseTypes() {
-    await fetch('http://localhost:5000/getTravellingExpenseTypes')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        for(var i = 0; i < data.length; i++) {
-          expenseTypeDropdown.push({value: data[i].type})
-        }
-        expenseTypeDropdown.push({value: 'Others'})
-      }
-      );
-  }
   
 
   const styles = StyleSheet.create({
@@ -48,6 +25,16 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: "Arial",
+    },
+    loadingPage: {
+      position:'absolute',
+      height:'100%',
+      width:'100%',
+      zIndex: isLoading ? 999 : -1,
+      justifyContent:'center',
+      alignItems:'center',
+      backgroundColor:'black',
+      opacity: isLoading ? '50%' : '0%'
     },
     pageDefault: {
       width: "100%",
@@ -225,6 +212,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
+  const expenseTypeDropdown = route.params.travellingExpenseTypes;
   const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
     amount: null, date: null, description: null, receipt: null});
 
@@ -267,6 +255,10 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
 
   return (
     <View style={styles.page}>
+      <View style={styles.loadingPage}>
+        <ActivityIndicator size='large' color="#E04F4F" />
+      </View>
+
       <View style={styles.pageDefault}>
       <View style={styles.topCard}>
         
