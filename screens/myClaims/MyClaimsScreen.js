@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
+import { parseDatePeriod } from '../../functions/Parsers';
 
 export default function MyClaimsScreen({ navigation }) {        
 
@@ -13,19 +14,23 @@ export default function MyClaimsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);  
 
   useEffect(() => {
-    //setIsLoading(true)
+    setIsLoading(true)
+    fetchData()
     
+  }, []);
+
+
+  async function fetchData() {
     const email = window.localStorage.getItem('session');
-    fetch(`http://localhost:5000/myClaims/${email}`)
+    await fetch(`http://localhost:5000/myClaims/${email}`)
     .then((response) => response.json())
     .then((data) => {
       data = data.reverse()
       setFullData(data);
       setData(data);
     });
-    
-    
-  }, []);
+    setIsLoading(false)
+  }
   
   /*
   const FULLDATA = [
@@ -166,36 +171,7 @@ export default function MyClaimsScreen({ navigation }) {
   });
 
 
-  
 
-  /*
-  useEffect(() => {
-    if(data != null){
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].email == selectedId.email) {
-          console.log(userDepartments)
-          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
-        }
-      }
-    }
-
-  }, [userDepartments]);
-
-
-  
-  async function handleEditUser (selectedId) {
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/admin/editUser', {
-      method: 'POST', 
-      headers: header,
-      body: JSON.stringify(selectedId)})
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      setUserDepartments(data);
-    })
-  }
-  */
 
   async function handleEditClaim (selectedId) {
 
@@ -227,6 +203,7 @@ export default function MyClaimsScreen({ navigation }) {
     }
     return false
   }
+
 
 
   const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
@@ -262,13 +239,10 @@ export default function MyClaimsScreen({ navigation }) {
 
     const backgroundColor = item.id === selectedId.id ? '#EEEEEE' : 'white';
     const transform = item.id === selectedId.id ? [{translateX: 2 }] : [{translateX: 0 }];
-    const pay_period_from = new Date(item.pay_period_from).toLocaleDateString("en-UK")
-    const pay_period_to = new Date(item.pay_period_to).toLocaleDateString("en-UK")
-    const monthlyPeriod = pay_period_from + " - " + pay_period_to
-    const period_from = new Date(item.period_from).toLocaleDateString("en-UK")
-    const period_to = new Date(item.period_to).toLocaleDateString("en-UK")
-    const travellingPeriod = period_from + " - " + period_to
-    
+
+    const monthlyPeriod = parseDatePeriod(item.pay_period_from, item.pay_period_to)
+    const travellingPeriod = parseDatePeriod(item.period_from, item.period_to)
+
     return (
       <Item 
         date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
