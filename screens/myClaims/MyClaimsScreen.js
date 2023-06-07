@@ -10,13 +10,17 @@ export default function MyClaimsScreen({ navigation }) {
 
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false); 
 
   useEffect(() => {
-    //setIsLoading(true)
+    setIsLoading(true)
+    fetchData();
     
+  }, []);
+
+  async function fetchData() {
     const email = window.localStorage.getItem('session');
-    fetch(`http://localhost:5000/myClaims/${email}`)
+    await fetch(`http://localhost:5000/myClaims/${email}`)
     .then((response) => response.json())
     .then((data) => {
       data = data.reverse()
@@ -24,8 +28,8 @@ export default function MyClaimsScreen({ navigation }) {
       setData(data);
     });
     
-    
-  }, []);
+    setIsLoading(false);
+  }
   
   /*
   const FULLDATA = [
@@ -166,36 +170,6 @@ export default function MyClaimsScreen({ navigation }) {
   });
 
 
-  
-
-  /*
-  useEffect(() => {
-    if(data != null){
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].email == selectedId.email) {
-          console.log(userDepartments)
-          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
-        }
-      }
-    }
-
-  }, [userDepartments]);
-
-
-  
-  async function handleEditUser (selectedId) {
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/admin/editUser', {
-      method: 'POST', 
-      headers: header,
-      body: JSON.stringify(selectedId)})
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      setUserDepartments(data);
-    })
-  }
-  */
 
   async function handleEditClaim (selectedId) {
 

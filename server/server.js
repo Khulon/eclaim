@@ -409,7 +409,10 @@ app.post('/uploadImage', async (req, res) => {
 
 
     var request = new sql.Request();
-    await request.query("UPDATE Employees SET profile = '"+image+"' WHERE email = '"+email+"'");
+    const query = "UPDATE Employees SET profile = @image WHERE email = '"+email+"'"
+    request.input('image', sql.VarChar, image)
+    await request.query(query);
+    
     res.send({message: "Image updated successfully!"});
 
 
@@ -453,13 +456,13 @@ app.get('/getExpenses/:type/:id', async (req, res) => {
 try {
   if(type == 'Monthly') {
 
-    const queryString = 'SELECT name, email, total_amount, expense_type, date_of_expense, item_number, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
+    const queryString = 'SELECT id, name, email, total_amount, expense_type, date_of_expense, item_number, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
     request.input('id', sql.Int, id);
     const result = await request.query(queryString);
     res.send(result.recordset);
 
   } else { 
-    const queryString = 'SELECT name, email, amount, expense_type, date, item_number FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
+    const queryString = 'SELECT id, name, email, amount, expense_type, date, item_number, receipt, description FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
     request.input('id', sql.Int, id);
     const result = await request.query(queryString);
     res.send(result.recordset);
@@ -513,7 +516,7 @@ app.post('/addTravellingExpense', async (req, res) => {
       request.input('type', sql.VarChar, type)
       await request.query(query);
     }
-    const count = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
+    const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM TravellingExpenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
@@ -544,6 +547,91 @@ app.get('/getTravellingExpenseTypes', async (req, res) => {
     var request = new sql.Request();
     const result = await request.query("SELECT * FROM TravellingExpenseTypes");
     res.send(result.recordset);
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+});
+
+
+
+
+
+//User edits expense
+app.post('/editTravellingExpense', async (req, res) => {
+  let id = req.body.id;
+  let claimee = req.body.claimee;
+  let item_number = req.body.item_number;
+  let amount = req.body.amount;
+  let type = req.body.type;
+  let otherType = req.body.otherType;
+  let date = req.body.date;
+  let receipt = req.body.receipt;
+  let description = req.body.description;
+    
+  
+  try{
+
+    var request = new sql.Request();
+    if(type == "Others") {
+
+      if(otherType == "") {
+        otherType = null;
+      }
+
+      if(otherType == "Others") {
+        throw new Error("Please enter a valid expense type!")
+      }
+
+      type = otherType;
+    }
+
+    if(description == "") {
+      description = null;
+    }
+    const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
+    if(checkType.recordset[0].count == 0) {
+      const query = "INSERT INTO TravellingExpenseTypes VALUES(@type)"
+      request.input('type', sql.VarChar, type)
+      await request.query(query);
+    }
+    const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const query = "UPDATE TravellingExpenses SET expense_type = '"+type+"', date = @date, "
+    + "description = '"+description+"', amount = @amount, receipt = '"+receipt+"', last_modified = @lm WHERE id = @id"
+    + " AND claimee = '"+claimee+"' AND item_number = @item_number";
+
+    request.input('date', sql.Date, expense_date.recordset[0].date);
+    request.input('amount', sql.Numeric(18,2), amount);
+    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('id', sql.Int, id)
+    request.input('item_number', sql.Int, item_number);
+    
+    await request.query(query)
+    res.send({message: "Expense updated!"})
+
+  } catch(err) { 
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+  
+});
+
+
+//Delete travelling expense
+app.post('/deleteTravellingExpense', async (req, res) => {
+  let id = req.body.id;
+  let claimee = req.body.claimee;
+  let item_number = req.body.item_number;
+
+  try {
+    var request = new sql.Request();
+    const query = "DELETE FROM TravellingExpenses WHERE id = @id AND claimee = '"+claimee+"' AND item_number = @item_number";
+    request.input('id', sql.Int, id)
+    request.input('item_number', sql.Int, item_number);
+    await request.query(query);
+    res.send({message: "Expense deleted!"})
   } catch(err) {
     console.log(err)
     res.send({message: "Error!"});

@@ -14,6 +14,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
+  const [travellingExpenseTypes] = useState([])
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
@@ -36,6 +37,13 @@ export default function EditClaimScreen({ navigation, route, props}) {
         setFullData(data);
         setData(data)
       });
+
+      await fetch('http://localhost:5000/getTravellingExpenseTypes')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        data.forEach((item) => {travellingExpenseTypes.push({value: item.type})})
+      });
       setIsLoading(false)
     } catch (error) {
       alert("Failed to load. Please check your internet connection!")
@@ -46,8 +54,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
   
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
-  const [selectedId, setSelectedId] = useState({emailAndItemNumber: ''});
+  const [selectedId, setSelectedId] = useState({emailAndItemNumber: []});
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -185,15 +192,21 @@ export default function EditClaimScreen({ navigation, route, props}) {
   });
 
   function addExpense () {
-    if (claim.form_type == 'Travelling') {
-      navigation.navigate("AddTravelExpenseScreen",{props: claim}) 
-    } else {
-      navigation.navigate("AddMonthlyExpenseScreen",{props: claim})
-    }
+    claim.form_type == 'Travelling' 
+    ? navigation.navigate("AddTravelExpenseScreen",
+     {props: claim, travellingExpenseTypes: travellingExpenseTypes}) 
+     : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
+
   }
 
-  function handleEditExpense() {
-    navigation.navigate("EditTravelExpenseScreen")
+  function handleEditExpense(item) {
+    console.log(item)
+    
+    if(claim.form_type == 'Travelling') {
+      navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes})
+    } else {
+      navigation.navigate('EditMonthlyExpenseScreen', {expense: item})
+    } 
   }
 
 
@@ -289,10 +302,10 @@ export default function EditClaimScreen({ navigation, route, props}) {
         type = {item.expense_type}
         amount = {claim.form_type == 'Monthly' ? item.total_amount : item.amount}
 
-        onMouseEnter={() => setSelectedId({...selectedId, emailAndItemNumber: [item.email, item.item_number,]})}
-        onMouseLeave={() => setSelectedId({...selectedId, emailAndItemNumber: ['','']})}
+        onMouseEnter={() => setSelectedId({...selectedId, emailAndItemNumber: [item.email, item.item_number]})}
+        onMouseLeave={() => setSelectedId({...selectedId, emailAndItemNumber: []})}
 
-        onPress={() => console.log(handleEditExpense(selectedId))}
+        onPress={() => handleEditExpense(item)}
         backgroundColor={backgroundColor}
         transform={transform}
       />
