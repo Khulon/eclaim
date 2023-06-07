@@ -335,7 +335,8 @@ export default function EditClaimScreen({ navigation, route, props}) {
             </View>
             </TouchableOpacity>
           </View>
-          <View style={{width:'23%', alignItems:'center'}}>
+          {userDetails.email == claim.form_creator ? (
+            <View style={{width:'23%', alignItems:'center'}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
             onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim())}>
             <View style={styles.deleteButton}>
@@ -348,6 +349,10 @@ export default function EditClaimScreen({ navigation, route, props}) {
             </View>
             </TouchableOpacity>
           </View>
+          ):(
+            <View></View>
+          )}
+          
           </View>
 
 
