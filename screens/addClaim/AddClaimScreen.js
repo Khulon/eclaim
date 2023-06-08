@@ -190,9 +190,6 @@ export default function AddClaimScreen({ navigation }) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     switch(isExistingClaim) {
       case 'Yes':
-        //handleJoin() using form id
-        // Insert into claimee (trigger updates claimee count on Claims table)
-        
         fetch('http://localhost:5000/joinClaim', {
           method: 'POST',
           headers: header,

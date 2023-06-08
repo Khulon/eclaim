@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 
-export default function AddMonthlyExpenseScreen({ navigation }) {        
+export default function AddMonthlyExpenseScreen({ navigation, route }) {        
 
 
   const [isEditing, setIsEditing] = useState(false)
@@ -17,35 +17,6 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const EditButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
-
-
-  const expenseTypeDropdown = [
-    {key:'0', value:'Entertainment and Gifts'},
-    {key:'1', value:'Taxi, C/park, ERP'},
-    {key:'2', value:'Fuel'},
-    {key:'3', value:'Vehical Repair'},
-    {key:'4', value:'Medical'},
-    {key:'5', value:'Others'},
-    ]
-
-  const departments = [
-    {key:'0', value:'EKTS'},
-    {key:'1', value:'EKTU'},
-    {key:'2', value:'EKTY'},
-    {key:'3', value:'EKJP'},
-    {key:'4', value:'EKTK'},
-    {key:'5', value:'IME'},
-    {key:'6', value:'Reefertec'},
-    {key:'7', value:'Smartz'},
-    {key:'8', value:'PCL'},
-    {key:'9', value:'Finance'},
-    {key:'10', value:'IT'},
-    {key:'11', value:'Marketing'},
-    {key:'12', value:'HR'},
-    {key:'13', value:'Eddie'},
-    {key:'14', value:'Paul'},
-    ]
-
 
 
   const styles = StyleSheet.create({
@@ -189,7 +160,7 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
     alignItems:'center'
     },
 
-    recieptImage: {
+    receiptImage: {
       width:'100%',
       height: "400px",
       borderRadius:'12px',
@@ -234,32 +205,21 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
 
   });
 
-  const image = window.localStorage.getItem('image')
-  const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
 
-  useEffect(() => {
-    setNewUser({...newUser, department: userDepartments});
-  }, [userDepartments]);
-
-
-  function addUser (){
+  function updateExpense(expense) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    console.log(userDepartments);
-    console.log(newUser);
-    fetch('http://localhost:5000/admin/addUser', {
+    fetch('http://localhost:5000/editMonthlyExpense', {
       method: 'POST', 
       headers: header,
-      body: JSON.stringify(newUser)})
+      body: JSON.stringify(expense)})
       .then((response) => response.json())
       .then((resp) => { 
         console.log(resp);
-        if(resp.message == 'User Added!') {
-          alert('User Added!');
-          window.location.reload(false);
+        if(resp.message == 'Expense updated!') {
+          alert('Monthly expense updated!');
+          navigation.goBack();
         } else {
-          alert('Failed to add user!');
+          alert('Failed to update expense!');
         }
       });
   }; 
@@ -276,18 +236,49 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
     console.log(result.uri);
 
     if (!result.canceled) {
-      window.localStorage.setItem('image', result.uri);
+      setNewExpense({...expense, receipt: result.uri});
     }
+}
+
+function deleteExpense(expense) {
+  const header = {'Content-Type': 'application/json' };
+  fetch('http://localhost:5000/deleteExpense', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify(expense)})
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          if(data.message == "Expense deleted!") {
+            alert("Expense deleted!")
+            navigation.goBack();
+          } else {
+            alert("Failed to delete expense!")
+          }
+          })
 }
 
 function handleToggleEdit () {
   if (isEditing) {
-      setNewUser({name:null, email:null, company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
+      setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
+        item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
+        place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
+         with_GST: expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, 
+         description: expenseDetails.description, receipt: expenseDetails.receipt});
     setIsEditing(false)
   } else {
     setIsEditing(true)
   }
 }
+
+const expenseDetails = route.params.expense
+const date = new Date(expenseDetails.date_of_expense).toLocaleDateString("en-UK");
+const expenseTypeDropdown = route.params.monthlyExpenseTypes
+const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
+  item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
+  place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
+   with_GST: expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, 
+   description: expenseDetails.description, receipt: expenseDetails.receipt});
 
 
   return (
@@ -348,8 +339,9 @@ function handleToggleEdit () {
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles} 
-                setSelected={(company) => setNewUser({...newUser, company:company})}
-                data={expenseTypeDropdown} 
+                setSelected={(type) => setNewExpense({...expense, type: type})}
+                data={expenseTypeDropdown}
+                placeholder = {expense.type}
                 save="value"
                 showsVerticalScrollIndicator = {false}
                 search = {false}
@@ -359,8 +351,8 @@ function handleToggleEdit () {
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Expense Type</Text>
         <TextInput style={styles.textInput}
-          placeholder="expense" 
-          value={newUser.name} 
+          placeholder="eg. Overtime meal"
+          value={expense.type}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
@@ -368,26 +360,28 @@ function handleToggleEdit () {
         </View>
       )}
       
-        
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>If others, state type</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. overtime meal" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
-          autoCapitalize="none" 
-          autoCorrect={false} 
-          editable={isEditing}
-        />
-        </View>
+      {expense.type == 'Others' ? (
+          <View style={styles.inputContainer}>
+          <Text style={styles.normalBoldText}>If others, state type</Text>
+          <TextInput style={styles.textInput}
+            placeholder="eg. Overtime meal"
+            onChangeText={(type) => setNewExpense({...expense, otherType: type})}
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={isEditing}
+          />
+          </View>
+        ) : (
+          <View></View>
+        )}
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Date</Text>
         <TextInput style={styles.textInput}
-          placeholder="dd/mm/yy" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
-          autoCapitalize="none" 
+          placeholder="dd/mm/yyyy"
+          value={expense.date}
+          onChangeText={(date) => setNewExpense({...expense, date: date})}
+          autoCapitalize="none"
           autoCorrect={false} 
           editable={isEditing}
         />
@@ -395,11 +389,11 @@ function handleToggleEdit () {
 
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Amount before GST</Text>
+        <Text style={styles.normalBoldText}>Amount without GST</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 20.34" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.without_GST} 
+          onChangeText={(amount) => setNewExpense({...expense, without_GST: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
@@ -407,26 +401,26 @@ function handleToggleEdit () {
         </View>
 
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Amount after GST</Text>
+        <Text style={styles.normalBoldText}>Amount with GST</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.with_GST} 
+          onChangeText={(amount) => setNewExpense({...expense, with_GST: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
         />
         </View>
 
-        {newUser.company == 'Entertainment and Gifts' ? (
+        {expense.company == 'Entertainment and Gifts' ? (
         <View style={{width:'100%', alignItems:'center'}}>
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Place</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.place} 
+          onChangeText={(place) => setNewExpense({...expense, place: place})}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
@@ -437,8 +431,8 @@ function handleToggleEdit () {
         <Text style={styles.normalBoldText}>Customer Name</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.customer} 
+          onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
@@ -449,8 +443,8 @@ function handleToggleEdit () {
         <Text style={styles.normalBoldText}>Company</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.company} 
+          onChangeText={(company) => setNewExpense({...expense, company: company})}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
@@ -469,9 +463,9 @@ function handleToggleEdit () {
         <Text style={styles.normalBoldText}>Description</Text>
         <TextInput style={[styles.textInput,{height:'100px'}]}
           placeholder="Desciption of expense" 
-          value={newUser.email} 
+          value={expense.description} 
           multiline={true}
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          onChangeText={(description) => setNewExpense({...expense, description: description})}
           autoCapitalize="none" 
           autoCorrect={false} 
           editable={isEditing}
@@ -479,10 +473,10 @@ function handleToggleEdit () {
         </View>
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Reciept</Text>
+        <Text style={styles.normalBoldText}>Receipt</Text>
         <TouchableOpacity disabled={!isEditing} onPress={()=> pickImage()}>
-          <Image style={styles.recieptImage}
-            source={image}
+          <Image style={styles.receiptImage}
+            source={expense.receipt}
           />
           <View style={[styles.imageInput]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>

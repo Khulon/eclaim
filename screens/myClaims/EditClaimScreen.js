@@ -32,11 +32,10 @@ export default function EditClaimScreen({ navigation, route, props}) {
   async function fetchData() {
     try {
       const id = claim.id;
-      const type = claim.form_type;
       const user = window.localStorage.getItem('session');
       
       let [res1, res2, res3] = await Promise.all([
-      fetch(`http://localhost:5000/getExpenses/${user}/${type}/${id}`)
+      fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);
@@ -219,7 +218,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
       var amount = 0
       if(fullData != null){
         for (var i = 0; i < fullData.length; i++) {
-          amount += (claim.form_type == 'Monthly' ? fullData[i].total_amount : fullData[i].amount)
+          amount += (fullData[i].total_amount)
         }
       }
       return '$' + amount
@@ -241,6 +240,14 @@ export default function EditClaimScreen({ navigation, route, props}) {
     } else {
       if (userDetails.email == claim.form_creator) {
         //uncheck item
+        fetch('http://localhost:5000/checkExpense', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
+            })
+            .then(response => response.json())
       }
       navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes})
     } 
@@ -350,11 +357,11 @@ export default function EditClaimScreen({ navigation, route, props}) {
         email = {item.email}
         item_number = {item.item_number}
         receipt = {item.receipt}
-        date = {claim.form_type == 'Travelling' ? parseDate(item.date) : parseDate(item.date_of_expense)}
+        date = {parseDate(item.date_of_expense)}
         checked = {item.checked}
         name = {item.name} 
         type = {item.expense_type}
-        amount = {claim.form_type == 'Monthly' ? item.total_amount : item.amount}
+        amount = {item.total_amount}
 
         onMouseEnter={() => setSelectedId({...selectedId, emailAndItemNumber: [item.email, item.item_number]})}
         onMouseLeave={() => setSelectedId({...selectedId, emailAndItemNumber: []})}

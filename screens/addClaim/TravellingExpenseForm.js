@@ -5,7 +5,7 @@ import { Ionicons } from "react-native-vector-icons";
 
 
 
-export default function TravellingExpenseForm({ navigation, route }) {        
+export default function TravellingExpenseForm({ route }) {        
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
