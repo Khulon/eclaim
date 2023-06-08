@@ -138,7 +138,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
 
     bottomCard: {
       bottom: "0",
-      height: "100px",
+      height: claim.status == 'In Progress' ? "100px" : '70px',
       width:"100%",
       alignItems: "center",
       justifyContent: "flex-end",
@@ -236,7 +236,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
     console.log(item)
     
     if(claim.form_type == 'Travelling') {
-      navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes})
+      navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.status})
     } else {
       if (userDetails.email == claim.form_creator) {
         //uncheck item
@@ -249,7 +249,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
             })
             .then(response => response.json())
       }
-      navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes})
+      navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes, claimStatus: claim.status})
     } 
   }
 
@@ -457,8 +457,8 @@ export default function EditClaimScreen({ navigation, route, props}) {
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
         
-
         {claim.form_creator == userDetails.email ? (
+          claim.status == "In Progress" ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
@@ -472,6 +472,10 @@ export default function EditClaimScreen({ navigation, route, props}) {
           </Animated.View>
           </View>
           </View>
+          ) : (
+            <View></View>
+          )
+          
         ):(
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={[styles.buttonContainer,{width:'100%'}]}>

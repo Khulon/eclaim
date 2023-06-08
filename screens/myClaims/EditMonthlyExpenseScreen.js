@@ -493,8 +493,8 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
       </View>
 
 
-
-      <View style={styles.bottomCard}>
+      {route.params.claimStatus == 'In Progress' ? (
+        <View style={styles.bottomCard}>
         {isEditing ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
@@ -519,6 +519,10 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           </View>
         )}
       </View>
+      ) : (
+        <View></View>
+      )}
+      
 
 
       </View>
