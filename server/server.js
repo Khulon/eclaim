@@ -467,30 +467,30 @@ app.get('/getExpenses/:user/:type/:id', async (req, res) => {
 
 try {
   if(type == 'Monthly') {
-    //need to handle case where user is not form creator
-    const queryString = 'SELECT id, name, email, total_amount, expense_type, date_of_expense, item_number, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
-    request.input('id', sql.Int, id);
-    const result = await request.query(queryString);
-    res.send(result.recordset);
-
+      const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
+      request.input('claimId', sql.Int, id);
+      const form_creator = await request.query(query)
+      //check if user is form creator
+      if (form_creator.recordset[0].form_creator != user) {
+        const queryString = "SELECT * FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id AND claimee = '"+user+"'";
+        request.input('id', sql.Int, id);
+        const result = await request.query(queryString);
+        res.send(result.recordset);
+      //display all expenses
+      } else {
+        const queryString = 'SELECT * FROM MonthlyExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
+        request.input('id', sql.Int, id);
+        const result = await request.query(queryString);
+        res.send(result.recordset);
+  }
+  //Travelling
   } else { 
-    const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
-    request.input('claimId', sql.Int, id);
-    const form_creator = await request.query(query)
-    
-    if(form_creator.recordset[0].form_creator != user) {
       const queryString = "SELECT id, name, email, amount, expense_type, date, item_number, receipt,"
       + " description FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id AND claimee = '"+user+"'";
       request.input('id', sql.Int, id);
       const result = await request.query(queryString);
       res.send(result.recordset);
-    } else {
-      const queryString = 'SELECT id, name, email, amount, expense_type, date, item_number, receipt, description FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
-      request.input('id', sql.Int, id);
-      const result = await request.query(queryString);
-      res.send(result.recordset);
     }
-  }
   
 } catch(err) {
   console.log(err)
@@ -567,6 +567,80 @@ app.post('/addTravellingExpense', async (req, res) => {
 
 
 
+
+//Add monthly expense
+app.post('/addMonthlyExpense', async (req, res) => {
+  let id = req.body.id;
+  let claimee = req.body.claimee;
+  let before_GST = req.body.before_GST;
+  let after_GST = req.body.after_GST;
+  let total = before_GST + after_GST;
+  let place = req.body.place;
+  let customer_name = req.body.customer_name;
+  let company = req.body.company;
+  let type = req.body.type;
+  let otherType = req.body.otherType;
+  let receipt = req.body.receipt;
+  let date = req.body.date;
+  var description = req.body.description;
+
+  try {
+
+    if(type == "Others") {
+
+      if(otherType == "") {
+        otherType = null;
+      }
+
+      if(otherType == "Others") {
+        throw new Error("Please enter a valid expense type!")
+      }
+
+      type = otherType;
+
+    }
+
+    if(description == "") {
+      description = null;
+    }
+
+    
+    var request = new sql.Request();
+    const checkType = await request.query("SELECT COUNT(*) AS count FROM MonthlyExpenseTypes WHERE type = '"+type+"'")
+    if(checkType.recordset[0].count == 0) {
+      const query = "INSERT INTO MonthlyExpenseTypes VALUES(@type)"
+      request.input('type', sql.VarChar, type)
+      await request.query(query);
+    }
+    const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM MonthlyExpenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
+    let item_number = count.recordset[0].count + 1;
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
+    const query = ("INSERT INTO MonthlyExpenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, '"+place+"', '"+customer_name+"', '"+company+"', "
+    + ""+before_GST+", "+after_GST+", "+total+", @description, '"+receipt+"', 'No', @da, @lm )");
+    
+    request.input('id', sql.Int, id)
+    request.input('count', sql.Int, item_number);
+    request.input('date', sql.Date, expense_date.recordset[0].date)
+    request.input('description', sql.Text, description);
+    request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
+
+
+    await request.query(query);
+
+    res.send({message: "Success!"});
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Failed to add monthly expense!"});
+  }
+
+});
+
+
+
+
+//Get travelling expense types from database
 app.get('/getTravellingExpenseTypes', async (req, res) => {
   try {
     var request = new sql.Request();
@@ -580,6 +654,18 @@ app.get('/getTravellingExpenseTypes', async (req, res) => {
 });
 
 
+//Get monthly expense types from database
+app.get('/getMonthlyExpenseTypes', async (req, res) => {
+  try {
+    var request = new sql.Request();
+    const result = await request.query("SELECT * FROM MonthlyExpenseTypes");
+    res.send(result.recordset);
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+});
 
 
 
