@@ -33,17 +33,6 @@ export default function MonthlyExpenseForm({route}) {
         });
   }; 
 
-
-
-  /*
-  const companies = [
-    {key:'0', value:'EKCA'},
-    {key:'1', value:'Reefertec'},
-    {key:'2', value:'PCL'},
-    {key:'3', value:'SmartZ'},
-    {key:'4', value:'EKH'},
-    ]
-*/
   const expenseTypes = [
     {key:'0', value:'Travelling'},
     {key:'1', value:'Monthly'},

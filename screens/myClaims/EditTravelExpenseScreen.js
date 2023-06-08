@@ -268,7 +268,7 @@ function updateExpense(expense) {
 
 function deleteExpense(expense) {
   const header = {'Content-Type': 'application/json' };
-  fetch('http://localhost:5000/deleteTravellingExpense', {
+  fetch('http://localhost:5000/deleteExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})
@@ -285,23 +285,24 @@ function deleteExpense(expense) {
 }
 
 function handleToggleEdit () {
+ 
   if (isEditing) {
       setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
       item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-       amount: expenseDetails.amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
-    setIsEditing(false)
+       amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+      setIsEditing(false)
   } else {
-    setIsEditing(true)
+      setIsEditing(true)
   }
 }
 
 
 const expenseDetails = route.params.expense
-const date = new Date(expenseDetails.date).toLocaleDateString("en-UK");
+const date = new Date(expenseDetails.date_of_expense).toLocaleDateString("en-UK");
 const expenseTypeDropdown = route.params.travellingExpenseTypes
 const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
   item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-   amount: expenseDetails.amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+   amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
 
   return (
     <View style={styles.page}>
@@ -389,7 +390,6 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           <Text style={styles.normalBoldText}>If others, state type</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. Overtime meal"
-            //value={expense.type}
             onChangeText={(type) => setNewExpense({...expense, otherType: type})}
             autoCapitalize="none"
             autoCorrect={false}

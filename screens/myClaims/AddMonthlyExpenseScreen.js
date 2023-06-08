@@ -247,7 +247,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
   const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
-    before_GST: null, after_GST: null, place: null, customer_name: null, company: null, date: null, description: null, receipt: null});
+    with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: null, description: null, receipt: null});
 
 
   return (
@@ -325,22 +325,22 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
 
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Amount before GST</Text>
+        <Text style={styles.normalBoldText}>Amount without GST</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 20.34" 
-          value={expense.before_GST} 
-          onChangeText={(amount) => setExpense({...expense, before_GST: amount})}
+          value={expense.without_GST} 
+          onChangeText={(amount) => setExpense({...expense, without_GST: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
 
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Amount after GST</Text>
+        <Text style={styles.normalBoldText}>Amount with GST</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={expense.after_GST} 
-          onChangeText={(amount) => setExpense({...expense, after_GST: amount})}
+          value={expense.with_GST} 
+          onChangeText={(amount) => setExpense({...expense, with_GST: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
