@@ -1,7 +1,7 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations';
-import { Ionicons } from "react-native-vector-icons";
+import { Ionicons, Feather } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,10 +12,15 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 export default function EditTravelExpenseScreen({ navigation, route }) {        
- 
+
+
+  const [isEditing, setIsEditing] = useState(false)
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
+  const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
+  const EditButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
+
 
   const styles = StyleSheet.create({
     page: {
@@ -66,8 +71,16 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
     },
     backButtonBar: {
         width:"90%",
+        flexDirection:'row',
+        justifyContent:'space-between'
     },
 
+    deleteButton: {
+      width:'40px',
+      height:'40px',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
     backButton: {
         fontFamily: "inherit",
@@ -211,9 +224,6 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
         color: "#6A6A6A",
     },
 
-
-
-
   });
 
 
@@ -237,7 +247,6 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
 
 
 
-
 function updateExpense(expense) {
   const header = {'Content-Type': 'application/json' };
   fetch('http://localhost:5000/editTravellingExpense', {
@@ -254,8 +263,6 @@ function updateExpense(expense) {
             alert("Failed to update expense!")
           }
           })
-
-
 }
 
 
@@ -275,6 +282,17 @@ function deleteExpense(expense) {
             alert("Failed to delete expense!")
           }
           })
+}
+
+function handleToggleEdit () {
+  if (isEditing) {
+      setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
+      item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
+       amount: expenseDetails.amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+    setIsEditing(false)
+  } else {
+    setIsEditing(true)
+  }
 }
 
 
@@ -299,6 +317,22 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           <Text style={styles.mediumText}>Go Back</Text>
         </View>
       </TouchableOpacity>
+      
+      {isEditing ? (
+        <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
+        onPress={() => ConfirmationButton('Are you sure you want to delete this expense?', 'Click ok to confirm deletion.', () => deleteExpense(expense))}>
+        <View style={styles.deleteButton}>
+        {isDeleteButtonHover?(
+          <Text><Feather name="trash-2" color="#9C2424" size="27px"/></Text>
+        ):(
+          <Text><Feather name="trash" color="#9C2424" size="25px"/></Text>
+        )}
+      
+      </View>
+      </TouchableOpacity>
+      ) : (
+        <View></View>
+      )}
       </View>
       </View>
 
@@ -308,7 +342,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
         <View style={{width:"100%", alignItems:"center"}}>
         <View style={styles.headerBar}>
         <View style={{paddingHorizontal: '7px'}}>
-          <Text style={styles.bigText}>Edit</Text>
+          <Text style={styles.bigText}>Travel</Text>
         </View>
         <View style={{paddingHorizontal: '7px'}}>
           <Text style={styles.bigText}>Expense</Text>
@@ -317,7 +351,10 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
         </View>
  
       <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
-      <View style={[styles.inputContainer,{zIndex:5}]}>
+
+
+      {isEditing ? (
+        <View style={[styles.inputContainer,{zIndex:5}]}>
         <Text style={styles.normalBoldText}>Expense Type</Text>
         <SelectList
                 dropdownStyles={styles.dropdownStyles}
@@ -333,6 +370,19 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
                 search = {false}
             />  
         </View>
+      ) : (
+          <View style={styles.inputContainer}>
+          <Text style={styles.normalBoldText}>Expense Type</Text>
+          <TextInput style={styles.textInput}
+            placeholder="eg. Overtime meal"
+            value={expense.type}
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={isEditing}
+          />
+          </View>
+      )}
+      
        
         {expense.type == 'Others' ? (
           <View style={styles.inputContainer}>
@@ -343,6 +393,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
             onChangeText={(type) => setNewExpense({...expense, otherType: type})}
             autoCapitalize="none"
             autoCorrect={false}
+            editable={isEditing}
           />
           </View>
         ) : (
@@ -357,6 +408,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           onChangeText={(date) => setNewExpense({...expense, date: date})}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={isEditing}
         />
         </View>
 
@@ -368,6 +420,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           onChangeText={(amount) => setNewExpense({...expense, amount: amount})}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={isEditing}
         />
         </View>
        
@@ -381,12 +434,13 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           onChangeText={(description) => setNewExpense({...expense, description: description})}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={isEditing}
         />
         </View>
        
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Receipt</Text>
-        <TouchableOpacity onPress={()=> pickImage()}>
+        <TouchableOpacity disabled={!isEditing} onPress={()=> pickImage()}>
           <Image style={styles.receiptImage}
             source={expense.receipt}
           />
@@ -404,22 +458,30 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
    
       </View>
 
-
       <View style={styles.bottomCard}>
-        <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
-        <View style={styles.buttonContainer}>
-        <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
-        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to delete this expense?', 'Click ok to confirm deletion.', () => deleteExpense(expense))} style={styles.defaultButton} > Delete </TouchableOpacity>
-        </Animated.View>
-        </View>
+        {isEditing ? (
+          <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+          <View style={styles.buttonContainer}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
+          <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to cancel?', 'Changes will be reverted', handleToggleEdit())} style={styles.defaultButton} > Cancel </TouchableOpacity>
+          </Animated.View>
+          </View>
 
-        <View style={styles.buttonContainer}>
-        <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to save these changes?', 'Expense details will be updated', () => updateExpense(expense))}> Save </TouchableOpacity>
-        </Animated.View>
-        </View>
-        </View>
-
+          <View style={styles.buttonContainer}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
+          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to save these changes?', 'Expense details will be updated', () => updateExpense(expense))}> Save </TouchableOpacity>
+          </Animated.View>
+          </View>
+          </View>
+        ) : (
+          <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+          <View style={[styles.buttonContainer,{width:'100%'}]}>
+          <Animated.View onMouseEnter={() => MoveNegAnimation(EditButtonHover)} onMouseLeave={() => MovePosAnimation(EditButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: EditButtonHover }]}}>
+          <TouchableOpacity onPress={() => handleToggleEdit()} style={[styles.defaultButton,{backgroundColor:"#45B097"}]} > Edit </TouchableOpacity>
+          </Animated.View>
+          </View>
+          </View>
+        )}
       </View>
 
 
