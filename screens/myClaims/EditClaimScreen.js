@@ -221,6 +221,9 @@ export default function EditClaimScreen({ navigation, route, props}) {
     if(claim.form_type == 'Travelling') {
       navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes})
     } else {
+      if (userDetails.email == claim.form_creator) {
+        //uncheck item
+      }
       navigation.navigate('EditMonthlyExpenseScreen', {expense: item})
     } 
   }
