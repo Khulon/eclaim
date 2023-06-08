@@ -87,7 +87,7 @@ export default function ProfileScreen({ navigation }) {
     },
     infomationContainer: {
       width:'100%',
-      height:'13%',
+      height:'12%',
       minHeight:'60px',
       justifyContent:'center',
       alignItems:'center',
@@ -95,11 +95,13 @@ export default function ProfileScreen({ navigation }) {
     
     boldInfoText: {
       padding:'5px',
-      fontWeight:'700'
+      fontWeight:'700',
+      fontSize:'17px'
     },
     normalInfoText: {
       padding:'5px',
-      color:'#444'
+      color:'#444',
+      fontSize:'15px'
     },
     backButton: {
       fontFamily: "inherit",
