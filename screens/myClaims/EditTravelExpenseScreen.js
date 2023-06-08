@@ -12,8 +12,6 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 export default function EditTravelExpenseScreen({ navigation, route }) {        
-
-
  
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const CancelButtonHover = useRef(new Animated.Value(0)).current;

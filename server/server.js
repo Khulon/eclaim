@@ -467,30 +467,30 @@ app.get('/getExpenses/:user/:type/:id', async (req, res) => {
 
 try {
   if(type == 'Monthly') {
-    //need to handle case where user is not form creator
-    const queryString = 'SELECT id, name, email, total_amount, expense_type, date_of_expense, item_number, checked FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id';
-    request.input('id', sql.Int, id);
-    const result = await request.query(queryString);
-    res.send(result.recordset);
-
+      const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
+      request.input('claimId', sql.Int, id);
+      const form_creator = await request.query(query)
+      //check if user is form creator
+      if (form_creator.recordset[0].form_creator != user) {
+        const queryString = "SELECT * FROM MonthlyExpenses M JOIN Employees E ON M.claimee = E.email WHERE id = @id AND claimee = '"+user+"'";
+        request.input('id', sql.Int, id);
+        const result = await request.query(queryString);
+        res.send(result.recordset);
+      //display all expenses
+      } else {
+        const queryString = 'SELECT * FROM MonthlyExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
+        request.input('id', sql.Int, id);
+        const result = await request.query(queryString);
+        res.send(result.recordset);
+  }
+  //Travelling
   } else { 
-    const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
-    request.input('claimId', sql.Int, id);
-    const form_creator = await request.query(query)
-    
-    if(form_creator.recordset[0].form_creator != user) {
       const queryString = "SELECT id, name, email, amount, expense_type, date, item_number, receipt,"
       + " description FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id AND claimee = '"+user+"'";
       request.input('id', sql.Int, id);
       const result = await request.query(queryString);
       res.send(result.recordset);
-    } else {
-      const queryString = 'SELECT id, name, email, amount, expense_type, date, item_number, receipt, description FROM TravellingExpenses T JOIN Employees E ON T.claimee = E.email WHERE id = @id';
-      request.input('id', sql.Int, id);
-      const result = await request.query(queryString);
-      res.send(result.recordset);
     }
-  }
   
 } catch(err) {
   console.log(err)

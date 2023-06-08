@@ -232,9 +232,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         } else {
           alert("Error!")
         }
-      })
-
-      
+      })    
   }
 
 
