@@ -313,7 +313,6 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
           <Text style={styles.normalBoldText}>If others, state type</Text>
           <TextInput style={styles.textInput}
             placeholder="eg. Overtime meal" 
-            //value={expense.type} 
             onChangeText={(type) => setExpense({...expense, otherType: type})}
             autoCapitalize="none" 
             autoCorrect={false} 

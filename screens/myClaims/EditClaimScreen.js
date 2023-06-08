@@ -15,7 +15,8 @@ export default function EditClaimScreen({ navigation, route, props}) {
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
-  const [travellingExpenseTypes] = useState([])
+  const [travellingExpenseTypes, setTravellingExpenseTypes] = useState([])
+  const [monthlyExpenseTypes, setMonthlyExpenseTypes] = useState([])
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
@@ -33,19 +34,37 @@ export default function EditClaimScreen({ navigation, route, props}) {
       const id = claim.id;
       const type = claim.form_type;
       const user = window.localStorage.getItem('session');
-      await fetch(`http://localhost:5000/getExpenses/${user}/${type}/${id}`)
+      
+      let [res1, res2, res3] = await Promise.all([
+      fetch(`http://localhost:5000/getExpenses/${user}/${type}/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);
         setData(data)
-      });
+      }),
 
-      await fetch('http://localhost:5000/getTravellingExpenseTypes')
+      fetch('http://localhost:5000/getTravellingExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        data.forEach((item) => {travellingExpenseTypes.push({value: item.type})})
-      });
+        for(let i = 0; i < data.length; i++) {
+          data[i] = {value: data[i].type}
+        }
+        setTravellingExpenseTypes(data)
+        
+      }),
+
+      fetch('http://localhost:5000/getMonthlyExpenseTypes')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        for(let i = 0; i < data.length; i++) {
+          data[i] = {value: data[i].type}
+        }
+        setMonthlyExpenseTypes(data)
+      })
+    ])
+
       setIsLoading(false)
     } catch (error) {
       alert("Failed to load. Please check your internet connection!")
@@ -207,12 +226,11 @@ export default function EditClaimScreen({ navigation, route, props}) {
     }
   }
 
-  function addExpense () {
+  function addExpense () {  
     claim.form_type == 'Travelling' 
     ? navigation.navigate("AddTravelExpenseScreen",
      {props: claim, travellingExpenseTypes: travellingExpenseTypes}) 
-     : navigation.navigate("AddMonthlyExpenseScreen", {props: claim})
-
+     : navigation.navigate("AddMonthlyExpenseScreen", {props: claim, monthlyExpenseTypes: monthlyExpenseTypes}) 
   }
 
   function handleEditExpense(item) {
@@ -221,7 +239,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
     if(claim.form_type == 'Travelling') {
       navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes})
     } else {
-      navigation.navigate('EditMonthlyExpenseScreen', {expense: item})
+      navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes})
     } 
   }
 

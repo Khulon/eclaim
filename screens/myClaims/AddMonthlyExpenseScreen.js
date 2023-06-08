@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 
-export default function AddMonthlyExpenseScreen({ navigation }) {        
+export default function AddMonthlyExpenseScreen({ navigation, route }) {        
 
 
   
@@ -16,33 +16,6 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
-
-  const expenseTypeDropdown = [
-    {key:'0', value:'Entertainment and Gifts'},
-    {key:'1', value:'Taxi, C/park, ERP'},
-    {key:'2', value:'Fuel'},
-    {key:'3', value:'Vehical Repair'},
-    {key:'4', value:'Medical'},
-    {key:'5', value:'Others'},
-    ]
-
-  const departments = [
-    {key:'0', value:'EKTS'},
-    {key:'1', value:'EKTU'},
-    {key:'2', value:'EKTY'},
-    {key:'3', value:'EKJP'},
-    {key:'4', value:'EKTK'},
-    {key:'5', value:'IME'},
-    {key:'6', value:'Reefertec'},
-    {key:'7', value:'Smartz'},
-    {key:'8', value:'PCL'},
-    {key:'9', value:'Finance'},
-    {key:'10', value:'IT'},
-    {key:'11', value:'Marketing'},
-    {key:'12', value:'HR'},
-    {key:'13', value:'Eddie'},
-    {key:'14', value:'Paul'},
-    ]
 
 
 
@@ -185,7 +158,7 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
     alignItems:'center'
     },
 
-    recieptImage: {
+    receiptImage: {
       width:'100%',
       height: "400px",
       borderRadius:'12px',
@@ -230,35 +203,28 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
 
   });
 
-  const image = window.localStorage.getItem('image')
-  const [userDepartments, setDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
-
-  useEffect(() => {
-    setNewUser({...newUser, department: userDepartments});
-  }, [userDepartments]);
 
 
-  function addUser (){
+  async function handleAddExpense() {
+    console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    console.log(userDepartments);
-    console.log(newUser);
-    fetch('http://localhost:5000/admin/addUser', {
-      method: 'POST', 
+    await fetch('http://localhost:5000/addMonthlyExpense', {
+      method: 'POST',
       headers: header,
-      body: JSON.stringify(newUser)})
-      .then((response) => response.json())
-      .then((resp) => { 
-        console.log(resp);
-        if(resp.message == 'User Added!') {
-          alert('User Added!');
-          window.location.reload(false);
+      body: JSON.stringify(expense)})
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        if(data.message == "Success!") {
+          alert("Expense added successfully!")
+          navigation.goBack()
         } else {
-          alert('Failed to add user!');
+          alert("Error!")
         }
-      });
-  }; 
+      })
+
+      
+  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -272,10 +238,16 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
     console.log(result.uri);
 
     if (!result.canceled) {
-      window.localStorage.setItem('image', result.uri);
+      setExpense({...expense, receipt: result.uri});
     }
-}
+  }
 
+
+  const user = window.localStorage.getItem('session');
+  const claim  = route.params.props;
+  const expenseTypeDropdown = route.params.monthlyExpenseTypes;
+  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
+    before_GST: null, after_GST: null, place: null, customer_name: null, company: null, date: null, description: null, receipt: null});
 
 
   return (
@@ -318,7 +290,7 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
                 dropdownTextStyles={styles.dropdownTextStyles}
                 boxStyles={styles.boxStyles}
                 inputStyles={styles.inputStyles} 
-                setSelected={(company) => setNewUser({...newUser, company:company})}
+                setSelected={(type) => setExpense({...expense, type: type})}
                 data={expenseTypeDropdown} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
@@ -326,23 +298,26 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
             />  
         </View>
         
-        <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>If others, state type</Text>
-        <TextInput style={styles.textInput}
-          placeholder="eg. overtime meal" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
-          autoCapitalize="none" 
-          autoCorrect={false} 
-        />
-        </View>
+        {expense.type == 'Others' ? (
+          <View style={styles.inputContainer}>
+          <Text style={styles.normalBoldText}>If others, state type</Text>
+          <TextInput style={styles.textInput}
+            placeholder="eg. Overtime meal" 
+            onChangeText={(type) => setExpense({...expense, otherType: type})}
+            autoCapitalize="none" 
+            autoCorrect={false} 
+          />
+          </View>
+        ) : (
+          <View></View>
+        )}
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Date</Text>
         <TextInput style={styles.textInput}
-          placeholder="dd/mm/yy" 
-          value={newUser.name} 
-          onChangeText={(name) => setNewUser({...newUser, name:name})} 
+          placeholder="dd/mm/yyyy" 
+          value={expense.date} 
+          onChangeText={(date) => setExpense({...expense, date:date})} 
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -353,8 +328,8 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Amount before GST</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 20.34" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.before_GST} 
+          onChangeText={(amount) => setExpense({...expense, before_GST: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -364,22 +339,22 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Amount after GST</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.after_GST} 
+          onChangeText={(amount) => setExpense({...expense, after_GST: amount})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
 
-        {newUser.company == 'Entertainment and Gifts' ? (
+        {expense.type == 'Entertainment and Gifts' ? (
         <View style={{width:'100%', alignItems:'center'}}>
 
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Place</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.place} 
+          onChangeText={(place) => setExpense({...expense, place: place})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -389,8 +364,8 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Customer Name</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.customer_name} 
+          onChangeText={(customer_name) => setExpense({...expense, customer_name: customer_name})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -400,8 +375,8 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Company</Text>
         <TextInput style={styles.textInput}
           placeholder="eg. 23.00" 
-          value={newUser.email} 
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          value={expense.company} 
+          onChangeText={(company) => setExpense({...expense, company: company})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
@@ -419,19 +394,19 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
         <Text style={styles.normalBoldText}>Description</Text>
         <TextInput style={[styles.textInput,{height:'100px'}]}
           placeholder="Desciption of expense" 
-          value={newUser.email} 
+          value={expense.description} 
           multiline={true}
-          onChangeText={(email) => setNewUser({...newUser, email: email})}
+          onChangeText={(description) => setExpense({...expense, description: description})}
           autoCapitalize="none" 
           autoCorrect={false} 
         />
         </View>
         
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Reciept</Text>
+        <Text style={styles.normalBoldText}>Receipt</Text>
         <TouchableOpacity onPress={()=> pickImage()}>
-          <Image style={styles.recieptImage}
-            source={image}
+          <Image style={styles.receiptImage}
+            source={expense.receipt}
           />
           <View style={[styles.imageInput]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
@@ -453,13 +428,13 @@ export default function AddMonthlyExpenseScreen({ navigation }) {
         <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(CancelButtonHover)} onMouseLeave={() => MovePosAnimation(CancelButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: CancelButtonHover }]}}>
-        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to leave?', 'User information will not be saved', () => navigation.goBack())} style={styles.defaultButton} > Cancel </TouchableOpacity>
+        <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to cancel?', 'This expense will not be saved', () => navigation.goBack())} style={styles.defaultButton} > Cancel </TouchableOpacity>
         </Animated.View>
         </View>
 
         <View style={styles.buttonContainer}>
         <Animated.View onMouseEnter={() => MoveNegAnimation(SaveButtonHover)} onMouseLeave={() => MovePosAnimation(SaveButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SaveButtonHover }]}}>
-        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Confirm user creation?', 'User details can still be updated once created', () => addUser())}> Save </TouchableOpacity>
+        <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to add this expense?', 'OK to confirm',() => handleAddExpense())}> Save </TouchableOpacity>
         </Animated.View>
         </View>
         </View>
