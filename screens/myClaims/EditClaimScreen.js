@@ -239,7 +239,6 @@ export default function EditClaimScreen({ navigation, route, props}) {
       navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.status})
     } else {
       if (userDetails.email == claim.form_creator) {
-        //uncheck item
         fetch('http://localhost:5000/checkExpense', {
           method: 'POST',
           headers: {
