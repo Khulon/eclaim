@@ -293,6 +293,28 @@ export default function EditClaimScreen({ navigation, route, props}) {
     
   }
 
+  function handleSubmit (claim) {
+    console.log(claim)
+    fetch('http://localhost:5000/submitClaim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(claim)
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          if(data.message == "Claim submitted!") {
+            alert("Claim submitted successfully!")
+            window.location.reload(false)
+          } else {
+            alert("Claim could not be submitted!")
+          }
+        })
+
+  }
+
 
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
@@ -462,7 +484,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => deleteUser(userDetails))}> <Text style={styles.buttonText}>Submit</Text> </TouchableOpacity>
+          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => handleSubmit(claim))}> <Text style={styles.buttonText}>Submit</Text> </TouchableOpacity>
           </Animated.View>
           </View>
   
