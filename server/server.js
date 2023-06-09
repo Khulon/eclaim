@@ -899,3 +899,21 @@ app.post('/checkExpense', async (req, res) => {
     res.send({message: "Error!"});
   }
 });
+
+app.post('/submitClaim', async (req, res) => {
+  let id = req.body.id;
+
+  try {
+    var request = new sql.Request();
+    const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+" AND checked = 'No'")
+    if(result.recordset[0].count == 0) {
+      res.send({message: "Claim submitted!"})
+    } else {
+      throw new Error("Please check all expenses before submitting!")
+    }
+    //const query = "UPDATE Claims SET status = 'Submitted' WHERE id = @id";
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+})
