@@ -189,9 +189,15 @@ app.post('/admin/addUser', async (req, res) => {
   let isProcessor = req.body.isProcessor;
 
   var request = new sql.Request();
-  const query = "INSERT INTO Employees VALUES('"+email+"','"+name+"','"+company+"'," +
-  "'"+isProcessor+"','"+isApprover+"','"+isSupervisor+"', @profile)"
+  const query = "INSERT INTO Employees VALUES(@email, @name, @company," +
+  "@isProcessor, @isApprover, @isSupervisor, @profile)"
 
+  request.input('email', sql.VarChar, email)
+  request.input('name', sql.VarChar, name)
+  request.input('company', sql.VarChar, company)
+  request.input('isProcessor', sql.VarChar, isProcessor)
+  request.input('isApprover', sql.VarChar, isApprover)
+  request.input('isSupervisor', sql.VarChar, isSupervisor)
   request.input('profile', sql.VarChar, null)
   await request.query(query)
   .then(() => {
@@ -287,7 +293,7 @@ app.post('/addClaim', async (req, res) => {
     
     const query = "SET XACT_ABORT ON " 
     + "BEGIN TRANSACTION "
-    +"INSERT INTO Claims VALUES(@id, @total_amount, '"+formCreator+"', @expense_type, "
+    +"INSERT INTO Claims VALUES(@id, @total_amount, @formCreator, @expense_type, "
       + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd);"
       + "INSERT INTO MonthlyGeneral VALUES(@formid , @fromDate, @toDate, @costCenter, @note);"
       + " COMMIT TRANSACTION";
@@ -295,6 +301,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('id', sql.Int, newFormId);
     request.input('expense_type', sql.Text, expenseType)
     request.input('total_amount', sql.Numeric(18,2), 0);
+    request.input('formCreator', sql.VarChar, formCreator);
     request.input('levels', sql.Int, 1);
     request.input('claimees', sql.Int, 1);
     request.input('status', sql.VarChar, "In Progress");
