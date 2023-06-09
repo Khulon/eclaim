@@ -13,6 +13,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
   const DeleteButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
   
+  /*
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
@@ -20,7 +21,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
     {key:'3', value:'SmartZ'},
     {key:'4', value:'EKH'},
     ]
-const departments = [
+  const departments = [
     {key:'0', value:'EKTS'},
     {key:'1', value:'EKTU'},
     {key:'2', value:'EKTY'},
@@ -37,7 +38,7 @@ const departments = [
     {key:'13', value:'Eddie'},
     {key:'14', value:'Paul'},
     ]
-  
+  */
 
   const styles = StyleSheet.create({
     page: {
@@ -329,7 +330,7 @@ const departments = [
                 inputStyles={styles.inputStyles}  
                 setSelected={(company) => setUserDetails({...userDetails, company: company})}
                 placeholder={userDetails.company}
-                data={companies} 
+                data={route.params.allComps} 
                 save="value"
                 showsVerticalScrollIndicator = {false}
                 search = {false}
@@ -338,7 +339,7 @@ const departments = [
           <View style={[styles.inputContainer,{zIndex:4}]}>
           <Text style={styles.normalBoldText}>Department</Text>
           <MultiSelect
-              items={departments}
+              items={route.params.allDpts}
               uniqueKey="value"
               onSelectedItemsChange={(department) => setUserDepartments(department)}
               selectedItems= {userDepartments}

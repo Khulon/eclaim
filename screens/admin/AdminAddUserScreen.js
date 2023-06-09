@@ -8,7 +8,7 @@ import MultiSelect from 'react-native-multiple-select';
 
 
 
-export default function AdminAddUserScreen({ navigation }) {        
+export default function AdminAddUserScreen({ navigation, route}) {        
 
 
   
@@ -16,7 +16,7 @@ export default function AdminAddUserScreen({ navigation }) {
   const CancelButtonHover = useRef(new Animated.Value(0)).current;
   const SaveButtonHover = useRef(new Animated.Value(0)).current;
 
-
+  /*
   const companies = [
     {key:'0', value:'EKCA'},
     {key:'1', value:'Reefertec'},
@@ -43,6 +43,7 @@ export default function AdminAddUserScreen({ navigation }) {
     {key:'14', value:'Paul'},
     ]
 
+  */
 
 
   const styles = StyleSheet.create({
@@ -299,7 +300,7 @@ export default function AdminAddUserScreen({ navigation }) {
               inputStyles={styles.inputStyles} 
               setSelected={(company) => setNewUser({...newUser, company:company})}
               placeholder= "eg. EKCA"
-              data={companies} 
+              data={route.params.allComps} 
               save="value"
               showsVerticalScrollIndicator = {false}
               search = {false}
@@ -308,7 +309,7 @@ export default function AdminAddUserScreen({ navigation }) {
         <View style={[styles.inputContainer,{zIndex:4}]}>
         <Text style={styles.normalBoldText}>Department(s)</Text>
         <MultiSelect
-              items={departments}
+              items={route.params.allDpts}
               uniqueKey="value"
               onSelectedItemsChange={(department) => setDepartments(department)}
               selectedItems= {userDepartments}

@@ -8,7 +8,9 @@ import filter from "lodash.filter"
 export default function AdminHomeScreen({ navigation }) {        
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
     setIsLoading(true)
@@ -21,8 +23,19 @@ export default function AdminHomeScreen({ navigation }) {
       await fetch("http://localhost:5000/admin")
       .then((res) => res.json())
       .then((data) => {
-        setFullData(data);
-        setData(data);
+        console.log(data.users)
+        setFullData(data.users);
+        setData(data.users);
+        
+        for(let i = 0; i < data.departments.length; i++) {
+          data.departments[i] = {value: data.departments[i].department_name}
+        }
+        
+        setDepartments(data.departments)
+        for(let i = 0; i < data.companies.length; i++) {
+          data.companies[i] = {value: data.companies[i].prefix}
+        }
+        setCompanies(data.companies)
       })
       setIsLoading(false)
     } catch (error) {
@@ -31,31 +44,7 @@ export default function AdminHomeScreen({ navigation }) {
     }
 
   } 
-  
-  /*
-  const FULLDATA = [
-    {
-      email: 'karenlim@gmail.com',
-      email: 'karenlim@gmail.com',
-      name: 'Karen Lim',
-      company_prefix: 'EKCA',
-      department: ['EKA','EGK'],
-      supervisor: '0',
-      approver: '0',
-      processor: '1',
-    },
-    {
-      email: 'karentan@gmail.com',
-      email: 'karentan@gmail.com',
-      name: 'Karen Tan',
-      company_prefix: 'EKCA',
-      department: ['EKA','EGK','EEE'],
-      supervisor: '0',
-      approver: '0',
-      processor: '1',
-    },
-  ]; 
-  */
+
   
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
@@ -192,7 +181,7 @@ export default function AdminHomeScreen({ navigation }) {
       for (var i = 0; i < data.length; i++) {
         if (data[i].email == selectedId.email) {
           console.log(userDepartments)
-          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
+          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments, allDpts: departments, allComps: companies})
         }
       }
     }
@@ -334,7 +323,7 @@ export default function AdminHomeScreen({ navigation }) {
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{fullData != null ? fullData.length : 0}</Text>
         
         <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-        <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen")}  style={styles.defaultButton} > Add </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("AdminAddUserScreen", {allDpts: departments, allComps: companies})}  style={styles.defaultButton} > Add </TouchableOpacity>
         </Animated.View>
 
       </View>

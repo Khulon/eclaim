@@ -72,19 +72,23 @@ app.post('/register', (req, res) => {
 
 
 //Load all users on admin home page
-app.get('/admin',(req, res) => {
+app.get('/admin', async (req, res) => {
+  try {
   var request = new sql.Request();
         
     // query to the database and get the records
-    request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
+    const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
     + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
-    + ' JOIN Processors P ON E.company_prefix = P.company', function (err, rows) {
-        
-        if (err) console.log(err)
+    + ' JOIN Processors P ON E.company_prefix = P.company')
 
+    const departments = await request.query('SELECT department_name FROM Departments')
+    const companies = await request.query('SELECT prefix FROM Companies')
         // send records as a response
-        res.send(rows.recordset);
-    });
+    res.send({users: users.recordset, departments: departments.recordset, companies: companies.recordset});
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
 
 });
 
