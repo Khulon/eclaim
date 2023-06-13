@@ -8,7 +8,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
 
-export default function EditClaimScreen({ navigation, route, props}) {
+export default function EditClaimScreen({ navigation, route}) {
   const isFocused = useIsFocused();
   const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
@@ -27,7 +27,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
       fetchData()
     }
     
-  }, [props, isFocused]);
+  }, [isFocused]);
 
   async function fetchData() {
     try {

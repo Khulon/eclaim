@@ -39,12 +39,12 @@ app.get('/', function (req, res) {
     var request = new sql.Request();
         
     // query to the database and get the records
-    request.query('SELECT * from Accounts', function (err, rows) {
+    request.query('SELECT * from InProgressClaims', function (err, rows) {
         
         if (err) console.log(err)
 
         // send records as a response
-        res.send(rows.recordset[0]);
+        res.send([rows.recordset]);
     });
 });
 
@@ -903,6 +903,8 @@ app.post('/checkExpense', async (req, res) => {
   }
 });
 
+
+//Form creator submits claim
 app.post('/submitClaim', async (req, res) => {
   let id = req.body.id;
 
@@ -910,11 +912,15 @@ app.post('/submitClaim', async (req, res) => {
     var request = new sql.Request();
     const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+" AND checked = 'No'")
     if(result.recordset[0].count == 0) {
+      const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+      const updateStatus = "UPDATE Claims SET status = 'Submitted', submission_date = @sd, last_submitted_date = @lsd WHERE id = "+id+"";
+      request.input('sd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+      request.input('lsd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+      await request.query(updateStatus)
       res.send({message: "Claim submitted!"})
     } else {
       throw new Error("Please check all expenses before submitting!")
     }
-    //const query = "UPDATE Claims SET status = 'Submitted' WHERE id = @id";
   } catch(err) {
     console.log(err)
     res.send({message: "Error!"});
@@ -980,13 +986,24 @@ app.get('/management/:email', async (req, res) => {
   try {
     const { email } = req.params;
     var request = new sql.Request();
-  
-    const queryString = "SELECT * FROM Claims WHERE status = 'Submitted '";
+    const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
+    const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
+    //Approver
+    if(checkApprover.recordset[0].count == 1) {
+      const approverClaims = await request.query("SELECT * FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
+      + " WHERE submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND B.email != A.approver_name)")
+      res.send(approverClaims.recordset)
 
-
-    const result = await request.query(queryString);
-    res.send(result.recordset);
-
+    //Processor
+    } else if(checkProcessor.recordset[0].count == 1) {
+     const processorClaims = await request.query("SELECT * FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
+      + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
+      + " WHERE P.processor_email = '"+email+"' AND E.email != P.processor_email)")
+      res.send(processorClaims.recordset)
+    } else {
+      res.send([])
+    }
   } catch(err) {
       console.log(err)
       res.send({message: "Error!"});
