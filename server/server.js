@@ -56,7 +56,7 @@ const htmlToSend = template(replacements);
       auth: {
         user: 'eclaim@engkong.com',
         pass: 'eclaim12345%'
-      } */
+      }
   });
 
   

@@ -236,7 +236,7 @@ export default function ManagementScreen({ navigation }) {
         <View style={{height:'5%'}}></View>
         <View style={styles.topCard}>
         <View style={{width:'84%', flexGrow:1, flexDirection:'row', alignItems:'center'}}>
-          <Text style={{fontFamily:"inherit", fontSize: "35px", fontWeight:"700"}}>My Claims</Text>
+          <Text style={{fontFamily:"inherit", fontSize: "35px", fontWeight:"700"}}>Management</Text>
         </View>
         <View style={styles.inputContainer}>
           <TextInput style={styles.textInput}
