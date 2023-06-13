@@ -19,7 +19,6 @@ var config = {
         },
         encrypt:false
     }
-
 };
 
 
@@ -83,7 +82,6 @@ const htmlToSend = template(replacements);
 });
 
 */
-
 
 app.get('/', function (req, res) {
     // create Request object
@@ -1042,14 +1040,16 @@ app.get('/management/:email', async (req, res) => {
     const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
     //Approver
     if(checkApprover.recordset[0].count == 1) {
-      const approverClaims = await request.query("SELECT * FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
+      const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
+      + "period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
       + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND B.email != A.approver_name)")
       res.send(approverClaims.recordset)
 
     //Processor
     } else if(checkProcessor.recordset[0].count == 1) {
-     const processorClaims = await request.query("SELECT * FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
+     const processorClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
+     + "period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
       + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
       + " WHERE P.processor_email = '"+email+"' AND E.email != P.processor_email)")
       res.send(processorClaims.recordset)

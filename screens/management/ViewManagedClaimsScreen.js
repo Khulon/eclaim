@@ -8,15 +8,13 @@ import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
 
-export default function ViewManagedClaimsScreen({ navigation, route, props}) {
+export default function ViewManagedClaimsScreen({ navigation, route}) {
   const isFocused = useIsFocused();
   const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
-  const [travellingExpenseTypes, setTravellingExpenseTypes] = useState([])
-  const [monthlyExpenseTypes, setMonthlyExpenseTypes] = useState([])
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
@@ -27,42 +25,18 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
       fetchData()
     }
     
-  }, [props, isFocused]);
+  }, [isFocused]);
 
   async function fetchData() {
     try {
       const id = claim.id;
-      const user = window.localStorage.getItem('session');
-      
-      let [res1, res2, res3] = await Promise.all([
-      fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
+      const user = claim.form_creator;
+      await fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);
         setData(data)
-      }),
-
-      fetch('http://localhost:5000/getTravellingExpenseTypes')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        for(let i = 0; i < data.length; i++) {
-          data[i] = {value: data[i].type}
-        }
-        setTravellingExpenseTypes(data)
-        
-      }),
-
-      fetch('http://localhost:5000/getMonthlyExpenseTypes')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        for(let i = 0; i < data.length; i++) {
-          data[i] = {value: data[i].type}
-        }
-        setMonthlyExpenseTypes(data)
-      })
-    ])
+      });
 
       setIsLoading(false)
     } catch (error) {
@@ -219,23 +193,13 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
   }
 
 
-  function handleEditExpense(item) {
+  function handleViewExpense(item) {
     console.log(item)
     
     if(claim.form_type == 'Travelling') {
-      navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.status})
+      navigation.navigate("ViewManagedTravelExpenseScreen", {expense: item, claimStatus: claim.status})
     } else {
-      if (userDetails.email == claim.form_creator) {
-        fetch('http://localhost:5000/checkExpense', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(item)
-            })
-            .then(response => response.json())
-      }
-      navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes, claimStatus: claim.status})
+      navigation.navigate('ViewManagedMonthlyExpenseScreen', {expense: item, claimStatus: claim.status})
     } 
   }
 
@@ -332,7 +296,7 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
         onMouseEnter={() => setSelectedId({...selectedId, emailAndItemNumber: [item.email, item.item_number]})}
         onMouseLeave={() => setSelectedId({...selectedId, emailAndItemNumber: []})}
 
-        onPress={() => handleEditExpense(item)}
+        onPress={() => handleViewExpense(item)}
         backgroundColor={backgroundColor}
         transform={transform}
       />
@@ -405,8 +369,7 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
 
-    {console.log(claim.approver_name)}
-        {claim.status == 'Approver' ? (
+        {userDetails.approver == 'Yes' ? (
           claim.status == "Submitted" ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
@@ -427,7 +390,8 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
           )
           
         ):(
-          claim.status == "Approved" ? (
+          //Processor
+          userDetails.processor == 'Yes' && claim.status == "Approved" ? (
             <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
             <View style={styles.buttonContainer}>
             <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
