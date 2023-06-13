@@ -3,6 +3,9 @@ const cors = require('cors');
 const sql = require('mssql');
 const app = express();
 var async = require('async');
+const nodemailer = require('nodemailer');
+
+
 
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
@@ -917,3 +920,44 @@ app.post('/submitClaim', async (req, res) => {
     res.send({message: "Error!"});
   }
 })
+
+app.get('/sendEmail', async (req, res) => {
+  try {
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "smtp.engkong.com", // hostname
+      //secure: false, // use SSL
+      //port: 25, // port for secure SMTP
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      /*
+      auth: {
+        user: 'eclaim@engkong.com',
+        pass: 'eclaim12345%'
+      } */
+  });
+
+  
+    // Define the email message
+    const mailOptions = {
+      from: '',
+      to: 'eclaim@engkong.com',
+      subject: 'hello',
+      text: 'weijieeijwiejiwjijai'
+      
+    };
+
+    // Send the email
+    
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+    
+    res.send({message: "Email sent!"})
+  } catch (error) {
+    console.log('Error:', error);
+    res.send({message: "Error!"})
+  }
+
+});
