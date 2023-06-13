@@ -3,9 +3,6 @@ const cors = require('cors');
 const sql = require('mssql');
 const app = express();
 var async = require('async');
-const nodemailer = require('nodemailer');
-
-
 
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
@@ -32,6 +29,60 @@ sql.connect(config, function (err) {
     console.log("Connected!");
 });
 
+/*
+//Send email
+const nodemailer = require('nodemailer');
+const handlebars = require('handlebars')
+const path = require('path');
+const fs = require('fs');
+app.get('/sendEmail', async (req, res) => {
+  const filePath = path.join('server', '../../email/template.html');
+  const source = fs.readFileSync(filePath, 'utf-8').toString();
+  const template = handlebars.compile(source);
+  const replacements = {
+    username: "Darth Vader"
+  };
+const htmlToSend = template(replacements);
+  try {
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "smtp.engkong.com", // hostname
+      //secure: false, // use SSL
+      //port: 25, // port for secure SMTP
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      /*
+      auth: {
+        user: 'eclaim@engkong.com',
+        pass: 'eclaim12345%'
+      } */
+  });
+
+  
+    // Define the email message
+    const mailOptions = {
+      from: '',
+      to: 'eclaim@engkong.com',
+      subject: 'hello',
+      html: htmlToSend
+      
+    };
+
+    // Send the email
+    
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+    
+    res.send({message: "Email sent!"})
+  } catch (error) {
+    console.log('Error:', error);
+    res.send({message: "Error!"})
+  }
+
+});
+
+*/
 
 
 app.get('/', function (req, res) {
@@ -922,6 +973,7 @@ app.post('/submitClaim', async (req, res) => {
 })
 
 
+
 //Send email 
 app.get('/sendEmail/:id', async (req, res) => {
   try {
@@ -993,3 +1045,4 @@ app.get('/management/:email', async (req, res) => {
   }
 
 });
+
