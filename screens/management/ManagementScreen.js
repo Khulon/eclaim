@@ -1,129 +1,39 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
-import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons } from "react-native-vector-icons";
-import useAuth from '../../hooks/useAuth';
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
+import { parseDatePeriod } from '../../functions/Parsers';
 
 export default function ManagementScreen({ navigation }) {        
 
   window.localStorage.setItem('stackScreen', 'Management');
+  const userDetails = JSON.parse(window.localStorage.getItem('details'))
 
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false); 
 
   useEffect(() => {
-    //setIsLoading(true)
-    //fetchData()
-    setFullData(FULLDATA);
-        setData(FULLDATA);
+    setIsLoading(true)
+    fetchData()
+    
   }, []);
 
   async function fetchData() {
-     
-    try {
-      await fetch("http://localhost:5000/admin")
-      .then((res) => res.json())
-      .then((data) => {
-        setFullData(data);
-        setData(data);
-      })
-      setIsLoading(false)
-    } catch (error) {
-      alert("Failed to load. Please check your internet connection!")
-      setIsLoading(false)
-    }
-
-  } 
+    const email = userDetails.email
+    await fetch(`http://localhost:5000/management/${email}`)
+    .then((response) => response.json())
+    .then((data) => {
+      data = data.reverse()
+      setFullData(data);
+      setData(data);
+    });
+    setIsLoading(false);
+  }
   
   
-  const FULLDATA = [
-    {
-      claimId: '1234567',
-      creator: 'Paul Lim',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_Type: 'Travelling'
-    },
-    {
-      claimId: '2234567',
-      creator: 'Paul Lim',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'Submitted',
-      expense_type: 'Travelling'
-    },
-    {
-      claimId: '3234567',
-      creator: 'Paul Lim',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'Approved',
-      expense_type: 'Travelling'
-    },
-    {
-      claimId: '4234567',
-      creator: 'Paul Lim',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'Rejected',
-      expense_type: 'Monthly'
-    },
-    {
-      claimId: '5234567',
-      creator: 'Paul Lim',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-    {
-      claimId: '6234567',
-      creator: 'Paul Toh',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-    {
-      claimId: '7234567',
-      creator: 'Paul Chan',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-    {
-      claimId: '8234567',
-      creator: 'Paul Goh',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-    {
-      claimId: '9234567',
-      creator: 'Paul Liu',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-    {
-      claimId: '1239567',
-      creator: 'Paul Tay',
-      total: '43.23',
-      date: '01 May 23 - 31 May 23',
-      status: 'In Progress',
-      expense_type: 'Monthly'
-    },
-  ]; 
-    
-  
-  const [selectedId, setSelectedId] = useState({claimId: ''});
+  const [selectedId, setSelectedId] = useState({id: ''});
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -224,66 +134,41 @@ export default function ManagementScreen({ navigation }) {
   });
 
 
-  const [userDepartments, setUserDepartments] = useState([]);
+  async function handleEditClaim (selectedId) {
 
-  /*
-  useEffect(() => {
-    if(data != null){
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].email == selectedId.email) {
-          console.log(userDepartments)
-          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
-        }
-      }
-    }
-
-  }, [userDepartments]);
-
-
-  
-  async function handleEditUser (selectedId) {
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/admin/editUser', {
-      method: 'POST', 
-      headers: header,
-      body: JSON.stringify(selectedId)})
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      setUserDepartments(data);
-    })
-  }
-  */
-
-  async function handleEditUser (selectedId) {
     for (var i = 0; i < data.length; i++) {
-      if (data[i].email == selectedId.email) {
-        setUserDepartments(data[i].department)
-        console.log(userDepartments)
-        navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments})
+      if (data[i].id == selectedId.id) {
+        console.log(data[i].id)
+        navigation.navigate("EditClaimScreen", { props: data[i]})
+
       }
     }
+  
   }
 
   function handleSearch (search) {
     setSearch(search)
     const formattedQuery = search.toLowerCase();
-    const filteredData = filter(fullData, (person)=> {
-      return contains(person, formattedQuery)
+    const filteredData = filter(fullData, (claim)=> {
+      return contains(claim, formattedQuery)
     })
     setData(filteredData)
-    console.log(filteredData)
+    //console.log(filteredData)
   }
 
-  const contains = ({name,email}, query) => {
-    if (name.includes(query) || email.includes(query)) {
+  const contains = ({form_creator}, query) => {
+    console.log(form_creator)
+    console.log(query)
+    form_creator = form_creator.toLowerCase()
+    if (form_creator.includes(query)) {
       return true
     }
     return false
   }
 
 
-  const Item = ({date, creator, total, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+
+  const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
         {expense_type == 'Travelling' ? (
@@ -295,7 +180,8 @@ export default function ManagementScreen({ navigation }) {
 
       <View style={{height:"100%", width:"50%", minWidth:"180px", justifyContent:"center"}}>
       <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
+      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
       <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: {total}</Text>
       </View>
 
@@ -313,36 +199,31 @@ export default function ManagementScreen({ navigation }) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.claimId === selectedId.claimId ? '#EEEEEE' : 'white';
-    const transform = item.claimId === selectedId.claimId ? [{translateX: 2 }] : [{translateX: 0 }];
-    
+    const backgroundColor = item.id === selectedId.id ? '#EEEEEE' : 'white';
+    const transform = item.id === selectedId.id ? [{translateX: 2 }] : [{translateX: 0 }];
+
+    const monthlyPeriod = parseDatePeriod(item.pay_period_from, item.pay_period_to)
+    const travellingPeriod = parseDatePeriod(item.period_from, item.period_to)
+
     return (
       <Item 
-        date={item.date} 
-        creator = {item.creator}
-        total = {item.total}
+        date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
+        creator_Name = {item.form_creator}
+        total = {userDetails.email == item.form_creator ? '$' + (item.total_amount) : ('Hidden')}
+        claimees = {item.claimees}
         status = {item.status}
-        claimId = {item.claimId}
-        expense_type = {item.expense_type}
+        claimId = {item.id}
+        expense_type = {item.form_type}
 
-        onMouseEnter={() => setSelectedId({...selectedId, claimId: item.claimId})}
-        onMouseLeave={() => setSelectedId({...selectedId, claimId: null})}
 
-        onPress={() => handleEditUser(selectedId)}
+      onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
+      onMouseLeave={() => setSelectedId({...selectedId, id: null})}
+
+        onPress={() => handleEditClaim(selectedId)}
         backgroundColor={backgroundColor}
         transform={transform}
       />
     )
-  }
-
-  const { logoutUser } = useAuth();
-
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   return (
@@ -355,7 +236,7 @@ export default function ManagementScreen({ navigation }) {
         <View style={{height:'5%'}}></View>
         <View style={styles.topCard}>
         <View style={{width:'84%', flexGrow:1, flexDirection:'row', alignItems:'center'}}>
-          <Text style={{fontFamily:"inherit", fontSize: "35px", fontWeight:"700"}}>Management</Text>
+          <Text style={{fontFamily:"inherit", fontSize: "35px", fontWeight:"700"}}>My Claims</Text>
         </View>
         <View style={styles.inputContainer}>
           <TextInput style={styles.textInput}
@@ -382,9 +263,6 @@ export default function ManagementScreen({ navigation }) {
         keyExtractor={item => item.id}
       />
       </View>
-
-
-
       
 
 
@@ -398,5 +276,3 @@ export default function ManagementScreen({ navigation }) {
     
   );
 }
-
-
