@@ -105,7 +105,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
     bottomCard: {
       bottom: "0",
-      height: "100px" ,
+      height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed") ? "70px" : "100px",
       width:"100%",
       alignItems: "center",
       justifyContent: "flex-end",
