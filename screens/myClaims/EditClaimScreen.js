@@ -294,7 +294,6 @@ export default function EditClaimScreen({ navigation, route, props}) {
   }
 
   function handleSubmit (claim) {
-    console.log(claim)
     fetch('http://localhost:5000/submitClaim', {
       method: 'POST',
       headers: {
