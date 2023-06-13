@@ -921,43 +921,75 @@ app.post('/submitClaim', async (req, res) => {
   }
 })
 
-app.get('/sendEmail', async (req, res) => {
+
+//Send email 
+app.get('/sendEmail/:id', async (req, res) => {
   try {
+    const { id } = req.params;
 
     // Create a transporter
     const transporter = nodemailer.createTransport({
-      host: "smtp.engkong.com", // hostname
+      host: "email.engkong.com", // hostname
       //secure: false, // use SSL
       //port: 25, // port for secure SMTP
       tls: {
           rejectUnauthorized: false
       }, 
-      /*
+      
       auth: {
-        user: 'eclaim@engkong.com',
+        user: 'eclaim@engkong.net',
         pass: 'eclaim12345%'
-      } */
-  });
+      } 
+     
+    });
 
+    var request = new sql.Request();
+    const result = await request.query("SELECT receipt FROM Expenses WHERE id = "+id+"")
+    const receipts = []
+
+    for(var i = 0; i < result.recordset.length; i++) {
+      receipts.push({path: result.recordset[i].receipt})
+    }
   
     // Define the email message
     const mailOptions = {
-      from: '',
+      from: 'eclaim@engkong.com',
       to: 'eclaim@engkong.com',
       subject: 'hello',
-      text: 'weijieeijwiejiwjijai'
+      text: 'weijieeijwiejiwjijai',
+      attachments: receipts
       
     };
 
     // Send the email
     
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.response);
+    const info = transporter.sendMail(mailOptions);
+    console.log('Email sent:', (await info).response);
     
     res.send({message: "Email sent!"})
   } catch (error) {
     console.log('Error:', error);
     res.send({message: "Error!"})
+  }
+
+});
+
+
+//load management claims
+app.get('/management/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    var request = new sql.Request();
+  
+    const queryString = "SELECT * FROM Claims WHERE status = 'Submitted '";
+
+
+    const result = await request.query(queryString);
+    res.send(result.recordset);
+
+  } catch(err) {
+      console.log(err)
+      res.send({message: "Error!"});
   }
 
 });
