@@ -3,6 +3,9 @@ const cors = require('cors');
 const sql = require('mssql');
 const app = express();
 var async = require('async');
+const nodemailer = require('nodemailer');
+
+
 
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
@@ -898,4 +901,63 @@ app.post('/checkExpense', async (req, res) => {
     console.log(err)
     res.send({message: "Error!"});
   }
+});
+
+app.post('/submitClaim', async (req, res) => {
+  let id = req.body.id;
+
+  try {
+    var request = new sql.Request();
+    const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+" AND checked = 'No'")
+    if(result.recordset[0].count == 0) {
+      res.send({message: "Claim submitted!"})
+    } else {
+      throw new Error("Please check all expenses before submitting!")
+    }
+    //const query = "UPDATE Claims SET status = 'Submitted' WHERE id = @id";
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+})
+
+app.get('/sendEmail', async (req, res) => {
+  try {
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "smtp.engkong.com", // hostname
+      //secure: false, // use SSL
+      //port: 25, // port for secure SMTP
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      /*
+      auth: {
+        user: 'eclaim@engkong.com',
+        pass: 'eclaim12345%'
+      } */
+  });
+
+  
+    // Define the email message
+    const mailOptions = {
+      from: '',
+      to: 'eclaim@engkong.com',
+      subject: 'hello',
+      text: 'weijieeijwiejiwjijai'
+      
+    };
+
+    // Send the email
+    
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+    
+    res.send({message: "Email sent!"})
+  } catch (error) {
+    console.log('Error:', error);
+    res.send({message: "Error!"})
+  }
+
 });
