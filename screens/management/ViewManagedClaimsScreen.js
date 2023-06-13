@@ -131,7 +131,7 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
 
     bottomCard: {
       bottom: "0",
-      height: "100px" ,
+      height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed") ? "70px" : "100px",
       width:"100%",
       alignItems: "center",
       justifyContent: "flex-end",
@@ -405,8 +405,7 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
 
-    {console.log(claim.approver_name)}
-        {claim.status == 'Approver' ? (
+        {userDetails.approver == "Yes" ? (
           claim.status == "Submitted" ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
@@ -427,7 +426,7 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
           )
           
         ):(
-          claim.status == "Approved" ? (
+            userDetails.processor == "Yes" && claim.status == "Approved" ? (
             <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
             <View style={styles.buttonContainer}>
             <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
