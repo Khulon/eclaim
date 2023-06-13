@@ -134,12 +134,12 @@ export default function ManagementScreen({ navigation }) {
   });
 
 
-  async function handleEditClaim (selectedId) {
+  async function handleViewClaim (selectedId) {
 
     for (var i = 0; i < data.length; i++) {
       if (data[i].id == selectedId.id) {
         console.log(data[i].id)
-        navigation.navigate("EditClaimScreen", { props: data[i]})
+        navigation.navigate("ViewManagedClaimsScreen", { props: data[i]})
 
       }
     }
@@ -209,7 +209,7 @@ export default function ManagementScreen({ navigation }) {
       <Item 
         date={item.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod} 
         creator_Name = {item.form_creator}
-        total = {userDetails.email == item.form_creator ? '$' + (item.total_amount) : ('Hidden')}
+        total = {'$' + (item.total_amount)}
         claimees = {item.claimees}
         status = {item.status}
         claimId = {item.id}
@@ -219,7 +219,7 @@ export default function ManagementScreen({ navigation }) {
       onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
       onMouseLeave={() => setSelectedId({...selectedId, id: null})}
 
-        onPress={() => handleEditClaim(selectedId)}
+        onPress={() => handleViewClaim(selectedId)}
         backgroundColor={backgroundColor}
         transform={transform}
       />

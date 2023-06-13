@@ -10,7 +10,7 @@ import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
 export default function ViewManagedClaimsScreen({ navigation, route, props}) {
   const isFocused = useIsFocused();
-  const [claim] = useState(null);    
+  const [claim] = useState(route.params.props);    
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
@@ -131,7 +131,7 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
 
     bottomCard: {
       bottom: "0",
-      height: claim.status == 'In Progress' ? "100px" : '70px',
+      height: "100px" ,
       width:"100%",
       alignItems: "center",
       justifyContent: "flex-end",
@@ -405,7 +405,8 @@ export default function ViewManagedClaimsScreen({ navigation, route, props}) {
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
 
-        {claim.form_creator == 'Approver' ? (
+    {console.log(claim.approver_name)}
+        {claim.status == 'Approver' ? (
           claim.status == "Submitted" ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>

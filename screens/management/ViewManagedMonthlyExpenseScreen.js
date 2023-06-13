@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "react-native-vector-icons";
 
 
-export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {        
+export default function ViewManagedMonthlyExpenseScreen({ navigation, route, props }) {        
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
 
 
