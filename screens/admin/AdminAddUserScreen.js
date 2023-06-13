@@ -227,23 +227,28 @@ export default function AdminAddUserScreen({ navigation, route}) {
 
 
   function addUser (){
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    console.log(userDepartments);
-    console.log(newUser);
-    fetch('http://localhost:5000/admin/addUser', {
-      method: 'POST', 
-      headers: header,
-      body: JSON.stringify(newUser)})
-      .then((response) => response.json())
-      .then((resp) => { 
-        console.log(resp);
-        if(resp.message == 'User Added!') {
-          alert('User Added!');
-          window.location.reload(false);
-        } else {
-          alert('Failed to add user!');
-        }
-      });
+    if (newUser.isApprover == "Yes" && newUser.isSupervisor == "Yes") {
+      alert ("user cannot be an approver and supervisor for the same department!")
+    }
+    else {
+      const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+      console.log(userDepartments);
+      console.log(newUser);
+      fetch('http://localhost:5000/admin/addUser', {
+        method: 'POST', 
+        headers: header,
+        body: JSON.stringify(newUser)})
+        .then((response) => response.json())
+        .then((resp) => { 
+          console.log(resp);
+          if(resp.message == 'User Added!') {
+            alert('User Added!');
+            window.location.reload(false);
+          } else {
+            alert('Failed to add user!');
+          }
+        });
+    }
   }; 
 
 

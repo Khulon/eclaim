@@ -8,9 +8,9 @@ import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
 
-export default function EditClaimScreen({ navigation, route}) {
+export default function ViewManagedClaimsScreen({ navigation, route, props}) {
   const isFocused = useIsFocused();
-  const [claim] = useState(route.params.props);    
+  const [claim] = useState(null);    
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
@@ -27,7 +27,7 @@ export default function EditClaimScreen({ navigation, route}) {
       fetchData()
     }
     
-  }, [isFocused]);
+  }, [props, isFocused]);
 
   async function fetchData() {
     try {
@@ -71,8 +71,7 @@ export default function EditClaimScreen({ navigation, route}) {
     }
 
   } 
-  
-  const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
+
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const [selectedId, setSelectedId] = useState({emailAndItemNumber: []});
   const [search, setSearch] = useState('')
@@ -128,12 +127,6 @@ export default function EditClaimScreen({ navigation, route}) {
       borderRadius: "14px",
 
       cursor: "pointer"
-    },
-    deleteButton: {
-      width:'40px',
-      height:'40px',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
 
     bottomCard: {
@@ -225,12 +218,6 @@ export default function EditClaimScreen({ navigation, route}) {
     }
   }
 
-  function addExpense () {  
-    claim.form_type == 'Travelling' 
-    ? navigation.navigate("AddTravelExpenseScreen",
-     {props: claim, travellingExpenseTypes: travellingExpenseTypes}) 
-     : navigation.navigate("AddMonthlyExpenseScreen", {props: claim, monthlyExpenseTypes: monthlyExpenseTypes}) 
-  }
 
   function handleEditExpense(item) {
     console.log(item)
@@ -270,47 +257,6 @@ export default function EditClaimScreen({ navigation, route}) {
       return true
     }
     return false
-  }
-
-  function handleDeleteClaim (claim) {
-    fetch('http://localhost:5000/deleteClaim', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(claim)})
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        if(data.message = "Claim deleted!") {
-          alert("Claim deleted successfully!")
-          window.location.reload(false)
-        } else {
-          alert("Claim could not be deleted!")
-        }
-      })
-    
-  }
-
-  function handleSubmit (claim) {
-    fetch('http://localhost:5000/submitClaim', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(claim)
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if(data.message == "Claim submitted!") {
-            alert("Claim submitted successfully!")
-            window.location.reload(false)
-          } else {
-            alert("Claim could not be submitted!")
-          }
-        })
-
   }
 
 
@@ -397,19 +343,6 @@ export default function EditClaimScreen({ navigation, route}) {
   const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
 
 
-
-  function sendEmail() {
-    const id = claim.id
-    fetch(`http://localhost:5000/sendEmail/${id}`)
-    .then((response) => response.json())
-    .then((responseJson) => {
-      console.log(responseJson)
-      if(responseJson.message == 'Email sent!'){
-        alert('Email sent!')
-      }
-    })
-  }
-
   return (
     <View style={styles.page}>
       <View style={styles.loadingPage}>
@@ -428,24 +361,6 @@ export default function EditClaimScreen({ navigation, route}) {
             </View>
             </TouchableOpacity>
           </View>
-          {userDetails.email == claim.form_creator ? (
-            <View style={{width:'23%', alignItems:'center'}}>
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
-            onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim(claim))}>
-            <View style={styles.deleteButton}>
-              {isDeleteButtonHover?(
-                <Text><Feather name="trash-2" color="#9C2424" size="27px"/></Text>
-              ):(
-                <Text><Feather name="trash" color="#9C2424" size="25px"/></Text>
-              )}
-            
-            </View>
-            </TouchableOpacity>
-          </View>
-          ):(
-            <View></View>
-          )}
-          
           </View>
 
 
@@ -489,21 +404,19 @@ export default function EditClaimScreen({ navigation, route}) {
         </View>
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
-        
-        <TouchableOpacity onPress={() => sendEmail()} style={styles.defaultButton}> <Text style={styles.buttonText}>Send email</Text> </TouchableOpacity>
 
-        {claim.form_creator == userDetails.email ? (
-          claim.status == "In Progress" ? (
+        {claim.form_creator == 'Approver' ? (
+          claim.status == "Submitted" ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to submit?', 'You will no longer be able to edit your expenses', () => handleSubmit(claim))}> <Text style={styles.buttonText}>Submit</Text> </TouchableOpacity>
+          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to approve?', 'You will still be able to view status under Management', () => console.log('approve'))}> <Text style={styles.buttonText}>Approve</Text> </TouchableOpacity>
           </Animated.View>
           </View>
   
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > <Text style={styles.buttonText}>Add</Text> </TouchableOpacity>
+          <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to reject?', 'You will no longer see this in claim until submitted again', () => console.log('reject'))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text> </TouchableOpacity>
           
           </Animated.View>
           </View>
@@ -513,13 +426,24 @@ export default function EditClaimScreen({ navigation, route}) {
           )
           
         ):(
-          <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
-          <View style={[styles.buttonContainer,{width:'100%'}]}>
-          <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-          <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > <Text style={styles.buttonText}>Add</Text> </TouchableOpacity>
-          </Animated.View>
-          </View>
-          </View>
+          claim.status == "Approved" ? (
+            <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+            <View style={styles.buttonContainer}>
+            <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
+            <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to process?', 'The form creator will be notified', () => console.log('approve'))}> <Text style={styles.buttonText}>process</Text> </TouchableOpacity>
+            </Animated.View>
+            </View>
+    
+            <View style={styles.buttonContainer}>
+            <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
+            <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to reject?', 'You will no longer see this in claim until approved again', () => console.log('reject'))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
+            
+            </Animated.View>
+            </View>
+            </View>
+            ) : (
+                <View></View>
+          )
         )}
 
       
