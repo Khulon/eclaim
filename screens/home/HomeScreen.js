@@ -43,17 +43,6 @@ export default function HomeScreen({ navigation }) {
 
   });
 
-  function sendEmail() {
-    fetch('http://localhost:5000/sendEmail')
-    .then((response) => response.json())
-    .then((responseJson) => {
-      console.log(responseJson)
-      if(responseJson.message == 'Email sent!'){
-        alert('Email sent!')
-      }
-    })
-  }
-
 
   return (
     <View style={styles.page}>
@@ -66,7 +55,6 @@ export default function HomeScreen({ navigation }) {
         />
         <Text style={styles.text}>Welcome</Text>
         <Text style={styles.text}>{name}</Text>
-        <TouchableOpacity onPress={() => sendEmail()}> Send Email </TouchableOpacity>
 
 
         </View>

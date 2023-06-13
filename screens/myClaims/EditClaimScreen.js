@@ -1,4 +1,4 @@
-import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native';
+import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList, ActivityIndicator, Touchable} from 'react-native';
 import React, { useRef, useState, useEffect, useContext, createContext } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons, Feather } from "react-native-vector-icons";
@@ -397,6 +397,19 @@ export default function EditClaimScreen({ navigation, route, props}) {
   const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
 
 
+
+  function sendEmail() {
+    const id = claim.id
+    fetch(`http://localhost:5000/sendEmail/${id}`)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+      if(responseJson.message == 'Email sent!'){
+        alert('Email sent!')
+      }
+    })
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.loadingPage}>
@@ -477,6 +490,8 @@ export default function EditClaimScreen({ navigation, route, props}) {
         <Text style={{paddingTop:"15px"}}>Total:</Text>
         <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
         
+        <TouchableOpacity onPress={() => sendEmail()} style={styles.defaultButton}> <Text style={styles.buttonText}>Send email</Text> </TouchableOpacity>
+
         {claim.form_creator == userDetails.email ? (
           claim.status == "In Progress" ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
@@ -489,6 +504,7 @@ export default function EditClaimScreen({ navigation, route, props}) {
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
           <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > <Text style={styles.buttonText}>Add</Text> </TouchableOpacity>
+          
           </Animated.View>
           </View>
           </View>
