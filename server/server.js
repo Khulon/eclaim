@@ -1063,3 +1063,44 @@ app.get('/management/:email', async (req, res) => {
 
 });
 
+
+
+//Approve claim
+app.post('/approveClaim', async (req, res) => {
+  try{
+    let id = req.body.id;
+    var request = new sql.Request();
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad, last_approved_date = @lad WHERE id = "+id+"";
+    request.input('ad', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('lad', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(updateStatus)
+    res.send({message: "Success!"})
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+});
+
+
+//Process claim
+app.post('/processClaim', async (req, res) => {
+  try{
+    let id = req.body.id;
+    var request = new sql.Request();
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = @pd, last_processed_date = @lpd WHERE id = "+id+"";
+    request.input('pd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('lpd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(updateStatus)
+    res.send({message: "Success!"})
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+});
+
+
+
