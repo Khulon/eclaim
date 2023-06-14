@@ -33,7 +33,7 @@ export default function ManagementScreen({ navigation }) {
   }
   
   
-  const [selectedId, setSelectedId] = useState({id: ''});
+  const [selectedId, setSelectedId] = useState('');
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -134,10 +134,10 @@ export default function ManagementScreen({ navigation }) {
   });
 
 
-  async function handleViewClaim (selectedId) {
+  async function handleViewClaim () {
 
     for (var i = 0; i < data.length; i++) {
-      if (data[i].id == selectedId.id) {
+      if (data[i].id == selectedId) {
         console.log(data[i].id)
         navigation.navigate("ViewManagedClaimsScreen", { props: data[i]})
 
@@ -188,7 +188,7 @@ export default function ManagementScreen({ navigation }) {
       <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
         <View style={{width:"20%"}}></View>
         <View style={{justifyContent:'space-between', alignItems:'center'}}>
-          <Text style={{fontWeight:'500', fontSize: "12px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status=='Approved' ? "green" : '#B82626'}}>{status}</Text>
+          <Text style={{fontWeight:'500', fontSize: "12px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
           <Text style={{fontWeight:'600', color:"#444444", fontSize: "13px"}} >ID: {claimId}</Text>
         </View>
       </View>
@@ -199,8 +199,8 @@ export default function ManagementScreen({ navigation }) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.id === selectedId.id ? '#EEEEEE' : 'white';
-    const transform = item.id === selectedId.id ? [{translateX: 2 }] : [{translateX: 0 }];
+    const backgroundColor = item.id === selectedId ? '#EEEEEE' : 'white';
+    const transform = item.id === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
 
     const monthlyPeriod = parseDatePeriod(item.pay_period_from, item.pay_period_to)
     const travellingPeriod = parseDatePeriod(item.period_from, item.period_to)
@@ -216,10 +216,10 @@ export default function ManagementScreen({ navigation }) {
         expense_type = {item.form_type}
 
 
-      onMouseEnter={() => setSelectedId({...selectedId, id: item.id})}
-      onMouseLeave={() => setSelectedId({...selectedId, id: null})}
+      onMouseEnter={() => setSelectedId(item.id)}
+      onMouseLeave={() => setSelectedId('')}
 
-        onPress={() => handleViewClaim(selectedId)}
+        onPress={() => handleViewClaim()}
         backgroundColor={backgroundColor}
         transform={transform}
       />
