@@ -74,7 +74,9 @@ export default function EditClaimScreen({ navigation, route}) {
   
   const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
-  const [selectedId, setSelectedId] = useState({emailAndItemNumber: []});
+  const [selectedEmail, setSelectedEmail] = useState('');
+  const [selectedItemNo, setSelectedItemNo] = useState('');
+
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -368,9 +370,15 @@ export default function EditClaimScreen({ navigation, route}) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.email == selectedId.emailAndItemNumber[0] ? item.item_number == selectedId.emailAndItemNumber[1] ? '#EEEEEE' : 'white' : 'white';
-    const transform = item.email == selectedId.emailAndItemNumber[0] ? item.item_number == selectedId.emailAndItemNumber[1] ? [{translateX: 2 }] : [{translateX: 0 }] : [{translateX: 0 }];
+    const backgroundColor = item.email == selectedEmail ? item.item_number == selectedItemNo ? '#EEEEEE' : 'white' : 'white';
+    const transform = item.email == selectedEmail ? item.item_number == selectedItemNo ? [{translateX: 2 }] : [{translateX: 0 }] : [{translateX: 0 }];
     
+
+
+    function setEmailAndItemNumber (email, item_number) {
+      setSelectedEmail(email)
+      setSelectedItemNo(item_number)
+    }
 
     return (
       <Item 
@@ -383,8 +391,8 @@ export default function EditClaimScreen({ navigation, route}) {
         type = {item.expense_type}
         amount = {item.total_amount}
 
-        onMouseEnter={() => setSelectedId({...selectedId, emailAndItemNumber: [item.email, item.item_number]})}
-        onMouseLeave={() => setSelectedId({...selectedId, emailAndItemNumber: []})}
+        onMouseEnter={() => setEmailAndItemNumber(item.email, item.item_number)}
+        onMouseLeave={() => setEmailAndItemNumber('','')}
 
         onPress={() => handleEditExpense(item)}
         backgroundColor={backgroundColor}
