@@ -350,7 +350,7 @@ app.post('/addClaim', async (req, res) => {
     const query = "SET XACT_ABORT ON " 
     + "BEGIN TRANSACTION "
     +"INSERT INTO Claims VALUES(@id, @total_amount, @formCreator, @expense_type, "
-      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @cd);"
+      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @rd, @lrd, @cd);"
       + "INSERT INTO MonthlyGeneral VALUES(@formid , @fromDate, @toDate, @costCenter, @note);"
       + " COMMIT TRANSACTION";
         
@@ -367,6 +367,8 @@ app.post('/addClaim', async (req, res) => {
     request.input('lsd', sql.DateTime, null);
     request.input('lad', sql.DateTime, null);
     request.input('lpd', sql.DateTime, null);
+    request.input('rd', sql.DateTime, null);
+    request.input('lrd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
     request.input('formid', sql.Int, newFormId);
     request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
@@ -382,6 +384,8 @@ app.post('/addClaim', async (req, res) => {
     console.log(err)
     res.send({message: "Failed to add claim!"});
   }
+
+
 
 //Adding travelling claim
 } else {
@@ -405,7 +409,7 @@ app.post('/addClaim', async (req, res) => {
     const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @lsd, @lad, @lpd, @cd);"
+    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @lsd, @lad, @lpd, @rd, @lrd, @cd);"
     + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, "+newFormId+"); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
@@ -418,6 +422,8 @@ app.post('/addClaim', async (req, res) => {
     request.input('lsd', sql.DateTime, null);
     request.input('lad', sql.DateTime, null);
     request.input('lpd', sql.DateTime, null);
+    request.input('rd', sql.DateTime, null);
+    request.input('lrd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
     request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
     request.input('period_to', sql.Date, toDate.recordset[0].toDate);
@@ -695,7 +701,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
       checked = 'Yes'
     }
     const query = ("INSERT INTO Expenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-    + ""+with_GST+", "+without_GST+", "+total+", @description, '"+receipt+"', @checked, @da, @lm )");
+    + ""+with_GST+", "+without_GST+", "+total+", @description, @receipt, @checked, @da, @lm )");
     
     request.input('id', sql.Int, id)
     request.input('count', sql.Int, item_number);
@@ -704,6 +710,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
     request.input('customer', sql.VarChar, customer_name);
     request.input('company', sql.VarChar, company);
     request.input('description', sql.Text, description);
+    request.input('receipt', sql.VarChar, receipt);
     request.input('checked', sql.VarChar, checked)
     request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
@@ -959,6 +966,10 @@ app.post('/submitClaim', async (req, res) => {
 
   try {
     var request = new sql.Request();
+    const emptyClaim = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+"")
+    if(emptyClaim.recordset[0].count == 0) {
+      throw new Error("Please add at least one expense!")
+    }
     const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+" AND checked = 'No'")
     if(result.recordset[0].count == 0) {
       const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
@@ -1075,6 +1086,7 @@ app.post('/approveClaim', async (req, res) => {
     request.input('ad', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('lad', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
+    //trigger sending of email to processor
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
@@ -1094,6 +1106,7 @@ app.post('/processClaim', async (req, res) => {
     request.input('pd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('lpd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
+    //trigger sending of email to form creator
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
@@ -1101,6 +1114,26 @@ app.post('/processClaim', async (req, res) => {
   }
 
 });
+
+
+//Approver reject claim
+app.post('/approverRejectClaim', async (req, res) => {
+  try {
+    var request = new sql.Request();
+    let id = req.body.id;
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const updateStatus = "UPDATE Claims SET status = 'Rejected', rejection_date = @rd, last_rejection_date = @lrd WHERE id = "+id+"";
+    request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('lrd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(updateStatus)
+    //trigger send email back to form creator
+    res.send({message: "Success!"})
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+})
 
 
 

@@ -412,7 +412,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
         />
         </View>
 
-        {expense.company == 'Entertainment and Gifts' ? (
+        {expense.type == 'Entertainment and Gifts' ? (
         <View style={{width:'100%', alignItems:'center'}}>
 
         <View style={styles.inputContainer}>
