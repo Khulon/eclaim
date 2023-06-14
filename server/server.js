@@ -45,10 +45,12 @@ app.get('/sendEmail/:id', async (req, res) => {
   const filePath = path.join('server', '../../email/template.html');
   const source = fs.readFileSync(filePath, 'utf-8').toString();
   const template = handlebars.compile(source);
+  const recipient = 'eclaim@engkong.com'
   const replacements = {
     username: "Darth Vader"
   };
-const htmlToSend = template(replacements);
+  const htmlToSend = template(replacements);
+
   try {
     const { id } = req.params;
 
@@ -79,9 +81,9 @@ const htmlToSend = template(replacements);
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim@engkong.com',
+      to: recipient,
       subject: 'hello',
-      text: 'weijieeijwiejiwjijai',
+//      text: 'weijieeijwiejiwjijai',
       html: htmlToSend,
       attachments: receipts
       
