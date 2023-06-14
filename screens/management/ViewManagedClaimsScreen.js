@@ -306,6 +306,48 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const monthlyPeriod = parseDatePeriod(claim.pay_period_from, claim.pay_period_to)
   const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
 
+  function approveClaim(claim) {
+    fetch('http://localhost:5000/approveClaim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(claim)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if(data.message == 'Success!') {
+          alert('Claim approved!')
+          window.location.reload(false)
+        } else {
+          alert('Claim could not be approved!')
+        }
+      })
+  }
+
+  function processClaim(claim) {
+    fetch('http://localhost:5000/processClaim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(claim)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if(data.message == 'Success!') {
+          alert('Claim processed!')
+          window.location.reload(false)
+        } else {
+          alert('Claim could not be processed!')
+        }
+      })
+  }
+
+
+
 
   return (
     <View style={styles.page}>
@@ -374,7 +416,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to approve?', 'You will still be able to view status under Management', () => console.log('approve'))}> <Text style={styles.buttonText}>Approve</Text> </TouchableOpacity>
+          <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to approve?', 'You will still be able to view status under Management', () => approveClaim(claim))}> <Text style={styles.buttonText}>Approve</Text> </TouchableOpacity>
           </Animated.View>
           </View>
   
@@ -395,7 +437,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
             <View style={styles.buttonContainer}>
             <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-            <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to process?', 'The form creator will be notified', () => console.log('approve'))}> <Text style={styles.buttonText}>process</Text> </TouchableOpacity>
+            <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to process?', 'The form creator will be notified', () => processClaim(claim))}> <Text style={styles.buttonText}>Process</Text> </TouchableOpacity>
             </Animated.View>
             </View>
     
