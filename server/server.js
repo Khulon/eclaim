@@ -1106,4 +1106,24 @@ app.post('/approverRejectClaim', async (req, res) => {
 })
 
 
+//Processor reject claim
+app.post('/processorRejectClaim', async (req, res) => {
+  try {
+    var request = new sql.Request();
+    let id = req.body.id;
+    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
+    const updateStatus = "UPDATE Claims SET status = 'Submitted', rejection_date = @rd, last_rejection_date = @lrd WHERE id = "+id+"";
+    request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    request.input('lrd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(updateStatus)
+    //trigger send email back to approver
+    res.send({message: "Success!"})
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+  }
+
+})
+
+
 

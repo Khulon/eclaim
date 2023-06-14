@@ -458,7 +458,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
    
       </View>
           {console.log(route.params.claimStatus)}
-      {route.params.claimStatus == 'In Progress' ? (
+      {route.params.claimStatus == 'In Progress' || route.params.claimStatus == 'Rejected' ? (
         <View style={styles.bottomCard}>
         {isEditing ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
