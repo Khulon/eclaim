@@ -501,7 +501,7 @@ export default function EditClaimScreen({ navigation, route}) {
         <TouchableOpacity onPress={() => sendEmail()} style={styles.defaultButton}> <Text style={styles.buttonText}>Send email</Text> </TouchableOpacity>
 
         {claim.form_creator == userDetails.email ? (
-          claim.status == "In Progress" ? (
+          claim.status == "In Progress" || claim.status == 'Rejected' ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>

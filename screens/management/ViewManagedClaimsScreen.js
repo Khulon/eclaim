@@ -372,6 +372,28 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
 
+  function processorReject(claim) {
+    fetch('http://localhost:5000/processorRejectClaim', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(claim)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if(data.message == 'Success!') {
+          alert('Claim rejected!')
+          window.location.reload(false)
+        } else {
+          alert('Claim could not be rejected!')
+        }
+      })
+  }
+
+
+
   return (
     <View style={styles.page}>
       <View style={styles.loadingPage}>
@@ -466,7 +488,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     
             <View style={styles.buttonContainer}>
             <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-            <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to reject?', 'You will no longer see this in claim until approved again', () => console.log('reject'))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
+            <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to reject?', 'This claim will be sent back to its approver to be rejected', () => processorReject(claim))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
             
             </Animated.View>
             </View>
