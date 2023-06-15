@@ -246,7 +246,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
-  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
+  const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
     with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: null, description: null, receipt: null});
 
 

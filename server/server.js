@@ -30,80 +30,11 @@ sql.connect(config, function (err) {
 
 
 
-
-
-
 //Send email
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars')
 const path = require('path');
 const fs = require('fs');
-
-//Send email 
-app.get('/sendEmail/:id', async (req, res) => {
-
-  const filePath = path.join('server', '../../email/template.html');
-  const source = fs.readFileSync(filePath, 'utf-8').toString();
-  const template = handlebars.compile(source);
-  const recipient = 'eclaim@engkong.com'
-  const replacements = {
-    username: "Darth Vader"
-  };
-  const htmlToSend = template(replacements);
-
-  try {
-    const { id } = req.params;
-
-    // Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: "email.engkong.com", // hostname
-      //secure: false, // use SSL
-      //port: 25, // port for secure SMTP
-      tls: {
-          rejectUnauthorized: false
-      }, 
-      
-      auth: {
-        user: 'eclaim@engkong.net',
-        pass: 'eclaim12345%'
-      } 
-     
-    });
-
-    var request = new sql.Request();
-    const result = await request.query("SELECT receipt FROM Expenses WHERE id = "+id+"")
-    const receipts = []
-
-    for(var i = 0; i < result.recordset.length; i++) {
-      receipts.push({path: result.recordset[i].receipt})
-    }
-  
-    // Define the email message
-    const mailOptions = {
-      from: 'eclaim@engkong.com',
-      to: recipient,
-      subject: 'hello',
-//      text: 'weijieeijwiejiwjijai',
-      html: htmlToSend,
-      attachments: receipts
-      
-    };
-
-    // Send the email
-    
-    const info = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await info).response);
-    
-    res.send({message: "Email sent!"})
-  } catch (error) {
-    console.log('Error:', error);
-    res.send({message: "Error!"})
-  }
-
-});
-
-
-
 
 
 app.get('/', function (req, res) {
@@ -373,7 +304,7 @@ app.post('/addClaim', async (req, res) => {
     const query = "SET XACT_ABORT ON " 
     + "BEGIN TRANSACTION "
     +"INSERT INTO Claims VALUES(@id, @total_amount, @formCreator, @expense_type, "
-      + "@levels, @claimees, @status, @sd, @ad, @pd, @lsd, @lad, @lpd, @rd, @lrd, @cd);"
+      + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, @cd);"
       + "INSERT INTO MonthlyGeneral VALUES(@formid , @fromDate, @toDate, @costCenter, @note);"
       + " COMMIT TRANSACTION";
         
@@ -387,11 +318,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('sd', sql.DateTime, null);
     request.input('ad', sql.DateTime, null);
     request.input('pd', sql.DateTime, null);
-    request.input('lsd', sql.DateTime, null);
-    request.input('lad', sql.DateTime, null);
-    request.input('lpd', sql.DateTime, null);
     request.input('rd', sql.DateTime, null);
-    request.input('lrd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
     request.input('formid', sql.Int, newFormId);
     request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
@@ -400,6 +327,9 @@ app.post('/addClaim', async (req, res) => {
     request.input('note', sql.Text, note);
 
     await request.query(query);
+    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime)"
+    request.input('datetime', sql.DateTime, result.recordset[0].currentDateTime);
+    await request.query(history);
   
     res.send({message: "Monthly claim added successfully!", user: formCreator});
         
@@ -432,7 +362,7 @@ app.post('/addClaim', async (req, res) => {
     const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @lsd, @lad, @lpd, @rd, @lrd, @cd);"
+    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, @cd);"
     + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, "+newFormId+"); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
@@ -442,11 +372,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('sd', sql.DateTime, null);
     request.input('ad', sql.DateTime, null);
     request.input('pd', sql.DateTime, null);
-    request.input('lsd', sql.DateTime, null);
-    request.input('lad', sql.DateTime, null);
-    request.input('lpd', sql.DateTime, null);
     request.input('rd', sql.DateTime, null);
-    request.input('lrd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
     request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
     request.input('period_to', sql.Date, toDate.recordset[0].toDate);
@@ -454,6 +380,9 @@ app.post('/addClaim', async (req, res) => {
 
     console.log(query)
     await request.query(query);
+    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime)"
+    request.input('datetime', sql.DateTime, result.recordset[0].currentDateTime);
+    await request.query(history);
 
     res.send({message: "Travelling claim added successfully!", user: formCreator});
 
@@ -952,9 +881,13 @@ app.post('/deleteClaim', async (req, res) => {
 
   try {
     var request = new sql.Request();
+    const currentDate = await request.query("SELECT GETDATE() AS currentDateTime")
     const query = "DELETE FROM Claims WHERE id = @id";
     request.input('id', sql.Int, id)
     await request.query(query);
+    const history = "INSERT INTO History VALUES("+id+", 'Deleted', @datetime)"	
+    request.input('datetime', sql.DateTime, currentDate.recordset[0].currentDateTime);
+    await request.query(history);
     res.send({message: "Claim deleted!"})
   } catch(err) {
     console.log(err)
@@ -985,25 +918,98 @@ app.post('/checkExpense', async (req, res) => {
 
 //Form creator submits claim
 app.post('/submitClaim', async (req, res) => {
-  let id = req.body.id;
+  let id = req.body.claim.current.id;
+  let form_creator = req.body.claim.current.form_creator;
+  let type = req.body.claim.current.form_type;
+  let total_amount = req.body.claim.current.total_amount
+  let period = req.body.parsedDate
 
   try {
     var request = new sql.Request();
+    
     const emptyClaim = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+"")
     if(emptyClaim.recordset[0].count == 0) {
       throw new Error("Please add at least one expense!")
     }
+    
     const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+" AND checked = 'No'")
     if(result.recordset[0].count == 0) {
+      
       const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-      const updateStatus = "UPDATE Claims SET status = 'Submitted', submission_date = @sd, last_submitted_date = @lsd WHERE id = "+id+"";
+      const updateStatus = "UPDATE Claims SET status = 'Submitted', submission_date = @sd WHERE id = "+id+"";
       request.input('sd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-      request.input('lsd', sql.DateTime, currentTime.recordset[0].currentDateTime);
       await request.query(updateStatus)
+      const history = "INSERT INTO History VALUES("+id+", 'Submitted', @datetime)"
+      request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+      await request.query(history); 
+
+      const approver = await request.query("SELECT approver_name FROM Claims C JOIN BelongsToDepartments B ON C.form_creator = B.email JOIN Approvers A ON B.department = A.department  WHERE id = "+id+"")
+      const approver_email = approver.recordset[0].approver_name;
+      console.log(total_amount)
+      
+      //Send email to approver
+      const filePath = path.join('server', '../../email/template.html');
+      const source = fs.readFileSync(filePath, 'utf-8').toString();
+      const template = handlebars.compile(source);
+      const approverReplacements = {
+        user: approver_email,
+        header: 'Claim received',
+        description: 'A new claim has been submitted and is awaiting your approval.',
+        type: type,
+        total_amount: total_amount,
+        period: period,
+        creator: form_creator
+      };
+      const confirmationReplacements = {
+        user: form_creator,
+        header: 'Claim submitted',
+        description: 'Your claim has been submitted and is awaiting approval.',
+        type: type,
+        total_amount: total_amount,
+        period: period,
+        creator: form_creator
+      };
+      const htmlToSend = template(approverReplacements);
+      const conf = template(confirmationReplacements);
+
+      // Create a transporter
+      const transporter = nodemailer.createTransport({
+        host: "email.engkong.com", // hostname
+        tls: {
+            rejectUnauthorized: false
+        }, 
+        auth: {
+          user: 'eclaim@engkong.net',
+          pass: 'eclaim12345%'
+        } 
+      });
+
+      // Define the email message
+      const mailOptions = {
+        from: 'eclaim@engkong.com',
+        to: 'eclaim@engkong.com', //change
+        subject: 'New claim needs approval',
+        html: htmlToSend,
+        
+      };
+      // Send the email
+      const approverInfo = transporter.sendMail(mailOptions);
+      console.log('Email sent:', (await approverInfo).response);
+
+      const confirmationMail = {
+        from: 'eclaim@engkong.com',
+        to: 'eclaim@engkong.com',
+        subject: 'Claim submission confirmation email',
+        html: conf,
+      }
+      const confirmation = transporter.sendMail(confirmationMail);
+      console.log('Email sent:', (await confirmation).response);
+      
       res.send({message: "Claim submitted!"})
+      
     } else {
       throw new Error("Please check all expenses before submitting!")
-    }
+    } 
   } catch(err) {
     console.log(err)
     res.send({message: "Error!"});
@@ -1052,10 +1058,12 @@ app.post('/approveClaim', async (req, res) => {
     let id = req.body.id;
     var request = new sql.Request();
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad, last_approved_date = @lad WHERE id = "+id+"";
+    const updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
     request.input('ad', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    request.input('lad', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
+    const history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime)"
+    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(history)
     //trigger sending of email to processor
     res.send({message: "Success!"})
   } catch(err) {
@@ -1072,10 +1080,12 @@ app.post('/processClaim', async (req, res) => {
     let id = req.body.id;
     var request = new sql.Request();
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = @pd, last_processed_date = @lpd WHERE id = "+id+"";
+    const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = @pd WHERE id = "+id+"";
     request.input('pd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    request.input('lpd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
+    const history = "INSERT INTO History VALUES("+id+", 'Processed', @datetime)"
+    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(history)
     //trigger sending of email to form creator
     res.send({message: "Success!"})
   } catch(err) {
@@ -1092,10 +1102,12 @@ app.post('/approverRejectClaim', async (req, res) => {
     var request = new sql.Request();
     let id = req.body.id;
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Rejected', rejection_date = @rd, last_rejection_date = @lrd WHERE id = "+id+"";
+    const updateStatus = "UPDATE Claims SET status = 'Rejected', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    request.input('lrd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
+    const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime)"
+    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(history)
     //trigger send email back to form creator
     res.send({message: "Success!"})
   } catch(err) {
@@ -1112,10 +1124,12 @@ app.post('/processorRejectClaim', async (req, res) => {
     var request = new sql.Request();
     let id = req.body.id;
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Submitted', rejection_date = @rd, last_rejection_date = @lrd WHERE id = "+id+"";
+    const updateStatus = "UPDATE Claims SET status = 'Submitted', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    request.input('lrd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
+    const history = "INSERT INTO History VALUES("+id+", 'Rejected by processor', @datetime)"
+    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    await request.query(history)
     //trigger send email back to approver
     res.send({message: "Success!"})
   } catch(err) {
