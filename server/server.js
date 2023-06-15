@@ -987,7 +987,7 @@ app.post('/submitClaim', async (req, res) => {
       // Define the email message
       const mailOptions = {
         from: 'eclaim@engkong.com',
-        to: 'eclaim@engkong.com', //change
+        to: approver_email, //change
         subject: 'New claim needs approval',
         html: htmlToSend,
         
@@ -998,7 +998,7 @@ app.post('/submitClaim', async (req, res) => {
 
       const confirmationMail = {
         from: 'eclaim@engkong.com',
-        to: 'eclaim@engkong.com',
+        to: form_creator,
         subject: 'Claim submission confirmation email',
         html: conf,
       }
@@ -1055,7 +1055,12 @@ app.get('/management/:email', async (req, res) => {
 //Approve claim
 app.post('/approveClaim', async (req, res) => {
   try{
-    let id = req.body.id;
+    let id = req.body.claim.id;
+    let approver = req.body.user;
+    let form_creator = req.body.claim.form_creator;
+    let type = req.body.claim.form_type;
+    let total_amount = req.body.claim.total_amount
+    let period = req.body.parsedDate
     var request = new sql.Request();
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
@@ -1065,6 +1070,69 @@ app.post('/approveClaim', async (req, res) => {
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger sending of email to processor
+
+    const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = "+id+")")
+    const processorEmail = processor.recordset[0].processor_email
+    
+    const filePath = path.join('server', '../../email/ApproverToFinance.html');
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source);
+    const processorReplacements = {
+      user: processorEmail,
+      header: 'Claim received',
+      description: 'A new claim has been approved and is awaiting your processing.',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      approvedBy: approver
+    };
+    const confirmationReplacements = {
+      user: approver,
+      header: 'Claim approved',
+      description: 'A claim that was approved by you has been sent for processing.',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      approvedBy: approver
+    };
+    const htmlToSend = template(processorReplacements);
+    const conf = template(confirmationReplacements);
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "email.engkong.com", // hostname
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      auth: {
+        user: 'eclaim@engkong.net',
+        pass: 'eclaim12345%'
+      } 
+    });
+
+    // Define the email message
+    const mailOptions = {
+      from: 'eclaim@engkong.com',
+      to: processorEmail, //change
+      subject: 'New claim to process',
+      html: htmlToSend,
+      
+    };
+    // Send the email
+    const approverInfo = transporter.sendMail(mailOptions);
+    console.log('Email sent:', (await approverInfo).response);
+
+    const confirmationMail = {
+      from: 'eclaim@engkong.com',
+      to: approver,
+      subject: 'Claim sent for processing - Confirmation Email',
+      html: conf,
+    }
+    const confirmation = transporter.sendMail(confirmationMail);
+    console.log('Email sent:', (await confirmation).response);
+
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
@@ -1077,7 +1145,12 @@ app.post('/approveClaim', async (req, res) => {
 //Process claim
 app.post('/processClaim', async (req, res) => {
   try{
-    let id = req.body.id;
+    let id = req.body.claim.id;
+    let processor = req.body.user;
+    let form_creator = req.body.claim.form_creator;
+    let type = req.body.claim.form_type;
+    let total_amount = req.body.claim.total_amount
+    let period = req.body.parsedDate
     var request = new sql.Request();
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = @pd WHERE id = "+id+"";
@@ -1087,6 +1160,69 @@ app.post('/processClaim', async (req, res) => {
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger sending of email to form creator
+
+    const approver = await request.query("SELECT approver_name FROM Approvers A JOIN BelongsToDepartments B ON A.department = B.department WHERE B.email = '"+form_creator+"'")
+    const approverEmail = approver.recordset[0].approver_name
+    const filePath = path.join('server', '../../email/FinanceToCreator.html');
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source);
+    const creatorReplacements = {
+      user: form_creator,
+      header: 'Claim processed',
+      description: 'Your claim has been processed!',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      approvedBy: approverEmail,
+      processedBy: processor
+    };
+    const confirmationReplacements = {
+      user: processor,
+      header: 'Claim processed',
+      description: 'You have processed a claim.',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      approvedBy: approverEmail,
+      processedBy: processor
+    };
+    const htmlToSend = template(creatorReplacements);
+    const conf = template(confirmationReplacements);
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "email.engkong.com", // hostname
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      auth: {
+        user: 'eclaim@engkong.net',
+        pass: 'eclaim12345%'
+      } 
+    });
+
+    // Define the email message
+    const mailOptions = {
+      from: 'eclaim@engkong.com',
+      to: form_creator, //change
+      subject: 'Your Claim has been processed',
+      html: htmlToSend,
+      
+    };
+    // Send the email
+    const info = transporter.sendMail(mailOptions);
+    console.log('Email sent:', (await info).response);
+
+    const confirmationMail = {
+      from: 'eclaim@engkong.com',
+      to: processor,
+      subject: 'You have processed a claim',
+      html: conf,
+    }
+    const confirmation = transporter.sendMail(confirmationMail);
+    console.log('Email sent:', (await confirmation).response);
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
@@ -1100,7 +1236,13 @@ app.post('/processClaim', async (req, res) => {
 app.post('/approverRejectClaim', async (req, res) => {
   try {
     var request = new sql.Request();
-    let id = req.body.id;
+    let id = req.body.claim.id;
+    let approver = req.body.user;
+    let form_creator = req.body.claim.form_creator;
+    let type = req.body.claim.form_type;
+    let total_amount = req.body.claim.total_amount
+    let period = req.body.parsedDate
+    let description = req.body.description
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const updateStatus = "UPDATE Claims SET status = 'Rejected', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
@@ -1109,6 +1251,68 @@ app.post('/approverRejectClaim', async (req, res) => {
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger send email back to form creator
+
+    const filePath = path.join('server', '../../email/Rejection.html');
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source);
+    const replacements = {
+      user: form_creator,
+      header: 'Claim rejected',
+      description: 'Your claim has been rejected!',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      rejector: approver,
+      message: description
+    };
+    const confirmationReplacements = {
+      user: approver,
+      header: 'Claim rejected',
+      description: 'You have rejected a claim.',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      rejector: approver,
+      message: description
+    };
+    const htmlToSend = template(replacements);
+    const conf = template(confirmationReplacements);
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "email.engkong.com", // hostname
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      auth: {
+        user: 'eclaim@engkong.net',
+        pass: 'eclaim12345%'
+      } 
+    });
+
+    // Define the email message
+    const mailOptions = {
+      from: 'eclaim@engkong.com',
+      to: form_creator, //change
+      subject: 'Your Claim has been processed',
+      html: htmlToSend,
+      
+    };
+    // Send the email
+    const info = transporter.sendMail(mailOptions);
+    console.log('Email sent:', (await info).response);
+
+    const confirmationMail = {
+      from: 'eclaim@engkong.com',
+      to: approver,
+      subject: 'You have processed a claim',
+      html: conf,
+    }
+    const confirmation = transporter.sendMail(confirmationMail);
+    console.log('Email sent:', (await confirmation).response);
+
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
@@ -1122,7 +1326,13 @@ app.post('/approverRejectClaim', async (req, res) => {
 app.post('/processorRejectClaim', async (req, res) => {
   try {
     var request = new sql.Request();
-    let id = req.body.id;
+    let id = req.body.claim.id;
+    let processor = req.body.user;
+    let form_creator = req.body.claim.form_creator;
+    let type = req.body.claim.form_type;
+    let total_amount = req.body.claim.total_amount
+    let period = req.body.parsedDate
+    let description = req.body.description
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const updateStatus = "UPDATE Claims SET status = 'Submitted', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
@@ -1131,6 +1341,69 @@ app.post('/processorRejectClaim', async (req, res) => {
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger send email back to approver
+
+    const findApprover = await request.query("SELECT approver_name FROM Approvers A JOIN BelongsToDepartments B ON A.department = B.department WHERE B.email = '"+form_creator+"'")
+    const approver = findApprover.recordset[0].approver_name
+    const filePath = path.join('server', '../../email/Rejection.html');
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source);
+    const replacements = {
+      user: approver,
+      header: 'Claim rejected',
+      description: 'A claim that was approved by you has been rejected.',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      rejector: processor,
+      message: description
+    };
+    const confirmationReplacements = {
+      user: processor,
+      header: 'Claim rejected',
+      description: 'You have rejected a claim.',
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      rejector: processor,
+      message: description
+    };
+    const htmlToSend = template(replacements);
+    const conf = template(confirmationReplacements);
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "email.engkong.com", // hostname
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      auth: {
+        user: 'eclaim@engkong.net',
+        pass: 'eclaim12345%'
+      } 
+    });
+
+    // Define the email message
+    const mailOptions = {
+      from: 'eclaim@engkong.com',
+      to: approver, 
+      subject: 'A claim approved by you has been rejected',
+      html: htmlToSend,
+      
+    };
+    // Send the email
+    const info = transporter.sendMail(mailOptions);
+    console.log('Email sent:', (await info).response);
+
+    const confirmationMail = {
+      from: 'eclaim@engkong.com',
+      to: processor,
+      subject: 'You have rejected a claim',
+      html: conf,
+    }
+    const confirmation = transporter.sendMail(confirmationMail);
+    console.log('Email sent:', (await confirmation).response);
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
