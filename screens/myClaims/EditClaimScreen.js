@@ -10,7 +10,7 @@ import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
 export default function EditClaimScreen({ navigation, route}) {
   const isFocused = useIsFocused();
-  const [claim] = useState(route.params.props);    
+  const claim = useRef(route.params.props);  
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
@@ -27,19 +27,23 @@ export default function EditClaimScreen({ navigation, route}) {
       fetchData()
     }
     
-  }, [isFocused]);
+  }, [isFocused, claim]);
 
   async function fetchData() {
     try {
-      const id = claim.id;
+      const id = claim.current.id;
       const user = window.localStorage.getItem('session');
-      
       let [res1, res2, res3] = await Promise.all([
       fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);
         setData(data)
+        claim.current.total_amount = 0
+        for (var i = 0; i < data.length; i++) {
+          claim.current.total_amount += (data[i].total_amount)
+        }
+        console.log(claim.current.total_amount)
       }),
 
       fetch('http://localhost:5000/getTravellingExpenseTypes')
@@ -140,7 +144,7 @@ export default function EditClaimScreen({ navigation, route}) {
 
     bottomCard: {
       bottom: "0",
-      height: claim.status == 'In Progress' ? "100px" : '70px',
+      height: claim.current.status == 'In Progress' || claim.current.status == 'Rejected' ? "100px" : '70px',
       width:"100%",
       alignItems: "center",
       justifyContent: "flex-end",
@@ -213,22 +217,8 @@ export default function EditClaimScreen({ navigation, route}) {
 
   });
 
-  function totalAmount () {
-    if (userDetails.email == claim.form_creator) {
-      return '$' + (claim.total_amount)
-    } else {
-      var amount = 0
-      if(fullData != null){
-        for (var i = 0; i < fullData.length; i++) {
-          amount += (fullData[i].total_amount)
-        }
-      }
-      return '$' + amount
-    }
-  }
-
   function addExpense () {  
-    claim.form_type == 'Travelling' 
+    claim.current.form_type == 'Travelling' 
     ? navigation.navigate("AddTravelExpenseScreen",
      {props: claim, travellingExpenseTypes: travellingExpenseTypes}) 
      : navigation.navigate("AddMonthlyExpenseScreen", {props: claim, monthlyExpenseTypes: monthlyExpenseTypes}) 
@@ -237,10 +227,10 @@ export default function EditClaimScreen({ navigation, route}) {
   function handleEditExpense(item) {
     console.log(item)
     
-    if(claim.form_type == 'Travelling') {
-      navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.status})
+    if(claim.current.form_type == 'Travelling') {
+      navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.current.status})
     } else {
-      if (userDetails.email == claim.form_creator) {
+      if (userDetails.email == claim.current.form_creator) {
         fetch('http://localhost:5000/checkExpense', {
           method: 'POST',
           headers: {
@@ -250,7 +240,7 @@ export default function EditClaimScreen({ navigation, route}) {
             })
             .then(response => response.json())
       }
-      navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes, claimStatus: claim.status})
+      navigation.navigate('EditMonthlyExpenseScreen', {expense: item, monthlyExpenseTypes: monthlyExpenseTypes, claimStatus: claim.current.status})
     } 
   }
 
@@ -295,25 +285,31 @@ export default function EditClaimScreen({ navigation, route}) {
   }
 
   function handleSubmit (claim) {
+    var parsedDate = ''
+    if(claim.current.form_type == 'Travelling') {
+      parsedDate = travellingPeriod
+    } else {
+      parsedDate = monthlyPeriod
+    }
     fetch('http://localhost:5000/submitClaim', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(claim)
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if(data.message == "Claim submitted!") {
-            alert("Claim submitted successfully!")
-            window.location.reload(false)
-          } else {
-            alert("Claim could not be submitted!")
-          }
-        })
-
+        body: JSON.stringify({claim: claim, parsedDate: parsedDate})
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if(data.message == "Claim submitted!") {
+          alert('Claim submitted successfully!')
+          window.location.reload(false)
+        } else {
+          alert('Claim could not be submitted!')
+        }
+      })
   }
+
 
 
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
@@ -401,22 +397,12 @@ export default function EditClaimScreen({ navigation, route}) {
     )
   }
 
-  const monthlyPeriod = parseDatePeriod(claim.pay_period_from, claim.pay_period_to)
-  const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
+  const monthlyPeriod = parseDatePeriod(claim.current.pay_period_from, claim.current.pay_period_to)
+  const travellingPeriod = parseDatePeriod(claim.current.period_from, claim.current.period_to)
 
 
 
-  function sendEmail() {
-    const id = claim.id
-    fetch(`http://localhost:5000/sendEmail/${id}`)
-    .then((response) => response.json())
-    .then((responseJson) => {
-      console.log(responseJson)
-      if(responseJson.message == 'Email sent!'){
-        alert('Email sent!')
-      }
-    })
-  }
+  
 
   return (
     <View style={styles.page}>
@@ -436,7 +422,7 @@ export default function EditClaimScreen({ navigation, route}) {
             </View>
             </TouchableOpacity>
           </View>
-          {userDetails.email == claim.form_creator ? (
+          {userDetails.email == claim.current.form_creator ? (
             <View style={{width:'23%', alignItems:'center'}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
             onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim(claim))}>
@@ -458,11 +444,11 @@ export default function EditClaimScreen({ navigation, route}) {
 
 
             <View style={{width:'100%', alignItems:"center"}}>
-            <Text style={{fontSize:'16px', fontWeight:'600'}}>{claim.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod}</Text>
-            <Text style={{fontSize:'12px'}}>Creator: {claim.form_creator}</Text>
+            <Text style={{fontSize:'16px', fontWeight:'600'}}>{claim.current.form_type == 'Travelling' ? travellingPeriod : monthlyPeriod}</Text>
+            <Text style={{fontSize:'12px'}}>Creator: {claim.current.form_creator}</Text>
             </View>
           </View>
-        <Text style={{fontFamily:"inherit", fontSize: "26px", fontWeight:"700"}}>{claim.form_type} Claim</Text>
+        <Text style={{fontFamily:"inherit", fontSize: "26px", fontWeight:"700"}}>{claim.current.form_type} Claim</Text>
         <View style={styles.inputContainer}>
           <TextInput style={styles.textInput}
             placeholder="Search" 
@@ -493,15 +479,13 @@ export default function EditClaimScreen({ navigation, route}) {
 
       <View style={styles.bottomCard}>
         <View style={{position:'absolute', width:'100%', height:'100%', flexDirection:'row-reverse'}}>
-            <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.id}</Text>
+            <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.current.id}</Text>
         </View>
         <Text style={{paddingTop:"15px"}}>Total:</Text>
-        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>
+        <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${claim.current.total_amount}</Text>
         
-        <TouchableOpacity onPress={() => sendEmail()} style={styles.defaultButton}> <Text style={styles.buttonText}>Send email</Text> </TouchableOpacity>
-
-        {claim.form_creator == userDetails.email ? (
-          claim.status == "In Progress" || claim.status == 'Rejected' ? (
+        {claim.current.form_creator == userDetails.email ? (
+          claim.current.status == "In Progress" || claim.current.status == 'Rejected' ? (
           <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
@@ -544,5 +528,6 @@ export default function EditClaimScreen({ navigation, route}) {
     
   );
 }
+
 
 
