@@ -310,14 +310,22 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
   const monthlyPeriod = parseDatePeriod(claim.pay_period_from, claim.pay_period_to)
   const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
+  var parsedDate = ''
+  if(claim.form_type == 'Travelling') {
+    parsedDate = travellingPeriod
+  } else {
+    parsedDate = monthlyPeriod
+  }
+  const user = window.localStorage.getItem('session')
 
   function approveClaim(claim) {
+    
     fetch('http://localhost:5000/approveClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify(claim)
+        body: JSON.stringify({claim: claim, parsedDate: parsedDate, user: user})
       })
       .then(response => response.json())
       .then(data => {
@@ -337,7 +345,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       headers: {
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify(claim)
+        body: JSON.stringify({claim: claim, parsedDate: parsedDate, user: user})
       })
       .then(response => response.json())
       .then(data => {
@@ -352,13 +360,12 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function approverReject(claim, description) {
-    console.log(description)
     fetch('http://localhost:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify(claim)
+        body: JSON.stringify({claim: claim, description: description, parsedDate: parsedDate, user: user})
       })
       .then(response => response.json())
       .then(data => {
@@ -374,13 +381,12 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
 
   function processorReject(claim, description) {
-    console.log(description)
     fetch('http://localhost:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify(claim)
+        body: JSON.stringify({claim: claim, description: description, parsedDate: parsedDate, user: user})
       })
       .then(response => response.json())
       .then(data => {
@@ -469,7 +475,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-          <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message?', 'Confirm rejection with message: ', (description) => approverReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text> </TouchableOpacity>
+          <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message', 'Confirm rejection with message: ', (description) => approverReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text> </TouchableOpacity>
           
           </Animated.View>
           </View>
@@ -490,7 +496,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     
             <View style={styles.buttonContainer}>
             <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-            <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message?', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
+            <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
             
             </Animated.View>
             </View>
