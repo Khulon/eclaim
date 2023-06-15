@@ -212,7 +212,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.travellingExpenseTypes;
-  const [expense, setExpense] = useState({id: claim.id, claimee: user, type: null, otherType: null,
+  const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
     amount: null, date: null, description: null, receipt: null});
 
 
