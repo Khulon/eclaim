@@ -948,7 +948,7 @@ app.post('/submitClaim', async (req, res) => {
       console.log(total_amount)
       
       //Send email to approver
-      const filePath = path.join('server', '../../email/template.html');
+      const filePath = path.join('server', '../../email/CreatorToApprover.html');
       const source = fs.readFileSync(filePath, 'utf-8').toString();
       const template = handlebars.compile(source);
       const approverReplacements = {
