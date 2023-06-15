@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useContext, createContext } from "r
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
 import { Ionicons, Feather } from "react-native-vector-icons";
 import filter from "lodash.filter"
-import ConfirmationButton from '../../components/ConfirmationButton';
+import ConfirmationButton, {inputConfirmationButton} from '../../components/ConfirmationButton';
 import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 
@@ -351,7 +351,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       })
   }
 
-  function approverReject(claim) {
+  function approverReject(claim, description) {
+    console.log(description)
     fetch('http://localhost:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
@@ -372,7 +373,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
 
-  function processorReject(claim) {
+  function processorReject(claim, description) {
+    console.log(description)
     fetch('http://localhost:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
@@ -467,7 +469,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   
           <View style={styles.buttonContainer}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-          <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to reject?', 'This claim will be sent back to form creator of this claim', () => approverReject(claim))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text> </TouchableOpacity>
+          <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message?', 'Confirm rejection with message: ', (description) => approverReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text> </TouchableOpacity>
           
           </Animated.View>
           </View>
@@ -488,7 +490,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     
             <View style={styles.buttonContainer}>
             <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-            <TouchableOpacity onPress={() => ConfirmationButton('Are you sure you want to reject?', 'This claim will be sent back to its approver to be rejected', () => processorReject(claim))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
+            <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message?', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
             
             </Animated.View>
             </View>
