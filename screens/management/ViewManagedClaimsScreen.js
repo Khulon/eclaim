@@ -6,6 +6,7 @@ import filter from "lodash.filter"
 import ConfirmationButton, {inputConfirmationButton} from '../../components/ConfirmationButton';
 import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
+import excel from '../../excel/excel';
 
 
 export default function ViewManagedClaimsScreen({ navigation, route}) {
@@ -18,6 +19,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
+  const [table, setTable] = useState([]);
 
   useEffect(() => {
     if (isFocused) {
@@ -35,7 +37,9 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);
-        setData(data)
+        setData(data);
+        setTable(data.map((item) => [item.description, item.expense_type, parseDate(item.date_of_expense), item.total_amount, item.receipt]))
+        
       });
 
       setIsLoading(false)
@@ -45,6 +49,9 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     }
 
   } 
+
+  
+
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState('');
@@ -402,6 +409,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
 
 
+
   return (
     <View style={styles.page}>
       <View style={styles.loadingPage}>
@@ -488,21 +496,30 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           //Processor
           userDetails.processor == 'Yes' && claim.status == "Approved" ? (
             <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
-            <View style={styles.buttonContainer}>
-            <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-            <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to process?', 'The form creator will be notified', () => processClaim(claim))}> <Text style={styles.buttonText}>Process</Text> </TouchableOpacity>
-            </Animated.View>
-            </View>
-    
-            <View style={styles.buttonContainer}>
-            <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
-            <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
-            
-            </Animated.View>
-            </View>
+              <View style={styles.buttonContainer}>
+                <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
+                  <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Are you sure you want to process?', 'The form creator will be notified', () => processClaim(claim))}> <Text style={styles.buttonText}>Process</Text> </TouchableOpacity>
+                </Animated.View>
+              </View>
+        
+              <View style={styles.buttonContainer}>
+                <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
+                  <TouchableOpacity onPress={() => inputConfirmationButton('Input rejection message', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} style={styles.defaultButton} > <Text style={styles.buttonText}>Reject</Text>  </TouchableOpacity>
+                </Animated.View>
+              </View>
             </View>
             ) : (
+              userDetails.processor == 'Yes' && claim.status == "Processed" ? (
+                <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+                  <View style={styles.buttonContainer}>
+                    <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
+                      <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Download expenses into Excel file?', 'Click ok to download', () => excel())}> <Text style={styles.buttonText}>Download</Text> </TouchableOpacity>
+                    </Animated.View>
+                  </View>
+                </View>
+              ) : (
                 <View></View>
+              )
           )
         )}
 
