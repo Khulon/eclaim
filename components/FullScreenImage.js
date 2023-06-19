@@ -1,6 +1,6 @@
 
-import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
-import React, { useRef, useState, useEffect } from "react";
+import { View, Image, TouchableOpacity } from 'react-native';
+import React from "react";
 
 
 export default function FullScreenImage ({image, myFunction, show}) {
