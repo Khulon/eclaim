@@ -5,12 +5,13 @@ import { Ionicons, Feather } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
 import * as ImagePicker from 'expo-image-picker';
+import FullScreenImage from '../../components/FullScreenImage';
 
 
 
 export default function AddMonthlyExpenseScreen({ navigation, route }) {        
 
-
+  const [isExpand, setIsExpand] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
@@ -283,6 +284,7 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
 
   return (
     <View style={styles.page}>
+      <FullScreenImage image={expense.receipt} myFunction={()=>{isExpand ? setIsExpand(false) : setIsExpand(true)}} show={isExpand}/>
       <View style={styles.pageDefault}>
       <View style={styles.topCard}>
         
@@ -471,19 +473,29 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           editable={isEditing}
         />
         </View>
-        
+
+        {isEditing ? (
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Receipt</Text>
-        <TouchableOpacity disabled={!isEditing} onPress={()=> pickImage()}>
+        <TouchableOpacity onPress={()=> pickImage()}>
           <Image style={styles.receiptImage}
             source={expense.receipt}
           />
           <View style={[styles.imageInput]}>
           <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
           </View>
-          </TouchableOpacity>
-
+        </TouchableOpacity>
         </View>
+       ) : (
+        <View style={styles.inputContainer}>
+        <Text style={styles.normalBoldText}>Receipt</Text>
+        <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
+          <Image style={styles.receiptImage}
+              source={expense.receipt}
+            />
+        </TouchableOpacity>
+      </View>
+       )}
 
 
       </View>
