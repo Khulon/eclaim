@@ -49,7 +49,7 @@ export default function AdminHomeScreen({ navigation }) {
   
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [selectedId, setSelectedId] = useState({email: ''});
+  const [selectedId, setSelectedId] = useState('');
   const [search, setSearch] = useState('')
 
   const styles = StyleSheet.create({
@@ -179,7 +179,7 @@ export default function AdminHomeScreen({ navigation }) {
   useEffect(() => {
     if(data != null){
       for (var i = 0; i < data.length; i++) {
-        if (data[i].email == selectedId.email) {
+        if (data[i].email == selectedId) {
           console.log(userDepartments)
           navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments, allDpts: departments, allComps: companies})
         }
@@ -194,7 +194,7 @@ export default function AdminHomeScreen({ navigation }) {
     await fetch('http://localhost:5000/admin/editUser', {
       method: 'POST', 
       headers: header,
-      body: JSON.stringify(selectedId)})
+      body: JSON.stringify({selectedId: selectedId})})
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
@@ -239,8 +239,8 @@ export default function AdminHomeScreen({ navigation }) {
 
   const renderItem = ({item}) => {
 
-    const backgroundColor = item.email === selectedId.email ? '#EEEEEE' : 'white';
-    const transform = item.email === selectedId.email ? [{translateX: 2 }] : [{translateX: 0 }];
+    const backgroundColor = item.email === selectedId ? '#EEEEEE' : 'white';
+    const transform = item.email === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
     
     return (
       <Item 
@@ -249,10 +249,10 @@ export default function AdminHomeScreen({ navigation }) {
         approver = {item.approver_name != null ? item.approver_name : 'None'}
         processor = {item.processor_email != null ? item.processor_email : 'None'}
 
-        onMouseEnter={() => setSelectedId({...selectedId, email: item.email})}
-        onMouseLeave={() => setSelectedId({...selectedId, email: null})}
+        onMouseEnter={() => setSelectedId(item.email)}
+        onMouseLeave={() => setSelectedId(null)}
 
-        onPress={() => console.log(handleEditUser(selectedId))}
+        onPress={() => handleEditUser(selectedId)}
         backgroundColor={backgroundColor}
         transform={transform}
       />
