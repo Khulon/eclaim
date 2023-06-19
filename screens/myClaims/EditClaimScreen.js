@@ -265,6 +265,7 @@ export default function EditClaimScreen({ navigation, route}) {
   }
 
   function handleDeleteClaim (claim) {
+    console.log(claim)
     fetch('http://localhost:5000/deleteClaim', {
       method: 'POST',
       headers: {
@@ -274,7 +275,7 @@ export default function EditClaimScreen({ navigation, route}) {
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        if(data.message = "Claim deleted!") {
+        if(data.message == "Claim deleted!") {
           alert("Claim deleted successfully!")
           window.location.reload(false)
         } else {

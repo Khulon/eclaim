@@ -877,7 +877,9 @@ app.post('/deleteExpense', async (req, res) => {
 
 //Delete claim
 app.post('/deleteClaim', async (req, res) => {
-  let id = req.body.id;
+  
+  let id = req.body.current.id;
+  console.log(id)
 
   try {
     var request = new sql.Request();
