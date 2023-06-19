@@ -1,10 +1,12 @@
 import { Animated, TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { Ionicons } from "react-native-vector-icons";
+import FullScreenImage from '../../components/FullScreenImage';
 
 
 export default function ViewManagedTravelExpenseScreen({ navigation, route }) {        
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
+  const [isExpand, setIsExpand] = useState(false)
 
   const styles = StyleSheet.create({
     page: {
@@ -163,14 +165,18 @@ export default function ViewManagedTravelExpenseScreen({ navigation, route }) {
   });
 
 
-const expenseDetails = route.params.expense
-const date = new Date(expenseDetails.date_of_expense).toLocaleDateString("en-UK");
-const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
+  
+  const expenseDetails = route.params.expense
+  const date = new Date(expenseDetails.date_of_expense).toLocaleDateString("en-UK");
+  const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
   item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-   amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+  amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+
 
   return (
     <View style={styles.page}>
+      <FullScreenImage image={expense.receipt} myFunction={()=>{isExpand ? setIsExpand(false) : setIsExpand(true)}} show={isExpand}/>
+      
       <View style={styles.pageDefault}>
       <View style={styles.topCard}>
        
@@ -271,10 +277,12 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
         </View>
        
         <View style={styles.inputContainer}>
-        <Text style={styles.normalBoldText}>Receipt</Text>
-          <Image style={styles.receiptImage}
-            source={expense.receipt}
-          />
+          <Text style={styles.normalBoldText}>Receipt</Text>
+          <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
+            <Image style={styles.receiptImage}
+                source={expense.receipt}
+              />
+          </TouchableOpacity>
         </View>
 
 
