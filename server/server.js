@@ -85,7 +85,7 @@ app.get('/admin', async (req, res) => {
     // query to the database and get the records
     const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
     + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
-    + ' JOIN Processors P ON E.company_prefix = P.company')
+    + ' JOIN Processors P ON E.company_prefix = P.company WHERE E.email != approver_name')
 
     const departments = await request.query('SELECT department_name FROM Departments')
     const companies = await request.query('SELECT prefix FROM Companies')
@@ -1030,7 +1030,7 @@ app.get('/management/:email', async (req, res) => {
     //Approver
     if(checkApprover.recordset[0].count == 1) {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
-      + "period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
+      + "period_from, period_to, cost_centre FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
       + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND B.email != A.approver_name)")
       res.send(approverClaims.recordset)
@@ -1038,7 +1038,7 @@ app.get('/management/:email', async (req, res) => {
     //Processor
     } else if(checkProcessor.recordset[0].count == 1) {
      const processorClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
-     + "period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
+     + "period_from, period_to, cost_centre FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
       + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
       + " WHERE P.processor_email = '"+email+"')")
       res.send(processorClaims.recordset)
