@@ -1,7 +1,7 @@
 import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList, ActivityIndicator, Touchable} from 'react-native';
 import React, { useRef, useState, useEffect, useContext, createContext } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../../assets/animation/AllAnimations'; 
-import { Ionicons, Feather } from "react-native-vector-icons";
+import { Ionicons, FontAwesome } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import ConfirmationButton, {inputConfirmationButton} from '../../components/ConfirmationButton';
 import { useIsFocused } from "@react-navigation/native";
@@ -65,6 +65,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
+  const [isDownloadExcelButtonHover, setIsDownloadExcelButtonHover] = useState(false)
+  const [isDownloadPdfButtonHover, setIsDownloadPdfButtonHover] = useState(false)
   const [selectedEmail, setSelectedEmail] = useState('');
   const [selectedItemNo, setSelectedItemNo] = useState('');
   const [search, setSearch] = useState('')
@@ -194,7 +196,12 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       flexDirection: "row",
       alignItems:"center"
     },
-
+    downloadButton: {
+      width:'40px',
+      height:'40px',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
   });
 
   function totalAmount () {
@@ -432,13 +439,42 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         <View style={{width:'100%', flexDirection:'row',paddingBottom:"10px"}}>
 
           <View style={{width:'100%', position:'absolute',zIndex:999, justifyContent:'space-between', flexDirection:'row'}}>
-          <View style={{width:'23%', alignItems:'center'}}>
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => navigation.goBack()}>
-            <View style={styles.backButton}>
-            <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
+            <View style={{width:'23%', alignItems:'center'}}>
+              <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => navigation.goBack()}>
+              <View style={styles.backButton}>
+              <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
+              </View> 
+              </TouchableOpacity>
             </View>
-            </TouchableOpacity>
-          </View>
+
+            <View style={{width:'23%', flexDirection:'row', justifyContent:'center'}}>
+              <View style={{width:'40px', alignItems:'center'}}>
+                <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadExcelButtonHover(true)} onMouseLeave={() => setIsDownloadExcelButtonHover(false)} 
+                onPress={() => excel()}>
+                <View style={styles.downloadButton}>
+                  {isDownloadExcelButtonHover?(
+                    <Text><FontAwesome name="file-excel-o" color="#3F9E87" size="27px"/></Text>
+                  ):(
+                    <Text><FontAwesome name="file-excel-o" color="#3F9E87" size="25px"/></Text>
+                  )}
+                </View>
+                </TouchableOpacity>
+              </View>
+
+              <View style={{width:'40px', alignItems:'center'}}>
+                <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadPdfButtonHover(true)} onMouseLeave={() => setIsDownloadPdfButtonHover(false)} 
+                onPress={() => handleDownloadPdfClaim(claim)}>
+                <View style={styles.downloadButton}>
+                  {isDownloadPdfButtonHover?(
+                    <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="27px"/></Text>
+                  ):(
+                    <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="25px"/></Text>
+                  )}
+                </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+            
           </View>
 
 
@@ -520,17 +556,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
               </View>
             </View>
             ) : (
-              userDetails.processor == 'Yes' && claim.status == "Processed" ? (
-                <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
-                  <View style={styles.buttonContainer}>
-                    <Animated.View onMouseEnter={() => MoveNegAnimation(SubmitButtonHover)} onMouseLeave={() => MovePosAnimation(SubmitButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: SubmitButtonHover }]}}>
-                      <TouchableOpacity style={[styles.defaultButton,{backgroundColor:"#45B097"}]} onPress = {() => ConfirmationButton('Download expenses into Excel file?', 'Click ok to download', () => excel(claim, table))}> <Text style={styles.buttonText}>Download</Text> </TouchableOpacity>
-                    </Animated.View>
-                  </View>
-                </View>
-              ) : (
-                <View></View>
-              )
+
+              <View></View>
           )
         )}
 

@@ -312,7 +312,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
           />  
         </View>
         <View style={[styles.inputContainer,{zIndex:4}]}>
-        <Text style={styles.normalBoldText}>Department(s)</Text>
+        <Text style={styles.normalBoldText}>Belongs to?</Text>
         <MultiSelect
               items={route.params.allDpts}
               uniqueKey="value"
@@ -382,6 +382,41 @@ export default function AdminAddUserScreen({ navigation, route}) {
               search = {false}
           />  
         </View>
+
+        {newUser.isApprover == 'Yes' ? (
+          <View style={[styles.inputContainer,{zIndex:4}]}>
+          <Text style={styles.normalBoldText}>Approver for?</Text>
+          <MultiSelect
+              items={route.params.allDpts}
+              uniqueKey="value"
+              onSelectedItemsChange={(department) => setDepartments(department)}
+              selectedItems= {userDepartments}
+              selectText="Select department(s)"
+              searchInputPlaceholderText="Search Items..."
+              onChangeInput={ (text)=> console.log(text)}
+              styleInputGroup={{borderBottomWidth:'1px', borderColor:'#DADADA'}}
+              styleSelectorContainer={{borderWidth:'1px', borderColor:'#DADADA' , borderRadius:'12px'}}
+              styleRowList={{padding:'5px', backgroundColor:'white'}}
+              styleDropdownMenuSubsection={{borderWidth:'1px', borderRadius:'12px', height:'45px', borderColor:'#DADADA', paddingLeft:'20px'}}
+              styleTextDropdown={{color:'#6A6A6A'}}
+
+              searchInputStyle={{height:'45px'}}
+              altFontFamily='inherit'
+              tagRemoveIconColor="#6A6A6A"
+              tagBorderColor="#6A6A6A"
+              tagTextColor="#6A6A6A"
+              selectedItemTextColor="#45B097"
+              selectedItemIconColor="#6A6A6A"
+              itemTextColor="#6A6A6A"
+              displayKey="value"
+              hideSubmitButton
+              hideDropdown
+        />
+        </View>
+        ):(
+          <View></View>
+        )}
+
         <View style={[styles.inputContainer,{zIndex:1}]}>
         <Text style={styles.normalBoldText}>Is a Processor?</Text>
         <SelectList
