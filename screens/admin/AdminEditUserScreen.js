@@ -320,7 +320,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
             autoCorrect={false} 
           />
           </View>
-          <View style={[styles.inputContainer,{zIndex:5}]}>
+          <View style={[styles.inputContainer,{zIndex:6}]}>
           <Text style={styles.normalBoldText}>Company</Text>
           <SelectList
                 dropdownStyles={styles.dropdownStyles}
@@ -336,8 +336,8 @@ export default function AdminEditUserScreen({ navigation, route }) {
                 search = {false}
             />  
           </View>
-          <View style={[styles.inputContainer,{zIndex:4}]}>
-          <Text style={styles.normalBoldText}>Department</Text>
+          <View style={[styles.inputContainer,{zIndex:5}]}>
+          <Text style={styles.normalBoldText}>Belongs to?</Text>
           <MultiSelect
               items={route.params.allDpts}
               uniqueKey="value"
@@ -376,7 +376,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
             autoCorrect={false} 
           />
           </View>
-          <View style={[styles.inputContainer,{zIndex:3}]}>
+          <View style={[styles.inputContainer,{zIndex:4}]}>
           <Text style={styles.normalBoldText}>Is a Supervisor?</Text>
           <SelectList
                 dropdownStyles={styles.dropdownStyles}
@@ -393,7 +393,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
             />  
           </View>
 
-          <View style={[styles.inputContainer,{zIndex:2}]}>
+          <View style={[styles.inputContainer,{zIndex:3}]}>
           <Text style={styles.normalBoldText}>Is an Approver?</Text>
           <SelectList
                 dropdownStyles={styles.dropdownStyles}
@@ -409,6 +409,43 @@ export default function AdminEditUserScreen({ navigation, route }) {
                 search = {false}
             />  
           </View>
+
+          {userDetails.approver == 'Yes' ? (
+          <View style={[styles.inputContainer,{zIndex:2}]}>
+          <Text style={styles.normalBoldText}>Department</Text>
+          <MultiSelect
+              items={route.params.allDpts}
+              uniqueKey="value"
+              onSelectedItemsChange={(department) => setUserDepartments(department)}
+              selectedItems= {userDepartments}
+              selectText="Select department(s)"
+              searchInputPlaceholderText="Search Items..."
+              onChangeInput={ (text)=> console.log(text)}
+
+              styleInputGroup={{borderBottomWidth:'1px', borderColor:'#DADADA'}}
+              styleSelectorContainer={{borderWidth:'1px', borderColor:'#DADADA' , borderRadius:'12px'}}
+              styleRowList={{padding:'5px', backgroundColor:'white'}}
+              styleDropdownMenuSubsection={{borderWidth:'1px', borderRadius:'12px', height:'45px', borderColor:'#DADADA', paddingLeft:'20px'}}
+              styleTextDropdown={{color:'#6A6A6A'}}
+
+              searchInputStyle={{height:'45px'}}
+              altFontFamily='inherit'
+              tagRemoveIconColor="#6A6A6A"
+              tagBorderColor="#6A6A6A"
+              tagTextColor="#6A6A6A"
+              selectedItemTextColor="#45B097"
+              selectedItemIconColor="#6A6A6A"
+              itemTextColor="#6A6A6A"
+              displayKey="value"
+              hideSubmitButton
+              hideDropdown
+        />
+        </View>
+        ):(
+          <View></View>
+        )}
+
+
           <View style={[styles.inputContainer,{zIndex:1}]}>
           <Text style={styles.normalBoldText}>Is a Processor?</Text>
           <SelectList
