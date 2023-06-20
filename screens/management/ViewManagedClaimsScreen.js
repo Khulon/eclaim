@@ -19,7 +19,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
-  const [table, setTable] = useState([]);
+  const [table, setTable] = useState([])
 
   useEffect(() => {
     if (isFocused) {
@@ -36,9 +36,22 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       await fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         setFullData(data);
         setData(data);
-        setTable(data.map((item) => [item.description, item.expense_type, parseDate(item.date_of_expense), item.total_amount, item.receipt]))
+        //setTable(data.map((item) => [item.description, item.expense_type, parseDate(item.date_of_expense), item.total_amount, item.receipt]))
+        
+        for(let i = 0; i < data.length; i++) {
+          if(claim.form_type == "Travelling") {
+            setTable([...table, {item_number: data[i].item_number, description: data[i].description, expense_type: data[i].expense_type, 
+              date_of_expense: parseDate(data[i].date_of_expense), total_amount: data[i].total_amount, receipt: data[i].receipt}])
+          } else {
+            setTable([...table, {claimee: data[i].claimee, item_number: data[i].item_number, date_of_expense: parseDate(data[i].date_of_expense), 
+              description: data[i].description, expense_type: data[i].expense_type, total_amount: data[i].total_amount, receipt: data[i].receipt,
+            place: data[i].place, customers: data[i].customer_name, company: data[i].company_name}])
+          }
+        }
+        
         
       });
 
@@ -49,8 +62,6 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     }
 
   } 
-
-  
 
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
@@ -545,6 +556,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
               </View>
             </View>
             ) : (
+
               <View></View>
           )
         )}

@@ -1,16 +1,51 @@
 import * as XLSX from 'xlsx'
+import { parseDate } from '../functions/Parsers';
 
 
-export default function excel(props) {
+export default function excel(claim, fullData) {
     try {
-        // Fetch the data from your API or source
-        const data = [{id: '1', name: 'First User'},{ id: '2', name: 'Second User'}];
+        console.log(fullData)
+        for(let i = 0; i < fullData.length; i++){
+            if(fullData[i].receipt != null){
+                fullData[i].receipt = "Yes"            
+            }
+        }
 
         // Create a new workbook
         const workbook = XLSX.utils.book_new();
 
+        const worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Pay Period From: ' + parseDate(claim.pay_period_from)],
+        ['Pay Period To: ' + parseDate(claim.pay_period_to)], ['Cost Centre: ' + claim.cost_centre]]);
+
         // Convert the data to worksheet format
-        const worksheet = XLSX.utils.json_to_sheet(data);
+        XLSX.utils.sheet_add_json(worksheet, fullData, { origin: 7});
+        //const worksheet = XLSX.utils.json_to_sheet(fullData);  
+
+        const columns = Object.keys(fullData[0]);
+        const columnWidths = columns.map(column => ({
+        width: column.length + 2
+        }));
+
+        fullData.forEach(row => {
+        columns.forEach((column, index) => {
+            const value = row[column].toString();
+            if (value.length + 2 > columnWidths[index].width) {
+            columnWidths[index].width = value.length + 2;
+            }
+        });
+        });
+
+        worksheet['!cols'] = columnWidths;
+
+        
+        const totalRow = fullData.length + 12;
+        
+
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Total Amount: $ ' + claim.total_amount ]], { origin: 'A' + totalRow });
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Approved By: $ ' ]], { origin: 'A' + (totalRow + 1) });
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Processed By: $ ']], { origin: 'A' + (totalRow + 2) });
+        
+
 
         // Add the worksheet to the workbook
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
@@ -22,7 +57,7 @@ export default function excel(props) {
         const excelUrl = URL.createObjectURL(excelBlob);
 
         // Download the Excel file
-        downloadExcelFile(excelUrl);
+        downloadExcelFile(excelUrl, claim.id);
     } catch (error) {
         console.error('Error fetching and downloading table data:', error);
     }
@@ -30,16 +65,16 @@ export default function excel(props) {
     }
     
     const workbookToExcelBlob = (workbook) => {
-    const excelData = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
-    return new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const excelData = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+        return new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     };
 
     // Function to download the Excel file
-    const downloadExcelFile = (excelUrl) => {
-    const link = document.createElement('a');
-    link.href = excelUrl;
-    link.download = 'table.xlsx';
-    link.click();
+    const downloadExcelFile = (excelUrl, id) => {
+        const link = document.createElement('a');
+        link.href = excelUrl;
+        link.download = 'Claim ' + id + '.xlsx';
+        link.click();
     };
 
   

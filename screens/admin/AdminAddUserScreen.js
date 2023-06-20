@@ -218,13 +218,17 @@ export default function AdminAddUserScreen({ navigation, route}) {
 
   
   const [userDepartments, setDepartments] = React.useState([]);
+  const [approvingDepartments, setApprovingDepartments] = React.useState([]);
   const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null});
+  company:null, department:[], isSupervisor: null, isApprover: null, isProcessor: null, approving: null});
 
+  
   useEffect(() => {
     setNewUser({...newUser, department: userDepartments});
-  }, [userDepartments]);
+    setNewUser({...newUser, approving: approvingDepartments});
+  }, [userDepartments, approvingDepartments]);
 
+  
 
   function addUser (){
     if (newUser.isApprover == "Yes" && newUser.isSupervisor == "Yes") {
@@ -389,8 +393,8 @@ export default function AdminAddUserScreen({ navigation, route}) {
           <MultiSelect
               items={route.params.allDpts}
               uniqueKey="value"
-              onSelectedItemsChange={(department) => setDepartments(department)}
-              selectedItems= {userDepartments}
+              onSelectedItemsChange={(department) => setApprovingDepartments(department)}
+              selectedItems= {approvingDepartments}
               selectText="Select department(s)"
               searchInputPlaceholderText="Search Items..."
               onChangeInput={ (text)=> console.log(text)}
