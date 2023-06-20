@@ -299,7 +299,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
           autoCorrect={false} 
         />
         </View>
-        <View style={[styles.inputContainer,{zIndex:5}]}>
+        <View style={[styles.inputContainer,{zIndex:6}]}>
         <Text style={styles.normalBoldText}>Company</Text>
         <SelectList
               dropdownStyles={styles.dropdownStyles}
@@ -315,7 +315,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
               search = {false}
           />  
         </View>
-        <View style={[styles.inputContainer,{zIndex:4}]}>
+        <View style={[styles.inputContainer,{zIndex:5}]}>
         <Text style={styles.normalBoldText}>Belongs to?</Text>
         <MultiSelect
               items={route.params.allDpts}
@@ -354,7 +354,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
           autoCorrect={false} 
         />
         </View>
-        <View style={[styles.inputContainer,{zIndex:3}]}>
+        <View style={[styles.inputContainer,{zIndex:4}]}>
         <Text style={styles.normalBoldText}>Is a Supervisor?</Text>
         <SelectList
               dropdownStyles={styles.dropdownStyles}
@@ -371,7 +371,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
 
         </View>
 
-        <View style={[styles.inputContainer,{zIndex:2}]}>
+        <View style={[styles.inputContainer,{zIndex:3}]}>
         <Text style={styles.normalBoldText}>Is a Approver?</Text>
         <SelectList
               dropdownStyles={styles.dropdownStyles}
@@ -388,7 +388,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
         </View>
 
         {newUser.isApprover == 'Yes' ? (
-          <View style={[styles.inputContainer,{zIndex:4}]}>
+          <View style={[styles.inputContainer,{zIndex:2}]}>
           <Text style={styles.normalBoldText}>Approver for?</Text>
           <MultiSelect
               items={route.params.allDpts}
