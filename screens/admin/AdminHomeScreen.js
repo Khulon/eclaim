@@ -175,18 +175,20 @@ export default function AdminHomeScreen({ navigation }) {
 
 
   const [userDepartments, setUserDepartments] = useState([]);
+  const [approvingDepartments, setApprovingDepartments] = useState([]);
 
   useEffect(() => {
     if(data != null){
       for (var i = 0; i < data.length; i++) {
         if (data[i].email == selectedId) {
           console.log(userDepartments)
-          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments, allDpts: departments, allComps: companies})
+          console.log(approvingDepartments)
+          navigation.navigate("AdminEditUserScreen", { props: data[i], dpts: userDepartments, allDpts: departments, appDpts: approvingDepartments, allComps: companies})
         }
       }
     }
 
-  }, [userDepartments]);
+  }, [userDepartments, approvingDepartments]);
 
 
   async function handleEditUser (selectedId) {
@@ -198,7 +200,8 @@ export default function AdminHomeScreen({ navigation }) {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      setUserDepartments(data);
+      setUserDepartments(data.dpts);
+      setApprovingDepartments(data.appDpts);
     })
   }
 
