@@ -42,7 +42,7 @@ app.get('/', function (req, res) {
     var request = new sql.Request();
         
     // query to the database and get the records
-    request.query('SELECT * from InProgressClaims', function (err, rows) {
+    request.query('SELECT * from Approvers;', function (err, rows) {
         
         if (err) console.log(err)
 
@@ -323,19 +323,22 @@ app.post('/addClaim', async (req, res) => {
     
     const fromDate = await request.query("SELECT PARSE('"+payPeriodFrom+"' as date USING 'AR-LB') AS fromDate")
     const toDate = await request.query("SELECT PARSE('"+payPeriodTo+"' as date USING 'AR-LB') AS toDate")
+    const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     
+
     const query = "SET XACT_ABORT ON " 
     + "BEGIN TRANSACTION "
     +"INSERT INTO Claims VALUES(@id, @total_amount, @formCreator, @expense_type, "
-      + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, @cd);"
+      + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, @cd, @nextApprover);"
       + "INSERT INTO MonthlyGeneral VALUES(@formid , @fromDate, @toDate, @costCenter, @note);"
       + " COMMIT TRANSACTION";
-        
+    console.log(formCreator)
+    console.log(checkApproval.recordset[0].levels_of_approval)
     request.input('id', sql.Int, newFormId);
     request.input('expense_type', sql.Text, expenseType)
     request.input('total_amount', sql.Numeric(18,2), 0);
     request.input('formCreator', sql.VarChar, formCreator);
-    request.input('levels', sql.Int, 1);
+    request.input('levels', sql.Int, checkApproval.recordset[0].levels_of_approval);
     request.input('claimees', sql.Int, 1);
     request.input('status', sql.VarChar, "In Progress");
     request.input('sd', sql.DateTime, null);
@@ -343,6 +346,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('pd', sql.DateTime, null);
     request.input('rd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
+    request.input('nextApprover', sql.VarChar, null);
     request.input('formid', sql.Int, newFormId);
     request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
     request.input('toDate', sql.Date, toDate.recordset[0].toDate);
@@ -383,20 +387,22 @@ app.post('/addClaim', async (req, res) => {
     }
     const fromDate = await request.query("SELECT PARSE('"+dateFrom+"' as date USING 'AR-LB') AS fromDate")
     const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
+    const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, @cd);"
+    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, @cd, @nextApprover);"
     + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, "+newFormId+"); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
     request.input('total_amount', sql.Numeric(18,2), 0);
-    request.input('levels', sql.Int, 1);
+    request.input('levels', sql.Int, checkApproval.recordset[0].levels_of_approval);
     request.input('claimees', sql.Int, 1);
     request.input('sd', sql.DateTime, null);
     request.input('ad', sql.DateTime, null);
     request.input('pd', sql.DateTime, null);
     request.input('rd', sql.DateTime, null);
     request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
+    request.input('nextApprover', sql.VarChar, null);
     request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
     request.input('period_to', sql.Date, toDate.recordset[0].toDate);
     request.input('note', sql.Text, note);
@@ -1051,11 +1057,12 @@ app.get('/management/:email', async (req, res) => {
     const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
     const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
     //Approver
-    if(checkApprover.recordset[0].count > 1) {
+    console.log(email)
+    if(checkApprover.recordset[0].count >= 1) {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
       + "period_from, period_to, cost_centre FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
-      + " WHERE submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
-      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name)")
+      + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = 'second'))")
       res.send(approverClaims.recordset)
 
     //Processor
@@ -1088,24 +1095,74 @@ app.post('/approveClaim', async (req, res) => {
     let period = req.body.parsedDate
     var request = new sql.Request();
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
+    var recipient = ""
+    var description = ""
+    var updateStatus = ""
+    var history = ""
+    var confirmationDescription = ""
+    var subject = ""
+    var confirmationSubject = ""
+    
+    //check for second Approver
+    //check for levels of approval, if more than 1, send to next approver
+    //keep track of which approval this is at
+    const checkApproval = await request.query("SELECT department_name, levels_of_approval FROM Departments WHERE department_name != '"+form_creator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+form_creator+"')")
+    
+    const levels = checkApproval.recordset[0].levels_of_approval
+    const department = checkApproval.recordset[0].department_name
+    if(levels > 1) {
+      const approversList = await request.query("WITH findApprovers (department, approver_name, levels) "
+      + "AS (select department, approver_name, "+levels+" from Approvers where department = '"+department+"'"
+      + "union all select A.department, A.approver_name, levels - 1 from Approvers A JOIN findApprovers F ON F.approver_name = A.department "
+      + "where levels > 1 ) select COUNT(*) AS count from findApprovers where department = '"+approver+"'");
+      const count = approversList.recordset[0].count
+      //send to processor
+      if(count == 0) {
+        const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = "+id+")")
+        recipient = processor.recordset[0].processor_email
+        updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
+        description = 'A new claim has been approved and is awaiting your processing.'
+        history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime)"
+        confirmationDescription = 'A claim that was approved by you has been sent for processing.'
+        subject = 'New claim to process'
+        confirmationSubject = 'Claim sent for processing - Confirmation Email'
+
+      } else {
+        //send to next approver
+        const nextApprover = await request.query("SELECT approver_name from Approvers where department = '"+approver+"'")
+        recipient = nextApprover
+        updateStatus = "UPDATE Claims SET status = 'Pending Next Approval', approval_date = @ad, next_recipient = '"+nextApprover+"' WHERE id = "+id+"";
+        description = "A new claim is awaiting your approval!"
+        history = "INSERT INTO History VALUES("+id+", 'Pending Next Approval', @datetime)"
+        confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
+        subject = "New claim to approve"
+        confirmationSubject = 'Claim sent to next approver - Confirmation Email'
+      }
+    //else, send to processor
+    } else {
+      const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = "+id+")")
+      recipient = processor.recordset[0].processor_email
+      updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
+      description = 'A new claim has been approved and is awaiting your processing.'
+      history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime)"
+      confirmationDescription = 'A claim that was approved by you has been sent for processing.'
+      subject = 'New claim to process'
+      confirmationSubject = 'Claim sent for processing - Confirmation Email'
+    }
+
     request.input('ad', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
-    const history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime)"
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
-    //trigger sending of email to processor
-
-    const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = "+id+")")
-    const processorEmail = processor.recordset[0].processor_email
+    //trigger sending of email to next person
     
     const filePath = path.join('server', '../../email/ApproverToFinance.html');
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
-    const processorReplacements = {
-      user: processorEmail,
+    const nextPerson = {
+      user: recipient,
       header: 'Claim received',
-      description: 'A new claim has been approved and is awaiting your processing.',
+      description: description,
       type: type,
       total_amount: total_amount,
       period: period,
@@ -1115,14 +1172,14 @@ app.post('/approveClaim', async (req, res) => {
     const confirmationReplacements = {
       user: approver,
       header: 'Claim approved',
-      description: 'A claim that was approved by you has been sent for processing.',
+      description: confirmationDescription,
       type: type,
       total_amount: total_amount,
       period: period,
       creator: form_creator,
       approvedBy: approver
     };
-    const htmlToSend = template(processorReplacements);
+    const htmlToSend = template(nextPerson);
     const conf = template(confirmationReplacements);
 
     // Create a transporter
@@ -1140,8 +1197,8 @@ app.post('/approveClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: processorEmail, //change
-      subject: 'New claim to process',
+      to: 'eclaim_test2@engkong.com',//change back to recipient
+      subject: subject,
       html: htmlToSend,
       
     };
@@ -1151,8 +1208,8 @@ app.post('/approveClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: approver,
-      subject: 'Claim sent for processing - Confirmation Email',
+      to: 'eclaim_test1@engkong.com',//change back to approver
+      subject: confirmationSubject, 
       html: conf,
     }
     const confirmation = transporter.sendMail(confirmationMail);

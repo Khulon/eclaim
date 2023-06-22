@@ -186,7 +186,7 @@ export default function MyClaimsScreen({ navigation }) {
       <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
         <View style={{width:"20%"}}></View>
         <View style={{justifyContent:'space-between', alignItems:'center'}}>
-          <Text style={{fontWeight:'500', fontSize: "12px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
+          <Text style={{fontWeight:'500', fontSize: "12px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
           <Text style={{fontWeight:'600', color:"#444444", fontSize: "13px"}} >ID: {claimId}</Text>
         </View>
       </View>
