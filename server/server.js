@@ -103,16 +103,20 @@ app.get('/admin', async (req, res) => {
 
 
 //Load all departments that the user belongs to
-app.post('/admin/editUser',(req, res) => {
-  let email = req.body.selectedId
-  var request = new sql.Request();
+app.post('/admin/editUser', async (req, res) => {
+  try {
+    let email = req.body.selectedId
+    var request = new sql.Request();
 
-  request.query("SELECT department FROM BelongsToDepartments WHERE email = '"+email+"'",
-   function (err, rows) {
-      if (err) console.log(err)
+    const rows = await request.query("SELECT department FROM BelongsToDepartments WHERE email = '"+email+"'")
+    const result = await request.query("SELECT department FROM Approvers WHERE approver_name = '"+email+"'")
+  
+    res.send({dpts: rows.recordset, appDpts: result.recordset});
 
-      res.send(rows.recordset);
-  });
+   } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"});
+   }
 
 });
 
@@ -130,8 +134,8 @@ app.post('/admin/editUser/save', async (req, res) => {
   let isSupervisor = req.body.supervisor;
   let isApprover = req.body.approver;
   let isProcessor = req.body.processor;
+  let approvingDepartments = req.body.approvingDepartments;
 
-  const newDpts = [];
   var insertDpts = "";
   
   for(var i = 0; i < departments.length; i++) {
@@ -142,20 +146,25 @@ app.post('/admin/editUser/save', async (req, res) => {
     }
   }
 
-  departments.forEach((dpt) => { newDpts.push(dpt)});
+  var queryString = ""
+  for(var i = 0; i < approvingDepartments.length; i++) {
+    queryString += "UPDATE Approvers SET approver_name = '"+newEmail+"' WHERE department = '"+approvingDepartments[i]+"';"
+  }
     
   var request = new sql.Request();
   try{
-     
-    await request.query("SET XACT_ABORT ON " 
-    + "BEGIN TRANSACTION "
-    + "UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
-    + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'"
-    + "DELETE FROM BelongsToDepartments WHERE email = '"+oldEmail+"'; "
-      + "INSERT INTO BelongsToDepartments VALUES" + insertDpts + " COMMIT TRANSACTION");
+    
+      console.log(oldEmail)
+      await request.query("SET XACT_ABORT ON " 
+      + "BEGIN TRANSACTION "
+      + "UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
+      + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'"
+      + "DELETE FROM BelongsToDepartments WHERE email = '"+oldEmail+"'; "
+        + "INSERT INTO BelongsToDepartments VALUES" + insertDpts
+        + queryString + " COMMIT TRANSACTION");
 
-
-    res.send({message: "User Updated!"})
+      res.send({message: "User Updated!"})
+    
 
   } catch(err) { 
     console.log(err)
@@ -172,16 +181,23 @@ app.post('/admin/editUser/save', async (req, res) => {
 //Admin deletes user
 app.post('/admin/deleteUser', async (req, res) => {
   let email = req.body.oldEmail;
+  let approver = req.body.approver;
   var request = new sql.Request();
+  try {
 
-  await request.query("DELETE FROM Employees WHERE email = '"+email+"'")
-  .then(() => {
-      res.send({message: "User Deleted!"});
-  })
-  .catch((err) => {
+
+    await request.query("DELETE FROM Employees WHERE email = '"+email+"'")
+    if(approver == 'Yes') {
+      await request.query("DELETE FROM Departments WHERE department_name = '"+email+"'")
+    }
+  
+  
+    res.send({message: "User Deleted!"});
+  
+  } catch(err) {
     console.log(err)
     res.json({message: "Failed to delete user!"});
-  });
+  }
 
 });
 
@@ -197,31 +213,38 @@ app.post('/admin/addUser', async (req, res) => {
   let isSupervisor = req.body.isSupervisor;
   let isApprover = req.body.isApprover;
   let isProcessor = req.body.isProcessor;
+  let approvingDepartments = req.body.approving;
 
-  var request = new sql.Request();
-  const query = "INSERT INTO Employees VALUES(@email, @name, @company," +
-  "@isProcessor, @isApprover, @isSupervisor, @profile)"
+  try {
+    var request = new sql.Request();
+    const query = "INSERT INTO Employees VALUES(@email, @name, @company," +
+    "@isProcessor, @isApprover, @isSupervisor, @profile)"
 
-  request.input('email', sql.VarChar, email)
-  request.input('name', sql.VarChar, name)
-  request.input('company', sql.VarChar, company)
-  request.input('isProcessor', sql.VarChar, isProcessor)
-  request.input('isApprover', sql.VarChar, isApprover)
-  request.input('isSupervisor', sql.VarChar, isSupervisor)
-  request.input('profile', sql.VarChar, null)
-  await request.query(query)
-  .then(() => {
+    request.input('email', sql.VarChar, email)
+    request.input('name', sql.VarChar, name)
+    request.input('company', sql.VarChar, company)
+    request.input('isProcessor', sql.VarChar, isProcessor)
+    request.input('isApprover', sql.VarChar, isApprover)
+    request.input('isSupervisor', sql.VarChar, isSupervisor)
+    request.input('profile', sql.VarChar, null)
+    await request.query(query)
+    
     for(var i = 0; i < departments.length; i++) {
-      var request = new sql.Request();
       request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')")
-    }})
-  .then(() => {
-    res.send({email: email, departments: departments, message: "User Added!"})
-  })
-  .catch((err) => {
-    console.log(err)
-    res.json({message: "Failed to add user!"});
-  })
+    }
+    
+    if(approvingDepartments != null) {
+      for(var i = 0; i < approvingDepartments.length; i++) {
+        request.query("UPDATE Approvers SET approver_name = '"+email+"' WHERE department = '"+approvingDepartments[i]+"'")
+      }
+    }
+    
+      res.send({email: email, departments: departments, message: "User Added!"})
+    
+  } catch(err) {
+      console.log(err)
+      res.json({message: "Failed to add user!"});
+  }
 });
 
 
@@ -1028,11 +1051,11 @@ app.get('/management/:email', async (req, res) => {
     const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
     const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
     //Approver
-    if(checkApprover.recordset[0].count == 1) {
+    if(checkApprover.recordset[0].count > 1) {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
       + "period_from, period_to, cost_centre FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
-      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND B.email != A.approver_name)")
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name)")
       res.send(approverClaims.recordset)
 
     //Processor

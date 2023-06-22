@@ -261,20 +261,26 @@ export default function AdminEditUserScreen({ navigation, route }) {
   }
 
   const fetchedDepartments = [];
+  const fetchedAppDpts = []
 
   for(var i in route.params.dpts) {
     fetchedDepartments.push(route.params.dpts[i].department);
   }
 
+  for(var i in route.params.appDpts) {
+    fetchedAppDpts.push(route.params.appDpts[i].department);
+  }
+
   const [userDepartments, setUserDepartments] = React.useState(fetchedDepartments);
+  const [approvingDepartments, setApprovingDepartments] = React.useState(fetchedAppDpts);
   const [userDetails, setUserDetails] = useState({name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
      company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
       approver: route.params.props.approver, processor: route.params.props.processor,
-       department: null});
+       department: null, approvingDepartments: null});
 
   useEffect(() => {
-    setUserDetails({...userDetails, department: userDepartments});
-  }, [userDepartments]);
+    setUserDetails({...userDetails, department: userDepartments, approvingDepartments: approvingDepartments});
+  }, [userDepartments, approvingDepartments]);
 
 
   return (
@@ -412,12 +418,12 @@ export default function AdminEditUserScreen({ navigation, route }) {
 
           {userDetails.approver == 'Yes' ? (
           <View style={[styles.inputContainer,{zIndex:2}]}>
-          <Text style={styles.normalBoldText}>Department</Text>
+          <Text style={styles.normalBoldText}>Approver For?</Text>
           <MultiSelect
               items={route.params.allDpts}
               uniqueKey="value"
-              onSelectedItemsChange={(department) => setUserDepartments(department)}
-              selectedItems= {userDepartments}
+              onSelectedItemsChange={(department) => setApprovingDepartments(department)}
+              selectedItems= {approvingDepartments}
               selectText="Select department(s)"
               searchInputPlaceholderText="Search Items..."
               onChangeInput={ (text)=> console.log(text)}

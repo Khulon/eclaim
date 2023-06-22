@@ -220,12 +220,11 @@ export default function AdminAddUserScreen({ navigation, route}) {
   const [userDepartments, setDepartments] = React.useState([]);
   const [approvingDepartments, setApprovingDepartments] = React.useState([]);
   const [newUser, setNewUser] = useState({name:null, email:null, 
-  company:null, department:[], isSupervisor: null, isApprover: null, isProcessor: null, approving: null});
+  company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null, approving: null});
 
   
   useEffect(() => {
-    setNewUser({...newUser, department: userDepartments});
-    setNewUser({...newUser, approving: approvingDepartments});
+    setNewUser({...newUser, department: userDepartments, approving: approvingDepartments});
   }, [userDepartments, approvingDepartments]);
 
   
