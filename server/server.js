@@ -85,7 +85,7 @@ app.get('/admin', async (req, res) => {
     // query to the database and get the records
     const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
     + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
-    + ' JOIN Processors P ON E.company_prefix = P.company WHERE E.email != approver_name')
+    + ' JOIN Processors P ON E.company_prefix = P.company WHERE E.email != approver_name OR approver_name IS NULL OR processor_email IS NULL')
 
     const departments = await request.query('SELECT department_name FROM Departments')
     const companies = await request.query('SELECT prefix FROM Companies')
@@ -141,20 +141,25 @@ app.post('/admin/editUser/save', async (req, res) => {
   for(var i = 0; i < departments.length; i++) {
     if(i == departments.length - 1) {
       insertDpts += "('"+newEmail+"'," + "'"+departments[i]+"');";
+    } else if (isApprover == 'No' && departments[i] == newEmail) {
+      continue;
     } else {
       insertDpts += "('"+newEmail+"'," + "'"+departments[i]+"'),";
     }
+  }
+
+  if(isApprover == 'No') {
+    approvingDepartments = [];
   }
 
   var queryString = ""
   for(var i = 0; i < approvingDepartments.length; i++) {
     queryString += "UPDATE Approvers SET approver_name = '"+newEmail+"' WHERE department = '"+approvingDepartments[i]+"';"
   }
-    
+  console.log(insertDpts)
+  console.log(approvingDepartments)
   var request = new sql.Request();
   try{
-    
-      console.log(oldEmail)
       await request.query("SET XACT_ABORT ON " 
       + "BEGIN TRANSACTION "
       + "UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
@@ -164,7 +169,6 @@ app.post('/admin/editUser/save', async (req, res) => {
         + queryString + " COMMIT TRANSACTION");
 
       res.send({message: "User Updated!"})
-    
 
   } catch(err) { 
     console.log(err)
