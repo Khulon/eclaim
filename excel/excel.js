@@ -13,22 +13,25 @@ export default function excel(claim, fullData) {
 
         // Create a new workbook
         const workbook = XLSX.utils.book_new();
+        
 
-        const worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Pay Period From: ' + parseDate(claim.pay_period_from)],
+        const worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Pay Period From: ' + parseDate(claim.pay_period_from)],
         ['Pay Period To: ' + parseDate(claim.pay_period_to)], ['Cost Centre: ' + claim.cost_centre]]);
 
         // Convert the data to worksheet format
         XLSX.utils.sheet_add_json(worksheet, fullData, { origin: 7});
-        //const worksheet = XLSX.utils.json_to_sheet(fullData);  
+        
 
         const columns = Object.keys(fullData[0]);
         const columnWidths = columns.map(column => ({
         width: column.length + 2
         }));
-
+        
+        
+        
         fullData.forEach(row => {
         columns.forEach((column, index) => {
-            const value = row[column].toString();
+            const value = row[column]
             if (value.length + 2 > columnWidths[index].width) {
             columnWidths[index].width = value.length + 2;
             }
@@ -36,14 +39,16 @@ export default function excel(claim, fullData) {
         });
 
         worksheet['!cols'] = columnWidths;
-
+        
+        const cellAddress = 'A9'; // Specify the cell address you want to access
+        const cellValue = worksheet[cellAddress].v;
         
         const totalRow = fullData.length + 12;
         
 
         XLSX.utils.sheet_add_aoa(worksheet, [[ 'Total Amount: $ ' + claim.total_amount ]], { origin: 'A' + totalRow });
-        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Approved By: $ ' ]], { origin: 'A' + (totalRow + 1) });
-        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Processed By: $ ']], { origin: 'A' + (totalRow + 2) });
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Approved By: ' ]], { origin: 'A' + (totalRow + 1) });
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Processed By: ']], { origin: 'A' + (totalRow + 2) });
         
 
 

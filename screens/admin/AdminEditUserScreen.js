@@ -229,6 +229,11 @@ export default function AdminEditUserScreen({ navigation, route }) {
       .then(response => response.json())
       .then(data => {
           console.log(data);
+          if(data.message == "User Deleted!") {
+            alert("User deleted successfully!")
+          } else {
+            alert("User deletion failed!")
+          }
       	});
 
       window.location.reload(false);
