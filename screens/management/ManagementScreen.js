@@ -4,6 +4,7 @@ import { Ionicons } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
 import { parseDatePeriod } from '../../functions/Parsers';
+import Tooltip from '../../components/Tooltip';
 
 export default function ManagementScreen({ navigation }) {        
 
@@ -122,7 +123,7 @@ export default function ManagementScreen({ navigation }) {
     },
     userCard: {
       backgroundColor: 'white',
-      height:"80px",
+      height:"100px",
       padding: "10px",
       borderBottomWidth: "0.5px",
       borderTopWidth: "0.5px",
@@ -171,25 +172,29 @@ export default function ManagementScreen({ navigation }) {
   const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
-        {expense_type == 'Travelling' ? (
-          <Text><Ionicons  name="airplane-outline" color="#444" size="large"/></Text>
+      {expense_type == 'Travel Claim' ? (
+          <Tooltip text={'Travel claim'}>
+            <Text><Ionicons  name="airplane-outline" color="#444" size="25px"/></Text>
+          </Tooltip>
         ):(
-          <Text><Ionicons  name="calendar-outline" color="#444" size="large"/></Text>
+          <Tooltip text={'Monthly Claim'}>
+            <Text><Ionicons  name="calendar-outline" color="#444" size="25px"/></Text>
+          </Tooltip>
         )}
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"180px", justifyContent:"center"}}>
-      <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
-      <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Total: {total}</Text>
+      <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
+      <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
+      <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
+      <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Total: {total}</Text>
       </View>
 
       <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
         <View style={{width:"20%"}}></View>
         <View style={{justifyContent:'space-between', alignItems:'center'}}>
-          <Text style={{fontWeight:'500', fontSize: "12px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
-          <Text style={{fontWeight:'600', color:"#444444", fontSize: "13px"}} >ID: {claimId}</Text>
+          <Text style={{fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
+          <Text style={{fontWeight:'600', color:"#444444", fontSize: "16px"}} >ID: {claimId}</Text>
         </View>
       </View>
       
@@ -236,7 +241,7 @@ export default function ManagementScreen({ navigation }) {
         <View style={{height:'5%'}}></View>
         <View style={styles.topCard}>
         <View style={{width:'84%', flexGrow:1, flexDirection:'row', alignItems:'center'}}>
-          <Text style={{fontFamily:"inherit", fontSize: "35px", fontWeight:"700"}}>Management</Text>
+          <Text style={{fontFamily:"inherit", fontSize: "38px", fontWeight:"700"}}>Management</Text>
         </View>
         <View style={styles.inputContainer}>
           <TextInput style={styles.textInput}

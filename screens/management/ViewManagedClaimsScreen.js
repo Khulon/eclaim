@@ -7,6 +7,7 @@ import ConfirmationButton, {inputConfirmationButton} from '../../components/Conf
 import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
 import excel from '../../excel/excel';
+import Tooltip from '../../components/Tooltip';
 
 
 export default function ViewManagedClaimsScreen({ navigation, route}) {
@@ -188,7 +189,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
     userCard: {
       backgroundColor: 'white',
-      height:"80px",
+      height:"100px",
       padding: "10px",
       borderBottomWidth: "0.5px",
       borderTopWidth: "0.5px",
@@ -260,28 +261,42 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
         <Text>
         {type=='Transport'?(
-          <Ionicons  name="car-outline" color="#444" size="25px"/>
+          <Tooltip text={'Transport Expense'}>
+            <Ionicons  name="car-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Entertainment'?(
-          <Ionicons  name="gift-outline" color="#444" size="25px"/>
+          <Tooltip text={'Entertainment Expense'}>
+            <Ionicons  name="gift-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Mobile'?(
-          <Ionicons  name="call-outline" color="#444" size="25px"/>
+          <Tooltip text={'Mobile Expense'}>
+            <Ionicons  name="call-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Fuel'?(
-          <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
+          <Tooltip text={'Fuel Expense'}>
+            <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Vehicle_repair'?(
-          <Ionicons  name="construct-outline" color="#444" size="25pxe"/>
+          <Tooltip text={'Vehicle Repair Expense'}>
+            <Ionicons  name="construct-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Medical'?(
-          <Ionicons  name="medkit-outline" color="#444" size="25px"/>
+          <Tooltip text={'Medical Expense'}>
+            <Ionicons  name="medkit-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):(
-          <Ionicons  name="reader-outline" color="#444" size="25px"/>
+          <Tooltip text={'Other Expenses'}>
+            <Ionicons  name="reader-outline" color="#444" size="25px"/>
+          </Tooltip>
         )}
       </Text>
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
         <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
-        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Name: {name}</Text>
-        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Type: {type}</Text>
-        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Cost: ${amount}</Text>
+        <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Name: {name}</Text>
+        <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Type: {type}</Text>
+        <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Cost: ${amount}</Text>
       </View>
       
         <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
@@ -289,14 +304,20 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
             {checked == 'No' ? (
                 <View style={{width:'30px', flexDirection:'row-reverse'}}>
-                <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="22px"></Ionicons></Text>
+                  <Tooltip text={'Unchecked'}>
+                    <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="25px"></Ionicons></Text>
+                  </Tooltip>
                 </View>
             ):(
                 <View></View>
             )}
             
             {receipt != null ? (
-                <Text><Ionicons name="document-attach-outline" color="#444" size="20px"></Ionicons></Text>
+              <View>
+                <Tooltip text={'Reciept'}>
+                  <Text><Ionicons name="document-attach-outline" color="#444" size="25px"></Ionicons></Text>
+                </Tooltip>
+              </View>
             ):(
                 <View></View>
             )}
