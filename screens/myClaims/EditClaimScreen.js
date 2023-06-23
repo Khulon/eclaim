@@ -207,7 +207,7 @@ export default function EditClaimScreen({ navigation, route}) {
 
     userCard: {
       backgroundColor: 'white',
-      height:"80px",
+      height:"100px",
       padding: "10px",
       borderBottomWidth: "0.5px",
       borderTopWidth: "0.5px",
@@ -351,10 +351,10 @@ export default function EditClaimScreen({ navigation, route}) {
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
-        <Text style={{fontSize: "13px", fontWeight:"700"}}>{date}</Text>
-        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Name: {name}</Text>
-        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Type: {type}</Text>
-        <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Cost: ${amount}</Text>
+        <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
+        <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Name: {name}</Text>
+        <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Type: {type}</Text>
+        <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Cost: ${amount}</Text>
       </View>
       
         <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
@@ -363,7 +363,7 @@ export default function EditClaimScreen({ navigation, route}) {
             {checked == 'No' ? (
                 <View style={{width:'30px', flexDirection:'row-reverse'}}>
                   <Tooltip text={'Unchecked'}>
-                    <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="22px"></Ionicons></Text>
+                    <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="25px"></Ionicons></Text>
                   </Tooltip>
                 </View>
             ):(
@@ -373,7 +373,7 @@ export default function EditClaimScreen({ navigation, route}) {
             {receipt != null ? (
               <View>
                 <Tooltip text={'Reciept'}>
-                  <Text><Ionicons name="document-attach-outline" color="#444" size="20px"></Ionicons></Text>
+                  <Text><Ionicons name="document-attach-outline" color="#444" size="23px"></Ionicons></Text>
                 </Tooltip>
               </View>
             ):(
