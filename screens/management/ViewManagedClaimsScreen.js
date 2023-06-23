@@ -250,7 +250,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function handleDownloadPdfClaim () {
-    const image = window.localStorage.getItem('image')
+    const image = require('../../assets/dummy_reciept.jpg')
+    console.log(image)
     navigation.navigate('pdf',{image: image})
   }
 
@@ -454,7 +455,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             <View style={{width:'23%', flexDirection:'row', justifyContent:'center'}}>
               <View style={{width:'40px', alignItems:'center'}}>
                 <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadExcelButtonHover(true)} onMouseLeave={() => setIsDownloadExcelButtonHover(false)} 
-                onPress={() => excel(claim, fullData)}>
+                onPress={() => excel(claim, table)}>
                 <View style={styles.downloadButton}>
                   {isDownloadExcelButtonHover?(
                     <Text><FontAwesome name="file-excel-o" color="#3F9E87" size="27px"/></Text>
