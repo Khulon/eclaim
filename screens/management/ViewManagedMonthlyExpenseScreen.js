@@ -306,7 +306,6 @@ const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expen
           editable={false}
         />
         </View>
-        
         <View style={styles.inputContainer}>
         <Text style={styles.normalBoldText}>Receipt</Text>
         <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
