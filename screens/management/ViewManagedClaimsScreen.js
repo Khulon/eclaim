@@ -253,7 +253,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   function handleDownloadPdfClaim () {
     const image = require('../../assets/dummy_reciept.jpg')
     console.log(image)
-    navigation.navigate('pdf',{image: image})
+    navigation.navigate('pdf',{data: data})
   }
 
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
