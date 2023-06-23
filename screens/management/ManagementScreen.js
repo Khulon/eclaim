@@ -4,6 +4,7 @@ import { Ionicons } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
 import { parseDatePeriod } from '../../functions/Parsers';
+import Tooltip from '../../components/Tooltip';
 
 export default function ManagementScreen({ navigation }) {        
 
@@ -171,10 +172,14 @@ export default function ManagementScreen({ navigation }) {
   const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
-        {expense_type == 'Travelling' ? (
-          <Text><Ionicons  name="airplane-outline" color="#444" size="large"/></Text>
+      {expense_type == 'Travel Claim' ? (
+          <Tooltip text={'Travel claim'}>
+            <Text><Ionicons  name="airplane-outline" color="#444" size="large"/></Text>
+          </Tooltip>
         ):(
-          <Text><Ionicons  name="calendar-outline" color="#444" size="large"/></Text>
+          <Tooltip text={'Monthly Claim'}>
+            <Text><Ionicons  name="calendar-outline" color="#444" size="large"/></Text>
+          </Tooltip>
         )}
       </View>
 

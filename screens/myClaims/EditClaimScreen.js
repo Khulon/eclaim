@@ -6,6 +6,7 @@ import filter from "lodash.filter"
 import ConfirmationButton from '../../components/ConfirmationButton';
 import { useIsFocused } from "@react-navigation/native";
 import { parseDate, parseDatePeriod } from '../../functions/Parsers';
+import Tooltip from '../../components/Tooltip';
 
 
 export default function EditClaimScreen({ navigation, route}) {
@@ -318,19 +319,33 @@ export default function EditClaimScreen({ navigation, route}) {
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
         <Text>
         {type=='Transport'?(
-          <Ionicons  name="car-outline" color="#444" size="25px"/>
+          <Tooltip text={'Transport Expense'}>
+            <Ionicons  name="car-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Entertainment'?(
-          <Ionicons  name="gift-outline" color="#444" size="25px"/>
+          <Tooltip text={'Entertainment Expense'}>
+            <Ionicons  name="gift-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Mobile'?(
-          <Ionicons  name="call-outline" color="#444" size="25px"/>
+          <Tooltip text={'Mobile Expense'}>
+            <Ionicons  name="call-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Fuel'?(
-          <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
+          <Tooltip text={'Fuel Expense'}>
+            <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Vehicle_repair'?(
-          <Ionicons  name="construct-outline" color="#444" size="25pxe"/>
+          <Tooltip text={'Vehicle Repair Expense'}>
+            <Ionicons  name="construct-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):type=='Medical'?(
-          <Ionicons  name="medkit-outline" color="#444" size="25px"/>
+          <Tooltip text={'Medical Expense'}>
+            <Ionicons  name="medkit-outline" color="#444" size="25px"/>
+          </Tooltip>
         ):(
-          <Ionicons  name="reader-outline" color="#444" size="25px"/>
+          <Tooltip text={'Other Expenses'}>
+            <Ionicons  name="reader-outline" color="#444" size="25px"/>
+          </Tooltip>
         )}
       </Text>
       </View>
@@ -347,14 +362,20 @@ export default function EditClaimScreen({ navigation, route}) {
 
             {checked == 'No' ? (
                 <View style={{width:'30px', flexDirection:'row-reverse'}}>
-                <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="22px"></Ionicons></Text>
+                  <Tooltip text={'Unchecked'}>
+                    <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="22px"></Ionicons></Text>
+                  </Tooltip>
                 </View>
             ):(
                 <View></View>
             )}
             
             {receipt != null ? (
-                <Text><Ionicons name="document-attach-outline" color="#444" size="20px"></Ionicons></Text>
+              <View>
+                <Tooltip text={'Reciept'}>
+                  <Text><Ionicons name="document-attach-outline" color="#444" size="20px"></Ionicons></Text>
+                </Tooltip>
+              </View>
             ):(
                 <View></View>
             )}
@@ -423,7 +444,7 @@ export default function EditClaimScreen({ navigation, route}) {
             </View>
             </TouchableOpacity>
           </View>
-          {userDetails.email == claim.current.form_creator ? (
+          {userDetails.email == claim.current.form_creator && claim.status == 'Submitted' ? (
             <View style={{width:'23%', alignItems:'center'}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
             onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim(claim))}>
