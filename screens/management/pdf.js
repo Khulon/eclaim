@@ -10,7 +10,9 @@ import { Ionicons } from "react-native-vector-icons";
 export default function pdf({route}) { 
     const [options, setOptions] = useState(0)
     const [hide, setHide] = useState(false)
-    const lol = route.params.data
+    const fullData = route.params.data
+
+    /*
     const fullData = [
         {receipt: lol[0].receipt},
         {receipt: lol[0].receipt},
@@ -33,6 +35,7 @@ export default function pdf({route}) {
         {receipt: lol[0].receipt},
         {receipt: lol[0].receipt},
     ]
+    */
 
  
 
