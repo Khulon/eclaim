@@ -1065,15 +1065,15 @@ app.get('/management/:email', async (req, res) => {
     console.log(email)
     if(checkApprover.recordset[0].count >= 1) {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
-      + "period_from, period_to, cost_centre FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
+      + "period_from, period_to, cost_centre, next_recipient FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
-      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = 'second'))")
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"'))")
       res.send(approverClaims.recordset)
 
     //Processor
     } else if(checkProcessor.recordset[0].count == 1) {
      const processorClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
-     + "period_from, period_to, cost_centre FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
+     + "period_from, period_to, cost_centre, next_recipient FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
       + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
       + " WHERE P.processor_email = '"+email+"')")
       res.send(processorClaims.recordset)
@@ -1135,8 +1135,8 @@ app.post('/approveClaim', async (req, res) => {
       } else {
         //send to next approver
         const nextApprover = await request.query("SELECT approver_name from Approvers where department = '"+approver+"'")
-        recipient = nextApprover
-        updateStatus = "UPDATE Claims SET status = 'Pending Next Approval', approval_date = @ad, next_recipient = '"+nextApprover+"' WHERE id = "+id+"";
+        recipient = nextApprover.recordset[0].approver_name
+        updateStatus = "UPDATE Claims SET status = 'Pending Next Approval', approval_date = @ad, next_recipient = '"+recipient+"' WHERE id = "+id+"";
         description = "A new claim is awaiting your approval!"
         history = "INSERT INTO History VALUES("+id+", 'Pending Next Approval', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
@@ -1248,8 +1248,15 @@ app.post('/processClaim', async (req, res) => {
     await request.query(history)
     //trigger sending of email to form creator
 
-    const approver = await request.query("SELECT approver_name FROM Approvers A JOIN BelongsToDepartments B ON A.department = B.department WHERE B.email = '"+form_creator+"'")
-    const approverEmail = approver.recordset[0].approver_name
+    const approvers = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND (status = 'Approved' OR status = 'Pending Next Approval')")
+    var approverEmail = ''
+    for (var i = 0; i < approvers.recordset.length; i++) {
+      if(i == approvers.recordset.length - 1) {
+        approverEmail += approvers.recordset[i].person
+      } else {
+        approverEmail += (approvers.recordset[i].person + ', ')
+      }
+    }
     const filePath = path.join('server', '../../email/FinanceToCreator.html');
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
@@ -1331,21 +1338,57 @@ app.post('/approverRejectClaim', async (req, res) => {
     let period = req.body.parsedDate
     let description = req.body.description
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Rejected', rejection_date = @rd WHERE id = "+id+"";
-    request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    await request.query(updateStatus)
+    var recipient = ""
+    var status = ""
+    var emailDescription = "Your claim has been rejected"
+    var subject = "Your claim has been rejected"
+    
+    const checkApproval = await request.query("SELECT department_name, levels_of_approval FROM Departments WHERE department_name != '"+form_creator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+form_creator+"')")
+    const levels = checkApproval.recordset[0].levels_of_approval
+    const department = checkApproval.recordset[0].department_name
+    if(levels > 1) {
+      const approversList = await request.query("WITH findApprovers (department, approver_name, levels) "
+      + "AS (select department, approver_name, "+levels+" from Approvers where department = '"+department+"'"
+      + "union all select A.department, A.approver_name, levels - 1 from Approvers A JOIN findApprovers F ON F.approver_name = A.department "
+      + "where levels > 1 ) select department from findApprovers where approver_name = '"+approver+"'");
+      const previousApprover = approversList.recordset[0].department
+      const creatorDepartment = await request.query("SELECT department FROM BelongsToDepartments WHERE email = '"+form_creator+"'")
+      if (previousApprover == creatorDepartment.recordset[0].department) {
+        recipient = form_creator
+        status = "Rejected"
+        const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
+        request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+        await request.query(updateStatus)
+      } else {
+        recipient = previousApprover
+        status = "Rejecting"
+        emailDescription = form_creator + "'s claim needs your rejection"
+        subject = "Claim needs your rejection"
+        const updateStatus = "UPDATE Claims SET status = '"+status+"', next_recipient = '"+previousApprover+"', rejection_date = @rd WHERE id = "+id+"";
+        request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+        await request.query(updateStatus)
+      }
+    } else {
+      recipient = form_creator
+      status = "Rejected"
+      const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
+      request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+      await request.query(updateStatus)
+    }
+
+
     const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime, '"+approver+"')"
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
+    
     //trigger send email back to form creator
-
     const filePath = path.join('server', '../../email/Rejection.html');
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
-      user: form_creator,
+      user: recipient,
       header: 'Claim rejected',
-      description: 'Your claim has been rejected!',
+      description: emailDescription,
       type: type,
       total_amount: total_amount,
       period: period,
@@ -1383,7 +1426,7 @@ app.post('/approverRejectClaim', async (req, res) => {
     const mailOptions = {
       from: 'eclaim@engkong.com',
       to: 'eclaim_test2@engkong.com', //change to form_creator
-      subject: 'Your claim has been rejected',
+      subject: subject,
       html: htmlToSend,
       
     };
@@ -1421,16 +1464,17 @@ app.post('/processorRejectClaim', async (req, res) => {
     let period = req.body.parsedDate
     let description = req.body.description
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Submitted', rejection_date = @rd WHERE id = "+id+"";
+    //check previous status
+    const previousApprover = await request.query("SELECT next_recipient FROM Claims where id = "+id+"")
+    const approver = previousApprover.recordset[0].next_recipient
+    const updateStatus = "UPDATE Claims SET status = 'Rejected by processor', next_recipient = '"+approver+"', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
     const history = "INSERT INTO History VALUES("+id+", 'Rejected by processor', @datetime, '"+processor+"')"
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger send email back to approver
-
-    const findApprover = await request.query("SELECT approver_name FROM Approvers A JOIN BelongsToDepartments B ON A.department = B.department WHERE B.email = '"+form_creator+"'")
-    const approver = findApprover.recordset[0].approver_name
+  
     const filePath = path.join('server', '../../email/Rejection.html');
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
@@ -1495,6 +1539,30 @@ app.post('/processorRejectClaim', async (req, res) => {
   } catch(err) {
     console.log(err)
     res.send({message: "Error!"});
+  }
+
+})
+
+app.get('/getHistory', async (req, res) => {
+  let id = req.body.id
+  let form_creator = req.body.form_creator
+
+  try {
+    var request = new sql.Request();
+    const approverCheck = await request.query("SELECT COUNT(*) AS count FROM Departments WHERE department_name = '"+form_creator+"'")
+    if (approverCheck.recordset[0].count == 1) {
+      const result = await request.query("SELECT top 2 * FROM History WHERE claim_id = "+id+" ORDER BY DESC")
+      res.send(result.recordset)
+    } else {
+      const levels = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+form_creator+"')")
+      const number = levels.recordset[0].levels_of_approval + 1
+      const result = await request.query("SELECT top "+number+" * FROM History WHERE claim_id = "+id+" ORDER BY DESC")
+      res.send(result.recordset)
+    }
+
+  } catch(err) {
+    console.log(err)
+    res.send({message: "Error!"})
   }
 
 })

@@ -4,6 +4,7 @@ import { parseDate } from '../functions/Parsers';
 
 export default function excel(claim, fullData) {
     try {
+
         console.log(fullData)
         for(let i = 0; i < fullData.length; i++){
             if(fullData[i].receipt != null){
