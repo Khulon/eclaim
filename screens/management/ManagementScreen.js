@@ -18,7 +18,6 @@ export default function ManagementScreen({ navigation }) {
   useEffect(() => {
     setIsLoading(true)
     fetchData()
-    
   }, []);
 
   async function fetchData() {
@@ -26,6 +25,7 @@ export default function ManagementScreen({ navigation }) {
     await fetch(`http://localhost:5000/management/${email}`)
     .then((response) => response.json())
     .then((data) => {
+      console.log(data)
       data = data.reverse()
       setFullData(data);
       setData(data);
