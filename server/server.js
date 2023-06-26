@@ -358,7 +358,7 @@ app.post('/addClaim', async (req, res) => {
     request.input('note', sql.Text, note);
 
     await request.query(query);
-    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime)"
+    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime, '"+formCreator+"')"
     request.input('datetime', sql.DateTime, result.recordset[0].currentDateTime);
     await request.query(history);
   
@@ -413,7 +413,7 @@ app.post('/addClaim', async (req, res) => {
 
     console.log(query)
     await request.query(query);
-    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime)"
+    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime, '"+formCreator+"')"
     request.input('datetime', sql.DateTime, result.recordset[0].currentDateTime);
     await request.query(history);
 
@@ -912,6 +912,7 @@ app.post('/deleteExpense', async (req, res) => {
 app.post('/deleteClaim', async (req, res) => {
   
   let id = req.body.current.id;
+  let form_creator = req.body.current.form_creator;
   console.log(id)
 
   try {
@@ -920,7 +921,7 @@ app.post('/deleteClaim', async (req, res) => {
     const query = "DELETE FROM Claims WHERE id = @id";
     request.input('id', sql.Int, id)
     await request.query(query);
-    const history = "INSERT INTO History VALUES("+id+", 'Deleted', @datetime)"	
+    const history = "INSERT INTO History VALUES("+id+", 'Deleted', @datetime, '"+form_creator+"')"	
     request.input('datetime', sql.DateTime, currentDate.recordset[0].currentDateTime);
     await request.query(history);
     res.send({message: "Claim deleted!"})
@@ -974,7 +975,7 @@ app.post('/submitClaim', async (req, res) => {
       const updateStatus = "UPDATE Claims SET status = 'Submitted', submission_date = @sd WHERE id = "+id+"";
       request.input('sd', sql.DateTime, currentTime.recordset[0].currentDateTime);
       await request.query(updateStatus)
-      const history = "INSERT INTO History VALUES("+id+", 'Submitted', @datetime)"
+      const history = "INSERT INTO History VALUES("+id+", 'Submitted', @datetime, '"+form_creator+"')"
       request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
       await request.query(history); 
 
@@ -1126,7 +1127,7 @@ app.post('/approveClaim', async (req, res) => {
         recipient = processor.recordset[0].processor_email
         updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
         description = 'A new claim has been approved and is awaiting your processing.'
-        history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime)"
+        history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent for processing.'
         subject = 'New claim to process'
         confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1137,7 +1138,7 @@ app.post('/approveClaim', async (req, res) => {
         recipient = nextApprover
         updateStatus = "UPDATE Claims SET status = 'Pending Next Approval', approval_date = @ad, next_recipient = '"+nextApprover+"' WHERE id = "+id+"";
         description = "A new claim is awaiting your approval!"
-        history = "INSERT INTO History VALUES("+id+", 'Pending Next Approval', @datetime)"
+        history = "INSERT INTO History VALUES("+id+", 'Pending Next Approval', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
         subject = "New claim to approve"
         confirmationSubject = 'Claim sent to next approver - Confirmation Email'
@@ -1148,7 +1149,7 @@ app.post('/approveClaim', async (req, res) => {
       recipient = processor.recordset[0].processor_email
       updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
       description = 'A new claim has been approved and is awaiting your processing.'
-      history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime)"
+      history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime, '"+approver+"')"
       confirmationDescription = 'A claim that was approved by you has been sent for processing.'
       subject = 'New claim to process'
       confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1242,7 +1243,7 @@ app.post('/processClaim', async (req, res) => {
     const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = @pd WHERE id = "+id+"";
     request.input('pd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
-    const history = "INSERT INTO History VALUES("+id+", 'Processed', @datetime)"
+    const history = "INSERT INTO History VALUES("+id+", 'Processed', @datetime, '"+processor+"')"
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger sending of email to form creator
@@ -1333,7 +1334,7 @@ app.post('/approverRejectClaim', async (req, res) => {
     const updateStatus = "UPDATE Claims SET status = 'Rejected', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
-    const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime)"
+    const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime, '"+approver+"')"
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger send email back to form creator
@@ -1423,7 +1424,7 @@ app.post('/processorRejectClaim', async (req, res) => {
     const updateStatus = "UPDATE Claims SET status = 'Submitted', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
-    const history = "INSERT INTO History VALUES("+id+", 'Rejected by processor', @datetime)"
+    const history = "INSERT INTO History VALUES("+id+", 'Rejected by processor', @datetime, '"+processor+"')"
     request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(history)
     //trigger send email back to approver
