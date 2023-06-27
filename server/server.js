@@ -1065,15 +1065,16 @@ app.get('/management/:email', async (req, res) => {
     console.log(email)
     if(checkApprover.recordset[0].count >= 1) {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
-      + "period_from, period_to, cost_centre, next_recipient FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
+      + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
-      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"'))")
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
+      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"'))")
       res.send(approverClaims.recordset)
 
     //Processor
     } else if(checkProcessor.recordset[0].count == 1) {
      const processorClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
-     + "period_from, period_to, cost_centre, next_recipient FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
+     + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
       + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
       + " WHERE P.processor_email = '"+email+"')")
       res.send(processorClaims.recordset)
@@ -1354,32 +1355,37 @@ app.post('/approverRejectClaim', async (req, res) => {
       const previousApprover = approversList.recordset[0].department
       const creatorDepartment = await request.query("SELECT department FROM BelongsToDepartments WHERE email = '"+form_creator+"'")
       if (previousApprover == creatorDepartment.recordset[0].department) {
+          recipient = form_creator
+          status = "Rejected"
+          const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
+          request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          await request.query(updateStatus)
+          const history = "INSERT INTO History VALUES("+id+", 'Rejected', @datetime, '"+approver+"')"
+          request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          await request.query(history)
+      } else {
+          recipient = previousApprover
+          status = "Rejecting"
+          emailDescription = form_creator + "'s claim needs your rejection"
+          subject = "Claim needs your rejection"
+          const updateStatus = "UPDATE Claims SET status = '"+status+"', next_recipient = '"+previousApprover+"', rejection_date = @rd WHERE id = "+id+"";
+          request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          await request.query(updateStatus)
+          const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime, '"+approver+"')"
+          request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          await request.query(history)
+      }
+    } else {
         recipient = form_creator
         status = "Rejected"
         const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
         request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
         await request.query(updateStatus)
-      } else {
-        recipient = previousApprover
-        status = "Rejecting"
-        emailDescription = form_creator + "'s claim needs your rejection"
-        subject = "Claim needs your rejection"
-        const updateStatus = "UPDATE Claims SET status = '"+status+"', next_recipient = '"+previousApprover+"', rejection_date = @rd WHERE id = "+id+"";
-        request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-        await request.query(updateStatus)
-      }
-    } else {
-      recipient = form_creator
-      status = "Rejected"
-      const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
-      request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
-      await request.query(updateStatus)
+        const history = "INSERT INTO History VALUES("+id+", 'Rejected', @datetime, '"+approver+"')"
+        request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+        await request.query(history)
     }
-
-
-    const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime, '"+approver+"')"
-    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    await request.query(history)
+  
     
     //trigger send email back to form creator
     const filePath = path.join('server', '../../email/Rejection.html');
@@ -1543,21 +1549,37 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
-app.get('/getHistory', async (req, res) => {
-  let id = req.body.id
-  let form_creator = req.body.form_creator
+app.get('/getHistory/:id/:status', async (req, res) => {
+  const { id, status} = req.params;
 
   try {
     var request = new sql.Request();
-    const approverCheck = await request.query("SELECT COUNT(*) AS count FROM Departments WHERE department_name = '"+form_creator+"'")
-    if (approverCheck.recordset[0].count == 1) {
-      const result = await request.query("SELECT top 2 * FROM History WHERE claim_id = "+id+" ORDER BY DESC")
-      res.send(result.recordset)
+    const check = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND status = 'Rejected'")
+    //get all approvers so far
+    if(status == 'Approved' || status == 'Pending Next Approval' || status == 'Processed') {
+      //rejected before
+      if(check.recordset[0].count > 0) {
+          const query = "SELECT DISTINCT person FROM History WHERE id = "+id+" AND (status = 'Approved' OR status = 'Pending Next Approval') " +
+        "AND date > (SELECT top 1 date FROM History WHERE id = "+id+" AND status = 'Rejected')"
+          const approvers = await request.query(query)
+          if(status == 'Processed') {
+            const processors = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND status = 'Processed' AND date > (SELECT top 1 date FROM History WHERE id = "+id+" AND status = 'Rejected')")
+            res.send({approvers: approvers.recordset, processor: processors.recordset})
+          } else {
+            res.send({approvers: approvers.recordset, processor: []})
+          }
+      //never rejected before
+      } else {
+          const result = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND (status = 'Approved' OR status = 'Pending Next Approval')")
+          if(status == 'Processed') {
+            const processors = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND status = 'Processed'")
+            res.send({approvers: result.recordset, processor: processors.recordset})
+          } else {
+            res.send({approvers: result.recordset, processor: []})
+          }
+      }
     } else {
-      const levels = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+form_creator+"')")
-      const number = levels.recordset[0].levels_of_approval + 1
-      const result = await request.query("SELECT top "+number+" * FROM History WHERE claim_id = "+id+" ORDER BY DESC")
-      res.send(result.recordset)
+      res.send({approvers: [], processor: []})
     }
 
   } catch(err) {
