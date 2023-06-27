@@ -17,6 +17,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);  
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
+  const [approvers, setApprovers] = useState([]);
+  const [processor, setProcessor] = useState([]);
 
   const SubmitButtonHover = useRef(new Animated.Value(0)).current;
   const AddButtonHover = useRef(new Animated.Value(0)).current;
@@ -34,14 +36,14 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     try {
       const id = claim.id;
       const user = claim.form_creator;
+      const status = claim.status;
       await fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
         setFullData(data);
         setData(data);
-        //setTable(data.map((item) => [item.description, item.expense_type, parseDate(item.date_of_expense), item.total_amount, item.receipt]))
-        
+
         for(let i = 0; i < data.length; i++) {
           if(claim.form_type == "Travelling") {
             setTable([...table, {item_number: data[i].item_number, description: data[i].description, expense_type: data[i].expense_type, 
@@ -52,8 +54,15 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             place: data[i].place, customers: data[i].customer_name, company: data[i].company_name}])
           }
         }
-        
-        
+      });
+
+
+      fetch(`http://localhost:5000/getHistory/${id}/${status}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        setApprovers(data.approvers);
+        setProcessor(data.processor);
       });
 
       setIsLoading(false)
@@ -251,8 +260,6 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function handleDownloadPdfClaim () {
-    const image = require('../../assets/dummy_reciept.jpg')
-    console.log(image)
     navigation.navigate('pdf',{data: data})
   }
 
@@ -476,7 +483,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             <View style={{width:'23%', flexDirection:'row', justifyContent:'center'}}>
               <View style={{width:'40px', alignItems:'center'}}>
                 <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadExcelButtonHover(true)} onMouseLeave={() => setIsDownloadExcelButtonHover(false)} 
-                onPress={() => excel(claim, table)}>
+                onPress={() => excel(claim, table, approvers, processor)}>
                 <View style={styles.downloadButton}>
                 <Tooltip text={'Excel'} bottom={true}>
                   {isDownloadExcelButtonHover?(

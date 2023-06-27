@@ -2,10 +2,13 @@ import * as XLSX from 'xlsx'
 import { parseDate } from '../functions/Parsers';
 
 
-export default function excel(claim, fullData) {
+export default function excel(claim, fullData, approvers, processor) {
+        
     try {
 
         console.log(fullData)
+        console.log(approvers)
+        console.log(processor)
         for(let i = 0; i < fullData.length; i++){
             if(fullData[i].receipt != null){
                 fullData[i].receipt = "Yes"            
@@ -14,10 +17,16 @@ export default function excel(claim, fullData) {
 
         // Create a new workbook
         const workbook = XLSX.utils.book_new();
+        var worksheet;
         
-
-        const worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Pay Period From: ' + parseDate(claim.pay_period_from)],
-        ['Pay Period To: ' + parseDate(claim.pay_period_to)], ['Cost Centre: ' + claim.cost_centre]]);
+        if(claim.form_type == 'Travelling') {
+            worksheet =  XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Country: '+ claim.country], ['Period From: ' + parseDate(claim.period_from)],
+            ['Period To: ' + parseDate(claim.period_to)], ['Exchange Rate: ' + claim.exchange_rate]]);
+        } else {
+            worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Period From: ' + parseDate(claim.pay_period_from)],
+            ['Period To: ' + parseDate(claim.pay_period_to)], ['Cost Centre: ' + claim.cost_centre]]);
+        }
+        
 
         // Convert the data to worksheet format
         XLSX.utils.sheet_add_json(worksheet, fullData, { origin: 7});
@@ -30,31 +39,59 @@ export default function excel(claim, fullData) {
         
         
         
-        fullData.forEach(row => {
-        columns.forEach((column, index) => {
-            const value = row[column]
-            if (value.length + 2 > columnWidths[index].width) {
-            columnWidths[index].width = value.length + 2;
+        for(let i = 0; i < fullData.length; i++) {
+            for(let j = 0; j < columns.length; j++) {
+                const cellAddress = XLSX.utils.encode_cell({ c: j, r: i + 7 });
+                const value = worksheet[cellAddress].v;
+                console.log(value)
+                if(value.length + 2 > columnWidths[j].width) {
+                    columnWidths[j].width = value.length + 2;
+                }
             }
-        });
-        });
+        }
 
-        worksheet['!cols'] = columnWidths;
-        
-        const cellAddress = 'A9'; // Specify the cell address you want to access
-        const cellValue = worksheet[cellAddress].v;
-        
+        worksheet['!cols'] = columnWidths; 
         const totalRow = fullData.length + 12;
+        var approversString = ""
+        var processorString = ""
         
+        if(approvers.length != 0) {
+            for (let i = 0; i < approvers.length; i++){
+                if (i == approvers.length - 1){
+                    approversString += approvers[i].person
+                } else {
+                    approversString += approvers[i].person + ", "
+                }
+            }
+        }
+        
+
+        if(processor.length == 0) {
+            processorString = ""
+        } else {
+            processorString = processor[0].person
+        }
 
         XLSX.utils.sheet_add_aoa(worksheet, [[ 'Total Amount: $ ' + claim.total_amount ]], { origin: 'A' + totalRow });
-        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Approved By: ' ]], { origin: 'A' + (totalRow + 1) });
-        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Processed By: ']], { origin: 'A' + (totalRow + 2) });
-        
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Approved By: ' + approversString ]], { origin: 'A' + (totalRow + 1) });
+        XLSX.utils.sheet_add_aoa(worksheet, [[ 'Processed By: ' + processorString]], { origin: 'A' + (totalRow + 2) });
 
 
         // Add the worksheet to the workbook
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+        const workbookToExcelBlob = (workbook) => {
+            const excelData = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+            return new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        };
+
+        // Function to download the Excel file
+        const downloadExcelFile = (excelUrl, id) => {
+            const link = document.createElement('a');
+            link.href = excelUrl;
+            link.download = 'Claim ' + id + '.xlsx';
+            link.click();
+        };
 
         // Generate the Excel file as a Blob
         const excelBlob = workbookToExcelBlob(workbook);
@@ -68,19 +105,10 @@ export default function excel(claim, fullData) {
         console.error('Error fetching and downloading table data:', error);
     }
 
-    }
+}
     
-    const workbookToExcelBlob = (workbook) => {
-        const excelData = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
-        return new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    };
+    
 
-    // Function to download the Excel file
-    const downloadExcelFile = (excelUrl, id) => {
-        const link = document.createElement('a');
-        link.href = excelUrl;
-        link.download = 'Claim ' + id + '.xlsx';
-        link.click();
-    };
+    
 
   
