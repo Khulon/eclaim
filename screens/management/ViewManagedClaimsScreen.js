@@ -485,11 +485,13 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                 <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadExcelButtonHover(true)} onMouseLeave={() => setIsDownloadExcelButtonHover(false)} 
                 onPress={() => excel(claim, table, approvers, processor)}>
                 <View style={styles.downloadButton}>
+                <Tooltip text={'Excel'} bottom={true}>
                   {isDownloadExcelButtonHover?(
                     <Text><FontAwesome name="file-excel-o" color="#3F9E87" size="27px"/></Text>
                   ):(
                     <Text><FontAwesome name="file-excel-o" color="#3F9E87" size="25px"/></Text>
                   )}
+                </Tooltip>
                 </View>
                 </TouchableOpacity>
               </View>
@@ -498,11 +500,13 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                 <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadPdfButtonHover(true)} onMouseLeave={() => setIsDownloadPdfButtonHover(false)} 
                 onPress={() => handleDownloadPdfClaim(claim)}>
                 <View style={styles.downloadButton}>
+                <Tooltip text={'Pdf'} bottom={true}>
                   {isDownloadPdfButtonHover?(
                     <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="27px"/></Text>
                   ):(
                     <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="25px"/></Text>
                   )}
+                </Tooltip>
                 </View>
                 </TouchableOpacity>
               </View>
