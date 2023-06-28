@@ -7,7 +7,7 @@ export const AuthProvider = ({children}) => {
 
   async function loginUser (loginDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/login', {
+    await fetch('http://10.0.1.28:5000/login', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify(loginDetails)})
