@@ -25,7 +25,7 @@ export default function MyClaimsScreen({ navigation }) {
 
   async function fetchData() {
     const email = window.localStorage.getItem('session');
-    await fetch(`http://localhost:5000/myClaims/${email}`)
+    await fetch(`http://10.0.1.28:5000/myClaims/${email}`)
     .then((response) => response.json())
     .then((data) => {
       data = data.reverse()
@@ -187,12 +187,12 @@ export default function MyClaimsScreen({ navigation }) {
       <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
       <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
       <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
-      <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Total: {total}</Text>
+      <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Total: {total}</Text> 
       </View>
 
       <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
         <View style={{width:"20%"}}></View>
-        <View style={{justifyContent:'space-between', alignItems:'center'}}>
+        <View style={{justifyContent:'space-between', alignItems:'flex-end'}}>
           <Text style={{fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
           <Text style={{fontWeight:'600', color:"#444444", fontSize: "16px"}} >ID: {claimId}</Text>
         </View>
