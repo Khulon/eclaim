@@ -19,7 +19,7 @@ export default function ProfileScreen({ navigation }) {
   /*
   useEffect( () => {
     const email = window.localStorage.getItem('session');
-    fetch('http://localhost:5000/getProfile', {
+    fetch('http://10.0.1.28:5000/getProfile', {
       method: 'POST',
       headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
       body: JSON.stringify({email: email})
@@ -148,7 +148,7 @@ export default function ProfileScreen({ navigation }) {
       window.localStorage.setItem('image', result.uri);
     }
 
-    fetch('http://localhost:5000/uploadImage', {
+    fetch('http://10.0.1.28:5000/uploadImage', {
       method: 'POST',
       headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
       body: JSON.stringify({email: userDetails.email, image: result.uri})

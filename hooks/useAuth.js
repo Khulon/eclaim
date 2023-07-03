@@ -38,7 +38,7 @@ export const AuthProvider = ({children}) => {
 
   const createUser = async (loginDetails) => {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/register', {
+    await fetch('http://10.0.1.28:5000/register', {
       method: 'POST',	
       headers: header,
       body: JSON.stringify(loginDetails)})
