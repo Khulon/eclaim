@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const sql = require('mssql');
 const app = express();
-var async = require('async');
 
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
@@ -29,7 +28,6 @@ sql.connect(config, function (err) {
 });
 
 
-
 //Send email
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars')
@@ -47,15 +45,18 @@ app.get('/', function (req, res) {
         if (err) console.log(err)
 
         // send records as a response
-        res.send([rows.recordset]);
+        res.send({hi: 'hello'});
     });
 });
 
 
 
-var server = app.listen(5000, function () {
-    console.log('Server is running on port ' + server.address().port + '...');
-});
+
+var port = process.env.port || process.env.PORT;
+app.listen(port, () => {
+	console.log(port)
+})
+
 
 
 
@@ -1023,7 +1024,7 @@ app.post('/submitClaim', async (req, res) => {
       // Define the email message
       const mailOptions = {
         from: 'eclaim@engkong.com',
-        to: 'eclaim_test2@engkong.com', //change to approver_email
+        to: approver_email, //change to approver_email
         subject: 'New claim needs approval',
         html: htmlToSend,
         
@@ -1034,7 +1035,7 @@ app.post('/submitClaim', async (req, res) => {
 
       const confirmationMail = {
         from: 'eclaim@engkong.com',
-        to: 'eclaim_test1@engkong.com', //change to form_creator
+        to: form_creator, //change to form_creator
         subject: 'Claim submission confirmation email',
         html: conf,
       }
