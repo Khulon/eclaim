@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
 import React, { useEffect, useState} from "react";
 import useAuth from '../../hooks/useAuth';
 import ConfirmationButton from '../../components/ConfirmationButton';
@@ -11,6 +11,7 @@ export default function ProfileScreen({ navigation }) {
   window.localStorage.setItem('stackScreen', 'Profile');
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
+  const [ showPassword, setShowPassword ] = useState(false)
 
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
   const image = window.localStorage.getItem('image')
@@ -87,7 +88,7 @@ export default function ProfileScreen({ navigation }) {
     },
     infomationContainer: {
       width:'100%',
-      height:'12%',
+      height:'80px',
       minHeight:'60px',
       justifyContent:'center',
       alignItems:'center',
@@ -188,6 +189,8 @@ export default function ProfileScreen({ navigation }) {
 
         
       <View style={styles.content}>
+        <ScrollView showsVerticalScrollIndicator={false} style={{height:'0px', width:'100%'}}>
+          <View style={{height:'50px'}}></View>
         <View style={styles.displayContainer}>
           <View style={styles.circle}>
           <TouchableOpacity onPress={()=> pickImage()}>
@@ -205,6 +208,8 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.nameText}>{userDetails.name}</Text>
         </View>
 
+        <View style={{height:'10px'}}></View>
+
         <View style={styles.infomationContainer}>
           <Text style={styles.boldInfoText}>Email</Text>
           <Text style={styles.normalInfoText}>{userDetails.email}</Text>
@@ -217,11 +222,30 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.boldInfoText}>Approver</Text>
           <Text style={styles.normalInfoText}>{userDetails.approver_name}</Text>
         </View>
-        <View style={styles.infomationContainer}>
-          <Text style={styles.boldInfoText}>Password</Text>
-          <Text style={styles.normalInfoText}>{userDetails.password}</Text>
-        </View>
+
+            {showPassword ? (
+              <View style={styles.infomationContainer}>
+                <View>
+                  <Text style={styles.boldInfoText}>Password</Text>
+                  <View style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
+                    <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
+                  </View>
+                </View>
+                <Text style={styles.normalInfoText}>{userDetails.password}</Text>
+              </View>
+            ) : (
+              <View style={styles.infomationContainer}>
+                <View>
+                  <Text style={styles.boldInfoText}>Password</Text>
+                  <View style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
+                    <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
+                  </View>
+                </View>
+                <Text style={styles.normalInfoText}>....</Text>
+              </View>
+            )}
         
+      </ScrollView>
       </View>
         
 
