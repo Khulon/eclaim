@@ -3,7 +3,9 @@ const cors = require('cors');
 const sql = require('mssql');
 const app = express();
 
-app.use(cors());
+app.use(cors( {
+  exposedHeaders: '*',
+}));
 app.use(express.json({limit: '50mb'}));
 
 var config = {
@@ -33,6 +35,7 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars')
 const path = require('path');
 const fs = require('fs');
+const e = require('express');
 
 /*
 
@@ -69,7 +72,7 @@ app.get('/', function (req, res) {
 });
 
 
-var port = process.env.port || process.env.PORT;
+var port = 5000 //process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -95,6 +98,8 @@ app.post('/register', (req, res) => {
 //Load all users on admin home page
 app.get('/admin', async (req, res) => {
   try {
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization');
+    res.setHeader('Access-Control-Request-Headers', '*');
     console.log(req.headers)
     var request = new sql.Request();
         
@@ -1083,7 +1088,7 @@ app.get('/management/:email', async (req, res) => {
       + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
       + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
-      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"'))")
+      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"' AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted')))")
       res.send(approverClaims.recordset)
 
     //Processor
