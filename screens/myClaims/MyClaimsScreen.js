@@ -25,7 +25,7 @@ export default function MyClaimsScreen({ navigation }) {
 
   async function fetchData() {
     const email = window.localStorage.getItem('session');
-    await fetch(`http://localhost:5000/myClaims/${email}`)
+    await fetch(`http://10.0.1.28:5000/myClaims/${email}`)
     .then((response) => response.json())
     .then((data) => {
       data = data.reverse()
