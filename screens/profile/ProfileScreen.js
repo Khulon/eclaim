@@ -230,9 +230,9 @@ export default function ProfileScreen({ navigation }) {
                   <Text style={styles.boldInfoText}>Password</Text>
                   <TouchableOpacity onPress={()=>setShowPassword(false)} onMouseEnter={()=> setIsEyeHover(true)} onMouseLeave={()=> setIsEyeHover(false)} style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
                     {isEyeHover ? (
-                      <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
-                    ) : (
                       <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
+                    ) : (
+                      <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -244,9 +244,9 @@ export default function ProfileScreen({ navigation }) {
                   <Text style={styles.boldInfoText}>Password</Text>
                   <TouchableOpacity onPress={()=>setShowPassword(true)} onMouseEnter={()=> setIsEyeHover(true)} onMouseLeave={()=> setIsEyeHover(false)} style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
                   {isEyeHover ? (
-                      <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
-                    ) : (
                       <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
+                    ) : (
+                      <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
                     )}
                   </TouchableOpacity>
                 </View>
