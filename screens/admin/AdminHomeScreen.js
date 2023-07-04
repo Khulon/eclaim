@@ -20,6 +20,7 @@ export default function AdminHomeScreen({ navigation }) {
   async function fetchData() {
      
     try {
+
       await fetch("http://10.0.1.28:5000/admin")
       .then((res) => res.json())
       .then((data) => {
