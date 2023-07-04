@@ -28,19 +28,19 @@ sql.connect(config, function (err) {
 });
 
 
-
 //Send email
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars')
 const path = require('path');
 const fs = require('fs');
 
+/*
 
 var server = app.listen(5000, function () {
   console.log('Server is running on port ' + server.address().port + '...');
 });
 
-/*
+
 const authentication = (req, res, next) => {
   //How to authenticate?
   //1. Check user is admin or not for /admin
@@ -69,6 +69,10 @@ app.get('/', function (req, res) {
 });
 
 
+var port = process.env.port || process.env.PORT;
+app.listen(port, () => {
+	console.log(port)
+})
 
 //User registers an account
 app.post('/register', (req, res) => {
@@ -1034,7 +1038,7 @@ app.post('/submitClaim', async (req, res) => {
       // Define the email message
       const mailOptions = {
         from: 'eclaim@engkong.com',
-        to: 'eclaim_test2@engkong.com', //change to approver_email
+        to: approver_email, //change to approver_email
         subject: 'New claim needs approval',
         html: htmlToSend,
         
@@ -1045,7 +1049,7 @@ app.post('/submitClaim', async (req, res) => {
 
       const confirmationMail = {
         from: 'eclaim@engkong.com',
-        to: 'eclaim_test1@engkong.com', //change to form_creator
+        to: form_creator, //change to form_creator
         subject: 'Claim submission confirmation email',
         html: conf,
       }
