@@ -34,6 +34,26 @@ const handlebars = require('handlebars')
 const path = require('path');
 const fs = require('fs');
 
+/*
+
+var server = app.listen(5000, function () {
+  console.log('Server is running on port ' + server.address().port + '...');
+});
+
+
+const authentication = (req, res, next) => {
+  //How to authenticate?
+  //1. Check user is admin or not for /admin
+  //2. Check for email of user for myClaims and myExpenses
+  //3. Check if user is approver/processor for /management
+  console.log("Authenticating...")
+  console.log(req)
+  next()
+  
+}
+
+//app.use(authentication) */
+
 
 app.get('/', function (req, res) {
     // create Request object
@@ -43,22 +63,16 @@ app.get('/', function (req, res) {
     request.query('SELECT * from Approvers;', function (err, rows) {
         
         if (err) console.log(err)
-
         // send records as a response
-        res.send({hi: 'hello'});
+        res.send(rows.recordset);
     });
 });
-
-
 
 
 var port = process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
-
-
-
 
 //User registers an account
 app.post('/register', (req, res) => {
@@ -81,7 +95,8 @@ app.post('/register', (req, res) => {
 //Load all users on admin home page
 app.get('/admin', async (req, res) => {
   try {
-  var request = new sql.Request();
+    console.log(req.headers)
+    var request = new sql.Request();
         
     // query to the database and get the records
     const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
@@ -312,7 +327,6 @@ app.post('/addClaim', async (req, res) => {
     costCenter = null;
   }
   let note = req.body.note;
-
   //Adding monthly claim
   if (expenseType == "Monthly") {
   
