@@ -12,6 +12,7 @@ export default function ProfileScreen({ navigation }) {
 
   const [isBackButtonHover, setIsBackButtonHover] = useState(false);
   const [ showPassword, setShowPassword ] = useState(false)
+  const [ isEyeHover, setIsEyeHover ] = useState(false)
 
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
   const image = window.localStorage.getItem('image')
@@ -209,9 +210,13 @@ export default function ProfileScreen({ navigation }) {
               <View style={styles.infomationContainer}>
                 <View>
                   <Text style={styles.boldInfoText}>Password</Text>
-                  <View style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
-                    <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
-                  </View>
+                  <TouchableOpacity onPress={()=>setShowPassword(false)} onMouseEnter={()=> setIsEyeHover(true)} onMouseLeave={()=> setIsEyeHover(false)} style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
+                    {isEyeHover ? (
+                      <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
+                    ) : (
+                      <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
+                    )}
+                  </TouchableOpacity>
                 </View>
                 <Text style={styles.normalInfoText}>{userDetails.password}</Text>
               </View>
@@ -219,9 +224,13 @@ export default function ProfileScreen({ navigation }) {
               <View style={styles.infomationContainer}>
                 <View>
                   <Text style={styles.boldInfoText}>Password</Text>
-                  <View style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
-                    <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
-                  </View>
+                  <TouchableOpacity onPress={()=>setShowPassword(true)} onMouseEnter={()=> setIsEyeHover(true)} onMouseLeave={()=> setIsEyeHover(false)} style={{position:'absolute', width:'30px', height:'30px', left:'90px', justifyContent:'center', alignItems:'center'}}>
+                  {isEyeHover ? (
+                      <Text><Ionicons name="eye-outline" color="black" size='20px'/></Text>
+                    ) : (
+                      <Text><Ionicons name="eye-off-outline" color="black" size='20px'/></Text>
+                    )}
+                  </TouchableOpacity>
                 </View>
                 <Text style={styles.normalInfoText}>....</Text>
               </View>
