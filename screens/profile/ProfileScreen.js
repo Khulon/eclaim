@@ -16,24 +16,6 @@ export default function ProfileScreen({ navigation }) {
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
   const image = window.localStorage.getItem('image')
 
-  
-  /*
-  useEffect( () => {
-    const email = window.localStorage.getItem('session');
-    fetch('http://10.0.1.28:5000/getProfile', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
-      body: JSON.stringify({email: email})
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      setUserProfile({...userProfile, email: data.email, name: data.name, company: data.company_prefix,
-         approver: data.approver_name, processor: data.processor_email, password: data.password})
-    });
-      
-  }, []); */
-
   const styles = StyleSheet.create({
     page: {
       height: "100%",

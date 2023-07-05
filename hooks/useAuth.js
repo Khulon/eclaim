@@ -21,7 +21,7 @@ export const AuthProvider = ({children}) => {
           window.localStorage.setItem('stackScreen', 'HomeStack');
           window.localStorage.setItem('image', resp.image);
           window.localStorage.setItem('details', JSON.stringify(resp.details));
-        
+          
           window.location.reload(false);
           
         } else {
@@ -33,7 +33,7 @@ export const AuthProvider = ({children}) => {
 
   async function logoutUser () {
     window.localStorage.clear();
-    window.location.reload(true);
+    window.location.reload(false);
   }; 
 
   const createUser = async (loginDetails) => {
