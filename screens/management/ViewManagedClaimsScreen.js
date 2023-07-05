@@ -56,7 +56,6 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
       });
 
-
       fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}`)
       .then((response) => response.json())
       .then((data) => {

@@ -18,13 +18,9 @@ export default function AdminHomeScreen({ navigation }) {
   }, []);
 
   async function fetchData() {
-     
     try {
 
-      await fetch("http://localhost:5000/admin", {
-        method: 'GET',
-        headers: {'Authorization': 'admin'}
-      })
+      fetch('http://10.0.1.28:5000/admin')
       .then((res) => res.json())
       .then((data) => {
         console.log(data.users)

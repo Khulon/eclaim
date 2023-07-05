@@ -1,12 +1,18 @@
 const express = require('express');
+const LocalStorage = require('node-localstorage').LocalStorage
+const fs = require('fs');
+const nodemailer = require('nodemailer');
+const handlebars = require('handlebars')
+const path = require('path');
 const cors = require('cors');
 const sql = require('mssql');
 const app = express();
+var localStorage = new LocalStorage('./scratch');
 
-app.use(cors( {
-  exposedHeaders: '*',
-}));
+
+app.use(cors());
 app.use(express.json({limit: '50mb'}));
+
 
 var config = {
     user:'eclaim',
@@ -30,37 +36,24 @@ sql.connect(config, function (err) {
 });
 
 
-//Send email
-const nodemailer = require('nodemailer');
-const handlebars = require('handlebars')
-const path = require('path');
-const fs = require('fs');
-const e = require('express');
-
 /*
 
 var server = app.listen(5000, function () {
   console.log('Server is running on port ' + server.address().port + '...');
 });
+*/
 
-
-const authentication = (req, res, next) => {
-  //How to authenticate?
-  //1. Check user is admin or not for /admin
-  //2. Check for email of user for myClaims and myExpenses
-  //3. Check if user is approver/processor for /management
-  console.log("Authenticating...")
-  console.log(req)
-  next()
-  
-}
-
-//app.use(authentication) */
+var port = 5000 //process.env.port || process.env.PORT;
+app.listen(port, () => {
+	console.log(port)
+})
 
 
 app.get('/', function (req, res) {
     // create Request object
-    var request = new sql.Request();
+    var request = new sql.Request();0
+    
+    console.log(localStorage.getItem('session'))
         
     // query to the database and get the records
     request.query('SELECT * from Approvers;', function (err, rows) {
@@ -72,10 +65,6 @@ app.get('/', function (req, res) {
 });
 
 
-var port = 5000 //process.env.port || process.env.PORT;
-app.listen(port, () => {
-	console.log(port)
-})
 
 //User registers an account
 app.post('/register', (req, res) => {
@@ -98,9 +87,9 @@ app.post('/register', (req, res) => {
 //Load all users on admin home page
 app.get('/admin', async (req, res) => {
   try {
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization');
-    res.setHeader('Access-Control-Request-Headers', '*');
-    console.log(req.headers)
+    if(localStorage.getItem('session') != 'admin') {
+      throw new Error('Forbidden')
+    }
     var request = new sql.Request();
         
     // query to the database and get the records
@@ -114,12 +103,10 @@ app.get('/admin', async (req, res) => {
     res.send({users: users.recordset, departments: departments.recordset, companies: companies.recordset});
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: 'Error!'});
   }
 
 });
-
-
 
 
 
@@ -140,9 +127,6 @@ app.post('/admin/editUser', async (req, res) => {
    }
 
 });
-
-
-
 
 
 //Admin edits user details
@@ -274,9 +258,11 @@ app.post('/admin/addUser', async (req, res) => {
 
 
 
+
 //User to login
 app.post('/login', async (req, res) => {
   try {
+    
     let email = req.body.companyEmail;
     let password = req.body.password;
     var request = new sql.Request();
@@ -286,6 +272,7 @@ app.post('/login', async (req, res) => {
 
     //Admin login
     if (count == 1) {
+      localStorage.setItem('session', 'admin')
       res.send({ email: email, userType: "Admin", message: "Login Successful!"});	
 
     } else {
@@ -302,7 +289,11 @@ app.post('/login', async (req, res) => {
 
         let records = result.recordset[0];
 
+        localStorage.setItem('session', 'normal')
+        localStorage.setItem('user', email)
+        
         res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name,message: "Login Successful!", details: records});
+        
 
       } else {
         res.json({message: "Login Failed!"});
@@ -313,8 +304,6 @@ app.post('/login', async (req, res) => {
     res.json({message: "Login Failed!"});
 }
 });
-
-
 
 
 
@@ -511,6 +500,11 @@ app.post('/uploadImage', async (req, res) => {
 app.get('/myClaims/:email', async (req, res) => {
   try {
     const { email } = req.params;
+
+    if (localStorage.getItem('user') != null && localStorage.getItem('user') != email) {
+        throw new Error("Forbidden")
+    }
+    
     var request = new sql.Request();
   
     const queryString = 'SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to,'
@@ -534,7 +528,10 @@ app.get('/getExpenses/:user/:id', async (req, res) => {
   const { id, user } = req.params;
   var request = new sql.Request();
 
-try {
+  try {
+    if (localStorage.getItem('user') != null && localStorage.getItem('user') != email) {
+      throw new Error("Forbidden")
+    }
     //Check who is form creator
     const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
     request.input('claimId', sql.Int, id);
@@ -737,6 +734,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
 //Get travelling expense types from database
 app.get('/getTravellingExpenseTypes', async (req, res) => {
   try {
+    
     var request = new sql.Request();
     const result = await request.query("SELECT * FROM TravellingExpenseTypes");
     res.send(result.recordset);
@@ -751,6 +749,7 @@ app.get('/getTravellingExpenseTypes', async (req, res) => {
 //Get monthly expense types from database
 app.get('/getMonthlyExpenseTypes', async (req, res) => {
   try {
+    
     var request = new sql.Request();
     const result = await request.query("SELECT * FROM MonthlyExpenseTypes");
     res.send(result.recordset);
@@ -1077,7 +1076,13 @@ app.post('/submitClaim', async (req, res) => {
 //load management claims
 app.get('/management/:email', async (req, res) => {
   try {
+  
     const { email } = req.params;
+
+    if (localStorage.getItem('user') != null && localStorage.getItem('user') != email) {
+      throw new Error("Forbidden")
+    }
+
     var request = new sql.Request();
     const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
     const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
@@ -1087,8 +1092,8 @@ app.get('/management/:email', async (req, res) => {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
       + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
-      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
-      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"' AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted')))")
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name)) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
+      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"' AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted'))")
       res.send(approverClaims.recordset)
 
     //Processor
@@ -1570,10 +1575,37 @@ app.post('/processorRejectClaim', async (req, res) => {
 })
 
 app.get('/getHistory/:id/:status', async (req, res) => {
-  const { id, status} = req.params;
-
+  const { id, status} = req.params;   
+  
   try {
+    let email = localStorage.getItem('user')
     var request = new sql.Request();
+
+    const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
+    const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
+
+    if(checkApprover.recordset[0].count >= 1) {
+      
+      const approverClaims = await request.query("SELECT COUNT(*) AS count FROM (SELECT C.id FROM Claims C"
+      + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
+      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name)) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
+      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"' AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted'))) AS numbers WHERE id = "+id+"")
+      
+      if(approverClaims.recordset[0].count != 1) {
+        throw new Error('Forbidden')
+      }
+    
+    } else if(checkProcessor.recordset[0].count == 1) {
+      
+      const processorClaims = await request.query("SELECT COUNT(*) AS count FROM (SELECT C.id FROM Claims C"
+      + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
+      + " WHERE P.processor_email = '"+email+"')) AS numbers WHERE id = "+id+"")
+
+      if(processorClaims.recordset[0].count != 1) {
+        throw new Error('Forbidden')
+      }
+    }
+
     const check = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND status = 'Rejected'")
     //get all approvers so far
     if(status == 'Approved' || status == 'Pending Next Approval' || status == 'Processed') {
