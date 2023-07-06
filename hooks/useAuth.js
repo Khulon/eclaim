@@ -32,8 +32,13 @@ export const AuthProvider = ({children}) => {
   }; 
 
   async function logoutUser () {
-    window.localStorage.clear();
-    window.location.reload(false);
+    try {
+      window.localStorage.clear();
+      window.location.reload(false);
+    } catch (error) {
+      console.log(error)
+    }
+
   }; 
 
   const createUser = async (loginDetails) => {
