@@ -483,12 +483,12 @@ app.post('/uploadImage', async (req, res) => {
     request.input('image', sql.VarChar, image)
     await request.query(query);
     
-    res.send({message: "Image updated successfully!"});
+    res.send({error:false, message: "Image updated successfully!"});
 
 
   } catch (err) {
     console.log(err)
-    res.send({message: "Failed to upload image!"});
+    res.send({error:true, message: "Failed to upload image!"});
   }
 
 });

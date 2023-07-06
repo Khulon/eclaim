@@ -282,7 +282,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           <Tooltip text={'Fuel Expense'}>
             <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
           </Tooltip>
-        ):type=='Vehicle_repair'?(
+        ):type=='Vehicle Repair'?(
           <Tooltip text={'Vehicle Repair Expense'}>
             <Ionicons  name="construct-outline" color="#444" size="25px"/>
           </Tooltip>
