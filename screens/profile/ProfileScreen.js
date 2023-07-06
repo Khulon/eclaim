@@ -44,7 +44,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={styles.page}>
-      <View style={styles.pageLogin}>
+      <View style={styles.defaultPage}>
 
         <View style={{width:'100%', height:'100px', justifyContent:'flex-end', alignItems:'center'}}>
           <View style={{width:'84%', flexDirection:'row', height:'50px', alignItems:'center', justifyContent:'space-between'}}>
@@ -138,13 +138,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     fontFamily: "Arial",
   },
-  pageLogin: {
+  defaultPage: {
     width: "100%",
     flexGrow:1,
     backgroundColor: '#fff',
     alignItems: 'center',
     flexDirection: "column",
-    
   },
   content: {
     width:'100%',
@@ -155,12 +154,6 @@ const styles = StyleSheet.create({
   bottomNavigation: {
     width:'100%',
     height: '70px'
-
-  },
-  text: {
-    fontSize: "17px",
-    fontWeight: "700",
-    fontFamily: "inherit",
   },
   displayContainer: {
     width:'100%',
@@ -187,7 +180,6 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center',
   },
-  
   boldInfoText: {
     padding:'5px',
     fontWeight:'700',
@@ -198,5 +190,4 @@ const styles = StyleSheet.create({
     color:'#444',
     fontSize:'15px'
   },
-
 });
