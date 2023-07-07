@@ -43,7 +43,7 @@ var server = app.listen(5000, function () {
 });
 */
 
-var port = 5000 //process.env.port || process.env.PORT;
+var port = process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -95,7 +95,7 @@ app.get('/admin', async (req, res) => {
     // query to the database and get the records
     const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
     + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
-    + ' JOIN Processors P ON E.company_prefix = P.company WHERE approver_name IS NULL OR (E.email != approver_name AND processor_email IS NULL)')
+    + ' JOIN Processors P ON E.company_prefix = P.company WHERE approver_name IS NULL OR (E.email != approver_name)')
 
     const departments = await request.query('SELECT department_name FROM Departments')
     const companies = await request.query('SELECT prefix FROM Companies')
@@ -529,7 +529,7 @@ app.get('/getExpenses/:user/:id', async (req, res) => {
   var request = new sql.Request();
 
   try {
-    if (localStorage.getItem('user') != null && localStorage.getItem('user') != email) {
+    if (localStorage.getItem('user') != null && localStorage.getItem('user') != user) {
       throw new Error("Forbidden")
     }
     //Check who is form creator
