@@ -2,14 +2,14 @@ import { StyleSheet, TouchableOpacity, Animated} from 'react-native';
 import React, { useRef, useState } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../assets/animation/AllAnimations';
 
-export default function DefaultButton({description, onPress, customStyle}) {
+export default function DefaultButton({description, onPress, customStyle, buttonColor}) {
 
     const buttonHover = useRef(new Animated.Value(0)).current;
 
     const styles = StyleSheet.create({
         defaultButton: {
             fontFamily: "inherit",
-            backgroundColor: "#E04F4F",
+            backgroundColor: buttonColor == null ? "#E04F4F" : (buttonColor),
             border: "none",
         
             padding: "10px",
