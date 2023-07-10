@@ -222,7 +222,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
 
   function deleteUser(userDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/deleteUser', {
+    fetch('http://localhost:5000/admin/deleteUser', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(userDetails)})
@@ -248,7 +248,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
     console.log(userDepartments)
     console.log(userDetails)
     const header = {'Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/editUser/save', {
+    fetch('http://localhost:5000/admin/editUser/save', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(userDetails)})

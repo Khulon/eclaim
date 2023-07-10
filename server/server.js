@@ -87,6 +87,7 @@ app.post('/register', (req, res) => {
 //Load all users on admin home page
 app.get('/admin', async (req, res) => {
   try {
+    console.log(localStorage.getItem('session'))
     if(localStorage.getItem('session') != 'admin') {
       throw new Error('Forbidden')
     }
@@ -153,25 +154,37 @@ app.post('/admin/editUser/save', async (req, res) => {
     }
   }
 
-  if(isApprover == 'No') {
-    approvingDepartments = [];
-  }
+  
+  
 
   var queryString = ""
-  for(var i = 0; i < approvingDepartments.length; i++) {
-    queryString += "UPDATE Approvers SET approver_name = '"+newEmail+"' WHERE department = '"+approvingDepartments[i]+"';"
+
+  if(isApprover == 'No') {
+    approvingDepartments = [];
+    queryString = "UPDATE Approvers SET approver_name = null WHERE approver_name = '"+newEmail+"'";
   }
+
+  if(isApprover == 'Yes') {
+    for(var i = 0; i < approvingDepartments.length; i++) {
+      queryString += "UPDATE Approvers SET approver_name = '"+newEmail+"' WHERE department = '"+approvingDepartments[i]+"'; "
+    }
+  }
+
+  console.log(name)
   console.log(insertDpts)
-  console.log(approvingDepartments)
+  console.log(queryString)
+
   var request = new sql.Request();
   try{
       await request.query("SET XACT_ABORT ON " 
       + "BEGIN TRANSACTION "
       + "UPDATE Employees SET name = '"+name+"', company_prefix = '"+company+"', email = '"+newEmail+"', supervisor = '"+isSupervisor+"'"
       + ", approver = '"+isApprover+"', processor = '"+isProcessor+"' WHERE email = '"+oldEmail+"'"
-      + "DELETE FROM BelongsToDepartments WHERE email = '"+oldEmail+"'; "
+      + "DELETE FROM BelongsToDepartments WHERE email = '"+newEmail+"'; "
         + "INSERT INTO BelongsToDepartments VALUES" + insertDpts
         + queryString + " COMMIT TRANSACTION");
+      
+      localStorage.setItem('user', newEmail)
 
       res.send({message: "User Updated!"})
 
@@ -212,7 +225,6 @@ app.post('/admin/deleteUser', async (req, res) => {
 
 
 
-
 //Admin adds user
 app.post('/admin/addUser', async (req, res) => {
   let name = req.body.name;
@@ -237,6 +249,8 @@ app.post('/admin/addUser', async (req, res) => {
     request.input('isSupervisor', sql.VarChar, isSupervisor)
     request.input('profile', sql.VarChar, null)
     await request.query(query)
+
+    console.log(departments)
     
     for(var i = 0; i < departments.length; i++) {
       request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')")
@@ -527,13 +541,14 @@ app.get('/myClaims/:email', async (req, res) => {
 app.get('/getExpenses/:user/:id', async (req, res) => {
   const { id, user } = req.params;
   var request = new sql.Request();
+  console.log(user)
+  console.log(localStorage.getItem('user'))
 
   try {
     /*
     if (localStorage.getItem('user') != null && localStorage.getItem('user') != user) {
       throw new Error("Forbidden")
-    }
-    */
+    } */
     //Check who is form creator
     const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
     request.input('claimId', sql.Int, id);
@@ -1044,7 +1059,7 @@ app.post('/submitClaim', async (req, res) => {
       // Define the email message
       const mailOptions = {
         from: 'eclaim@engkong.com',
-        to: approver_email, //change to approver_email
+        to: approver_email, 
         subject: 'New claim needs approval',
         html: htmlToSend,
         
@@ -1055,7 +1070,7 @@ app.post('/submitClaim', async (req, res) => {
 
       const confirmationMail = {
         from: 'eclaim@engkong.com',
-        to: form_creator, //change to form_creator
+        to: form_creator, 
         subject: 'Claim submission confirmation email',
         html: conf,
       }
@@ -1230,7 +1245,7 @@ app.post('/approveClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: recipient,//change back to recipient
+      to: recipient,
       subject: subject,
       html: htmlToSend,
       
@@ -1241,7 +1256,7 @@ app.post('/approveClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: approver,//change back to approver
+      to: approver,
       subject: confirmationSubject, 
       html: conf,
     }
@@ -1328,7 +1343,7 @@ app.post('/processClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: form_creator, //change to form_creator
+      to: form_creator, 
       subject: 'Your Claim has been processed',
       html: htmlToSend,
       
@@ -1339,7 +1354,7 @@ app.post('/processClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: processor, //change to processor
+      to: processor, 
       subject: 'You have processed a claim',
       html: conf,
     }
@@ -1458,7 +1473,7 @@ app.post('/approverRejectClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: recipient, //change to recipient
+      to: recipient,
       subject: subject,
       html: htmlToSend,
       
@@ -1469,7 +1484,7 @@ app.post('/approverRejectClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: approver, //change to approver
+      to: approver, 
       subject: 'You have rejected a claim',
       html: conf,
     }
@@ -1551,7 +1566,7 @@ app.post('/processorRejectClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: approver,  //change to approver
+      to: approver,  
       subject: 'A claim approved by you has been rejected',
       html: htmlToSend,
       
@@ -1562,7 +1577,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: processor, //change to processor
+      to: processor, 
       subject: 'You have rejected a claim',
       html: conf,
     }
