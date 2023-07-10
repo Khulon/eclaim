@@ -22,7 +22,7 @@ export default function ManagementScreen({ navigation }) {
 
   async function fetchData() {
     const email = userDetails.email
-    await fetch(`http://localhost:5000/management/${email}`)
+    await fetch(`http://10.0.1.28:5000/management/${email}`)
     .then((response) => response.json())
     .then((data) => {
       console.log(data)
