@@ -7,7 +7,6 @@ export default function StartScreen({ navigation }) {
   return (
     <View style={styles.page}>
       <View style={styles.pageLogin}>
-
         <View style={{alignItems: 'center', justifyContent: 'center', height: "70%"}}>
           <Image 
             style={{width: 120, height: 120}}

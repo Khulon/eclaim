@@ -25,7 +25,8 @@ export default function ProfileScreen({ navigation }) {
     if (!result.canceled) {
       window.localStorage.setItem('image', result.uri);
     }
-    fetch('http://10.0.1.28:5000/uploadImage', {
+
+    fetch('http://localhost:5000/uploadImage', {
       method: 'POST',
       headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
       body: JSON.stringify({email: userDetails.email, image: result.uri})
