@@ -103,7 +103,7 @@ export default function AdminHomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  const renderItem = ({item}) => {=
+  const renderItem = ({item}) => {
     const backgroundColor = item.email === selectedId ? '#EEEEEE' : 'white';
     const transform = item.email === selectedId ? [{translateX: 2 }] : [{translateX: 0 }];
     return (
