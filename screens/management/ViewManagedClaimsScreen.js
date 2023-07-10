@@ -87,7 +87,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       minWidth: "330px",
       backgroundColor: '#fff',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'flex-end',
       fontFamily: "Arial",
     },
     loadingPage: {
@@ -102,7 +102,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     },
     pageDefault: {
       width: "100%",
-      height: "90%",
+      height: "95%",
       backgroundColor: '#fff',
       alignItems: 'center',
       flexDirection: "column",
@@ -135,10 +135,10 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
     bottomCard: {
       bottom: "0",
-      height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed") ? "70px" : "100px",
+      height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed" || claim.status == "Rejected") ? "90px" : "140px",
       width:"100%",
       alignItems: "center",
-      justifyContent: "flex-end",
+      justifyContent: "flex-start",
       flexDirection: "column",
       borderTopWidth: "2px",
       borderColor: "#DADADA",

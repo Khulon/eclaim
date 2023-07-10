@@ -91,7 +91,7 @@ export default function EditClaimScreen({ navigation, route}) {
       minWidth: "330px",
       backgroundColor: '#fff',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'flex-end',
       fontFamily: "Arial",
     },
     loadingPage: {
@@ -106,7 +106,7 @@ export default function EditClaimScreen({ navigation, route}) {
     },
     pageDefault: {
       width: "100%",
-      height: "90%",
+      height: "95%",
       backgroundColor: '#fff',
       alignItems: 'center',
       flexDirection: "column",
@@ -145,10 +145,10 @@ export default function EditClaimScreen({ navigation, route}) {
 
     bottomCard: {
       bottom: "0",
-      height: claim.current.status == 'In Progress' || claim.current.status == 'Rejected' ? "100px" : '70px',
+      height: claim.current.status == 'In Progress' || claim.current.status == 'Rejected' ? "140px" : '90px',
       width:"100%",
       alignItems: "center",
-      justifyContent: "flex-end",
+      justifyContent: "flex-start",
       flexDirection: "column",
       borderTopWidth: "2px",
       borderColor: "#DADADA",
