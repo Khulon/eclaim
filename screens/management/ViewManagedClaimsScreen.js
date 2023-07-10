@@ -29,19 +29,22 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const monthlyPeriod = parseDatePeriod(claim.pay_period_from, claim.pay_period_to)
   const travellingPeriod = parseDatePeriod(claim.period_from, claim.period_to)
 
+  
   useEffect(() => {
     if (isFocused) {
       setIsLoading(true)
       fetchData()
     }
-  }, [isFocused]);
+    
+  }, [isFocused]); 
 
   async function fetchData() {
     try {
       const id = claim.id;
       const user = claim.form_creator;
       const status = claim.status;
-      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}`)
+      const token  = window.localStorage.getItem('token');
+      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -58,7 +61,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           }
         }
       });
-      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}`)
+
+      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -120,7 +124,9 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   } else {
     parsedDate = monthlyPeriod
   }
+  
   const user = window.localStorage.getItem('session')
+
   function approveClaim(claim) {
     fetch('http://10.0.1.28:5000/approveClaim', {
       method: 'POST',

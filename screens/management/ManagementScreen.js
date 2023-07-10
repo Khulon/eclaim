@@ -16,14 +16,16 @@ export default function ManagementScreen({ navigation }) {
   const [selectedId, setSelectedId] = useState('');
   const [search, setSearch] = useState('')
 
+  
   useEffect(() => {
     setIsLoading(true)
     fetchData()
-  }, []);
-
+  }, []); 
+ 
   async function fetchData() {
     const email = userDetails.email
-    await fetch(`http://10.0.1.28:5000/management/${email}`)
+    const token = window.localStorage.getItem('token');
+    await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
     .then((response) => response.json())
     .then((data) => {
       console.log(data)

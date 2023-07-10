@@ -34,8 +34,9 @@ export default function EditClaimScreen({ navigation, route}) {
     try {
       const id = claim.current.id;
       const user = window.localStorage.getItem('session');
+      const token = window.localStorage.getItem('token');
       let [res1, res2, res3] = await Promise.all([
-      fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}`)
+      fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         setFullData(data);

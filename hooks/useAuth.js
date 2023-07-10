@@ -21,6 +21,7 @@ export const AuthProvider = ({children}) => {
           window.localStorage.setItem('stackScreen', 'HomeStack');
           window.localStorage.setItem('image', resp.image);
           window.localStorage.setItem('details', JSON.stringify(resp.details));
+          window.localStorage.setItem('token', resp.token)
           
           window.location.reload(false);
           
