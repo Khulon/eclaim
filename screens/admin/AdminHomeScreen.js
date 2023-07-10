@@ -11,6 +11,7 @@ export default function AdminHomeScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const { logoutUser } = useAuth();
 
   useEffect(() => {
     setIsLoading(true)
@@ -262,15 +263,8 @@ export default function AdminHomeScreen({ navigation }) {
     )
   }
 
-  const { logoutUser } = useAuth();
 
-  async function handleLogOut() {
-    try {
-      logoutUser();
-    } catch (error) {
-      console.log(error);
-    }
-  }
+
 
   return (
     <View style={styles.page}>
@@ -282,7 +276,7 @@ export default function AdminHomeScreen({ navigation }) {
       <View style={styles.topCard}>
         <View style={{width:'100%', flexDirection:'row',paddingBottom:"15px"}}>
           <View style={{width:'23%', position:'absolute', alignItems:'center'}}>
-            <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => handleLogOut()}>
+            <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={() => logoutUser()}>
             <View style={styles.backButton}>
               <Text><Ionicons name="log-out-outline" color="#444" size='large'/></Text>
             </View>

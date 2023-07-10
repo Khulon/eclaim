@@ -334,7 +334,7 @@ export default function EditClaimScreen({ navigation, route}) {
           <Tooltip text={'Fuel Expense'}>
             <Ionicons  name="color-fill-outline" color="#444" size="25px"/>
           </Tooltip>
-        ):type=='Vehicle_repair'?(
+        ):type=='Vehicle Repair'?(
           <Tooltip text={'Vehicle Repair Expense'}>
             <Ionicons  name="construct-outline" color="#444" size="25px"/>
           </Tooltip>
@@ -444,7 +444,7 @@ export default function EditClaimScreen({ navigation, route}) {
             </View>
             </TouchableOpacity>
           </View>
-          {userDetails.email == claim.current.form_creator && claim.status == 'In Progress' ? (
+          {userDetails.email == claim.current.form_creator && claim.current.status == 'In Progress' ? (
             <View style={{width:'23%', alignItems:'center'}}>
             <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDeleteButtonHover(true)} onMouseLeave={() => setIsDeleteButtonHover(false)} 
             onPress={() => ConfirmationButton('Are you sure you want to delete this claim?', 'This action cannot be undone',() => handleDeleteClaim(claim))}>
