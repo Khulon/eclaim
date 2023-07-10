@@ -529,9 +529,11 @@ app.get('/getExpenses/:user/:id', async (req, res) => {
   var request = new sql.Request();
 
   try {
+    /*
     if (localStorage.getItem('user') != null && localStorage.getItem('user') != user) {
       throw new Error("Forbidden")
     }
+    */
     //Check who is form creator
     const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
     request.input('claimId', sql.Int, id);
@@ -1228,7 +1230,7 @@ app.post('/approveClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test2@engkong.com',//change back to recipient
+      to: recipient,//change back to recipient
       subject: subject,
       html: htmlToSend,
       
@@ -1239,7 +1241,7 @@ app.post('/approveClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test1@engkong.com',//change back to approver
+      to: approver,//change back to approver
       subject: confirmationSubject, 
       html: conf,
     }
@@ -1326,7 +1328,7 @@ app.post('/processClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test2@engkong.com', //change to form_creator
+      to: form_creator, //change to form_creator
       subject: 'Your Claim has been processed',
       html: htmlToSend,
       
@@ -1337,7 +1339,7 @@ app.post('/processClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test1@engkong.com', //change to processor
+      to: processor, //change to processor
       subject: 'You have processed a claim',
       html: conf,
     }
@@ -1456,7 +1458,7 @@ app.post('/approverRejectClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test2@engkong.com', //change to form_creator
+      to: recipient, //change to recipient
       subject: subject,
       html: htmlToSend,
       
@@ -1467,7 +1469,7 @@ app.post('/approverRejectClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test1@engkong.com', //change to approver
+      to: approver, //change to approver
       subject: 'You have rejected a claim',
       html: conf,
     }
@@ -1549,7 +1551,7 @@ app.post('/processorRejectClaim', async (req, res) => {
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test2@engkong.com',  //change to approver
+      to: approver,  //change to approver
       subject: 'A claim approved by you has been rejected',
       html: htmlToSend,
       
@@ -1560,7 +1562,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
-      to: 'eclaim_test1@engkong.com', //change to processor
+      to: processor, //change to processor
       subject: 'You have rejected a claim',
       html: conf,
     }
