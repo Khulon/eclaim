@@ -7,7 +7,7 @@ export const AuthProvider = ({children}) => {
 
   async function loginUser (loginDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/login', {
+    await fetch('http://10.0.1.28:5000/login', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify(loginDetails)})
@@ -21,6 +21,7 @@ export const AuthProvider = ({children}) => {
           window.localStorage.setItem('stackScreen', 'HomeStack');
           window.localStorage.setItem('image', resp.image);
           window.localStorage.setItem('details', JSON.stringify(resp.details));
+          window.localStorage.setItem('token', resp.token)
           
           window.location.reload(false);
           
@@ -43,7 +44,7 @@ export const AuthProvider = ({children}) => {
 
   const createUser = async (loginDetails) => {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/register', {
+    await fetch('http://10.0.1.28:5000/register', {
       method: 'POST',	
       headers: header,
       body: JSON.stringify(loginDetails)})

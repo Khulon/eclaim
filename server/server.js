@@ -1,13 +1,13 @@
 const express = require('express');
-const LocalStorage = require('node-localstorage').LocalStorage
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars')
 const path = require('path');
 const cors = require('cors');
 const sql = require('mssql');
+const jwt = require('jsonwebtoken');
 const app = express();
-var localStorage = new LocalStorage('./scratch');
+var tokenSecret = require('crypto').randomBytes(64).toString('hex')
 
 
 app.use(cors());
@@ -49,11 +49,32 @@ app.listen(port, () => {
 })
 
 
+function generateAccessToken(username) {
+  return jwt.sign(username, tokenSecret);
+}
+
+
+async function authenticateToken(req, res, next) {
+  const {token} = req.params
+  if (token == null) return res.sendStatus(401)
+
+  try {
+    const decoded = jwt.verify(token, tokenSecret)
+    var request = new sql.Request();
+    const result = await request.query("SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+decoded.email+"' AND password = '"+decoded.password+"'")
+    if(result.recordset[0].count != 1) return res.sendStatus(403)
+    next()
+
+  } catch(err) {
+    console.log(err)
+    return res.sendStatus(403)
+  }
+} 
+
+
 app.get('/', function (req, res) {
     // create Request object
-    var request = new sql.Request();0
-    
-    console.log(localStorage.getItem('session'))
+    var request = new sql.Request();
         
     // query to the database and get the records
     request.query('SELECT * from Approvers;', function (err, rows) {
@@ -85,12 +106,8 @@ app.post('/register', (req, res) => {
 
 
 //Load all users on admin home page
-app.get('/admin', async (req, res) => {
+app.get('/admin/:token', authenticateToken, async (req, res) => {
   try {
-    console.log(localStorage.getItem('session'))
-    if(localStorage.getItem('session') != 'admin') {
-      throw new Error('Forbidden')
-    }
     var request = new sql.Request();
         
     // query to the database and get the records
@@ -184,7 +201,7 @@ app.post('/admin/editUser/save', async (req, res) => {
         + "INSERT INTO BelongsToDepartments VALUES" + insertDpts
         + queryString + " COMMIT TRANSACTION");
       
-      localStorage.setItem('user', newEmail)
+      //localStorage.setItem('user', newEmail)
 
       res.send({message: "User Updated!"})
 
@@ -286,8 +303,10 @@ app.post('/login', async (req, res) => {
 
     //Admin login
     if (count == 1) {
-      localStorage.setItem('session', 'admin')
-      res.send({ email: email, userType: "Admin", message: "Login Successful!"});	
+
+      const token = generateAccessToken({ email: email, password: password });
+      console.log(token)
+      res.send({ email: email, userType: "Admin", token: token, message: "Login Successful!"});	
 
     } else {
       const result = await request.query(statement)
@@ -303,10 +322,10 @@ app.post('/login', async (req, res) => {
 
         let records = result.recordset[0];
 
-        localStorage.setItem('session', 'normal')
-        localStorage.setItem('user', email)
-        
-        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name,message: "Login Successful!", details: records});
+       
+        const token = generateAccessToken({ email: email, password: password });
+        console.log(token)
+        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records});
         
 
       } else {
@@ -508,16 +527,32 @@ app.post('/uploadImage', async (req, res) => {
 });
 
 
+async function authenticateUser(req, res, next) {
+  const {email, token} = req.params
+  if (token == null) return res.sendStatus(401)
+
+  try {
+    const decoded = jwt.verify(token, tokenSecret)
+    var request = new sql.Request();
+    console.log(email)
+    console.log(decoded.email)
+    console.log(decoded.password)
+    const password = await request.query("SELECT password FROM Accounts WHERE email = '"+decoded.email+"'")
+    console.log(password.recordset[0].password)
+    if(decoded.email != email || decoded.password != password.recordset[0].password) return res.sendStatus(403)
+    next()
+
+  } catch(err) {
+    console.log(err)
+    return res.sendStatus(403)
+  }
+} 
 
 
 //Load all user's claims on MyClaims page
-app.get('/myClaims/:email', async (req, res) => {
+app.get('/myClaims/:email/:token', authenticateUser, async (req, res) => {
   try {
     const { email } = req.params;
-
-    if (localStorage.getItem('user') != null && localStorage.getItem('user') != email) {
-        throw new Error("Forbidden")
-    }
     
     var request = new sql.Request();
   
@@ -537,18 +572,96 @@ app.get('/myClaims/:email', async (req, res) => {
 });
 
 
-//get expenses for claim
-app.get('/getExpenses/:user/:id', async (req, res) => {
-  const { id, user } = req.params;
-  var request = new sql.Request();
-  console.log(user)
-  console.log(localStorage.getItem('user'))
+async function expenseAuthentication (req, res, next) {
+  const {id, token} = req.params
+  if (token == null) return res.sendStatus(401)
 
   try {
-    /*
-    if (localStorage.getItem('user') != null && localStorage.getItem('user') != user) {
-      throw new Error("Forbidden")
-    } */
+    const decoded = jwt.verify(token, tokenSecret)
+    var request = new sql.Request();
+    const status = await request.query("SELECT status FROM Claims WHERE id = '"+id+"'")
+    const claimees = await request.query("SELECT claimee from Claimees WHERE form_id = "+id+"")
+    const firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = "+id+"))")
+    var nextApprover;
+    const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = "+id+"))")
+    var processor = findProcessor.recordset[0].processor_email
+
+    if(status.recordset[0].status == "Pending Next Approval") {
+      const next_Approver = await request.query("SELECT next_recipient FROM Claims WHERE id = "+id+"")
+      nextApprover = next_Approver.recordset[0].next_recipient
+      if(nextApprover == decoded.email) {
+        return next()
+      }
+    }
+    //check all claimees
+    for (var i = 0; i < claimees.recordset.length; i++) {
+      if(claimees.recordset[i].claimee == decoded.email) {
+        return next()
+      }
+    }
+
+    if(status.recordset[0].status == 'Submitted') {
+      //check for first approver
+      if(firstApprover.recordset[0].approver_name == decoded.email) {
+        return next()
+      }
+    } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
+      //everyone
+      const managers = await request.query("SELECT person FROM History WHERE id = "+id+" AND status != 'Created' AND status != 'Submitted'")
+      for (var i = 0; i < managers.recordset.length; i++) {
+        if(managers.recordset[i].person == decoded.email) {
+          return next()
+        }
+      }
+      if(processor == decoded.email) {
+        return next()
+      }
+    }
+    //check if claim has been deleted
+    const deleteCheck = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND status = 'Deleted'")
+
+    if(deleteCheck.recordset[0].count > 0) {
+      //deleted before
+      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND date > (SELECT TOP 1 date FROM History WHERE id = "+id+" AND status = 'Deleted' ORDER BY date DESC) AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
+      //rejected before
+      if(checkReject.recordset[0].count > 0) {
+        const managers = await request.query("SELECT person FROM History WHERE id = "+id+" AND status != 'Created' AND status != 'Submitted' AND date > (SELECT TOP 1 date FROM History WHERE id = "+id+" AND status = 'Deleted' ORDER BY date DESC)")
+        for (var i = 0; i < managers.recordset.length; i++) {
+          if(managers.recordset[i].person == decoded.email) {
+            return next()
+          }
+        }
+      }
+
+    } else {
+      //not deleted before
+      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
+      //rejected before
+      if(checkReject.recordset[0].count > 0) {
+        const managers = await request.query("SELECT person FROM History WHERE id = "+id+" AND status != 'Created' AND status != 'Submitted'")
+        for (var i = 0; i < managers.recordset.length; i++) {
+          if(managers.recordset[i].person == decoded.email) {
+            return next()
+          }
+        }
+      
+      }
+    }
+    return res.sendStatus(403)
+  } catch(err) {
+    console.log(err)
+    return res.sendStatus(403)
+  }
+} 
+
+
+//get expenses for claim
+app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res) => {
+  const { id, user } = req.params;
+  var request = new sql.Request();
+
+  try {
+
     //Check who is form creator
     const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
     request.input('claimId', sql.Int, id);
@@ -1091,14 +1204,10 @@ app.post('/submitClaim', async (req, res) => {
 
 
 //load management claims
-app.get('/management/:email', async (req, res) => {
+app.get('/management/:email/:token', authenticateUser, async (req, res) => {
   try {
   
     const { email } = req.params;
-
-    if (localStorage.getItem('user') != null && localStorage.getItem('user') != email) {
-      throw new Error("Forbidden")
-    }
 
     var request = new sql.Request();
     const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
@@ -1513,8 +1622,8 @@ app.post('/processorRejectClaim', async (req, res) => {
     let description = req.body.description
     const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     //check previous status
-    const previousApprover = await request.query("SELECT next_recipient FROM Claims where id = "+id+"")
-    const approver = previousApprover.recordset[0].next_recipient
+    const previousApprover = await request.query("SELECT top 1 person FROM History WHERE id = "+id+" AND status = 'Approved' ORDER BY date DESC")
+    const approver = previousApprover.recordset[0].person
     const updateStatus = "UPDATE Claims SET status = 'Rejected by processor', next_recipient = '"+approver+"', rejection_date = @rd WHERE id = "+id+"";
     request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
@@ -1591,37 +1700,11 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
-app.get('/getHistory/:id/:status', async (req, res) => {
+app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
   const { id, status} = req.params;   
   
   try {
-    let email = localStorage.getItem('user')
     var request = new sql.Request();
-
-    const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
-    const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
-
-    if(checkApprover.recordset[0].count >= 1) {
-      
-      const approverClaims = await request.query("SELECT COUNT(*) AS count FROM (SELECT C.id FROM Claims C"
-      + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
-      + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name)) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
-      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"' AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted'))) AS numbers WHERE id = "+id+"")
-      
-      if(approverClaims.recordset[0].count != 1) {
-        throw new Error('Forbidden')
-      }
-    
-    } else if(checkProcessor.recordset[0].count == 1) {
-      
-      const processorClaims = await request.query("SELECT COUNT(*) AS count FROM (SELECT C.id FROM Claims C"
-      + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
-      + " WHERE P.processor_email = '"+email+"')) AS numbers WHERE id = "+id+"")
-
-      if(processorClaims.recordset[0].count != 1) {
-        throw new Error('Forbidden')
-      }
-    }
 
     const check = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND status = 'Rejected'")
     //get all approvers so far

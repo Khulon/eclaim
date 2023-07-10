@@ -24,20 +24,22 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const AddButtonHover = useRef(new Animated.Value(0)).current;
   const [table, setTable] = useState([])
 
+  
   useEffect(() => {
     if (isFocused) {
       setIsLoading(true)
       fetchData()
     }
     
-  }, [isFocused]);
+  }, [isFocused]); 
 
   async function fetchData() {
     try {
       const id = claim.id;
       const user = claim.form_creator;
       const status = claim.status;
-      await fetch(`http://localhost:5000/getExpenses/${user}/${id}`)
+      const token  = window.localStorage.getItem('token');
+      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -56,7 +58,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
       });
 
-      fetch(`http://localhost:5000/getHistory/${id}/${status}`)
+      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -377,7 +379,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
   function approveClaim(claim) {
     
-    fetch('http://localhost:5000/approveClaim', {
+    fetch('http://10.0.1.28:5000/approveClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -397,7 +399,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function processClaim(claim) {
-    fetch('http://localhost:5000/processClaim', {
+    fetch('http://10.0.1.28:5000/processClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -417,7 +419,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function approverReject(claim, description) {
-    fetch('http://localhost:5000/approverRejectClaim', {
+    fetch('http://10.0.1.28:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -438,7 +440,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
 
   function processorReject(claim, description) {
-    fetch('http://localhost:5000/processorRejectClaim', {
+    fetch('http://10.0.1.28:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -17,6 +17,7 @@ export default function MyClaimsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false); 
   const [showTip, setTip] = useState(false);
 
+  
   useEffect(() => {
     setIsLoading(true)
     fetchData()
@@ -25,7 +26,8 @@ export default function MyClaimsScreen({ navigation }) {
 
   async function fetchData() {
     const email = window.localStorage.getItem('session');
-    await fetch(`http://localhost:5000/myClaims/${email}`)
+    const token = window.localStorage.getItem('token');
+    await fetch(`http://10.0.1.28:5000/myClaims/${email}/${token}`)
     .then((response) => response.json())
     .then((data) => {
       data = data.reverse()
