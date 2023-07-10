@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, Animated} from 'react-native';
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../assets/animation/AllAnimations';
 
 export default function DefaultButton({description, onPress, customStyle, buttonColor}) {
