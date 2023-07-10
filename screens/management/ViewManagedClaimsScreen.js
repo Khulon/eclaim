@@ -375,7 +375,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           />
         </View>
 
-        <View style={[styles.bottomCard, {height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed" || claim.status == "Rejected") ? "90px" : "140px"}]}>
+        <View style={[styles.bottomCard, {height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed" || claim.status == "Rejected" || claim.status == "Rejected by processor") ? "90px" : "140px"}]}>
           <View style={{position:'absolute', width:'100%', height:'100%', flexDirection:'row-reverse'}}>
             <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.id}</Text>
           </View>
