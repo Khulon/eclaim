@@ -524,17 +524,21 @@ export default function EditClaimScreen({ navigation, route}) {
           </View>
           </View>
           ) : (
-            <View></View>
+            <View/>
           )
           
         ):(
-          <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
+          claim.current.status == "In Progress" || claim.current.status == 'Rejected' ? (
+            <View style={{maxWidth:"500px" ,minWidth:"290px" ,width:"80%" ,flexDirection:"row", justifyContent:"center", alignItems:"center"}}>
           <View style={[styles.buttonContainer,{width:'100%'}]}>
           <Animated.View onMouseEnter={() => MoveNegAnimation(AddButtonHover)} onMouseLeave={() => MovePosAnimation(AddButtonHover)} style={{maxWidth: "400px", width: "90%", transform: [{translateY: AddButtonHover }]}}>
           <TouchableOpacity onPress={() => addExpense()} style={styles.defaultButton} > <Text style={styles.buttonText}>Add</Text> </TouchableOpacity>
           </Animated.View>
           </View>
           </View>
+          ) : (
+            <View/>
+          )
         )}
 
       

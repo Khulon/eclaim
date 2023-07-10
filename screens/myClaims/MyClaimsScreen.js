@@ -171,10 +171,10 @@ export default function MyClaimsScreen({ navigation }) {
     return false
   }
   
-  const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+  const Item = ({date, creator_Name, total, claimees, status, claimId, form_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
-        {expense_type == 'Travel Claim' ? (
+        {form_type == 'Travelling' ? (
           <Tooltip text={'Travel claim'}>
             <Text><Ionicons  name="airplane-outline" color="#444" size="25px"/></Text>
           </Tooltip>
@@ -220,7 +220,7 @@ export default function MyClaimsScreen({ navigation }) {
         claimees = {item.claimees}
         status = {item.status}
         claimId = {item.id}
-        expense_type = {item.form_type}
+        form_type = {item.form_type}
 
 
        onMouseEnter={() => setSelectedId(item.id)}
