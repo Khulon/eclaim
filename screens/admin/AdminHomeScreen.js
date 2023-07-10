@@ -156,7 +156,7 @@ export default function AdminHomeScreen({ navigation }) {
             showsVerticalScrollIndicator={false}
             data={data}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.email}
           />
         </View>
 

@@ -10,7 +10,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
   
   const [userDepartments, setDepartments] = React.useState([]);
   const [approvingDepartments, setApprovingDepartments] = React.useState([]);
-  const [newUser, setNewUser] = useState({name:null, email:null, company:null, department:null, isSupervisor: null, isApprover: null, isProcessor: null, approving: null});
+  const [newUser, setNewUser] = useState({name:'', email:'', company:'', department:'', isSupervisor: '', isApprover: '', isProcessor: '', approving: ''});
 
   useEffect(() => {
     setNewUser({...newUser, department: userDepartments, approving: approvingDepartments});
@@ -101,12 +101,11 @@ export default function AdminAddUserScreen({ navigation, route}) {
                   selectText="Select department(s)"
                   searchInputPlaceholderText="Search Items..."
                   onChangeInput={ (text)=> console.log(text)}
-                  styleInputGroup={{borderBottomWidth:'1px', borderColor:'#DADADA'}}
-                  styleSelectorContainer={{borderWidth:'1px', borderColor:'#DADADA' , borderRadius:'12px'}}
-                  styleRowList={{padding:'5px', backgroundColor:'white'}}
-                  styleDropdownMenuSubsection={{borderWidth:'1px', borderRadius:'12px', height:'45px', borderColor:'#DADADA', paddingLeft:'20px'}}
+                  styleInputGroup={{borderBottomWidth:1, borderColor:'#DADADA'}}
+                  styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA' , borderRadius:12}}
+                  styleRowList={{padding:5, backgroundColor:'white'}}
+                  styleDropdownMenuSubsection={{borderWidth:1, borderRadius:12, height:45, borderColor:'#DADADA', paddingLeft:20}}
                   styleTextDropdown={{color:'#6A6A6A'}}
-
                   searchInputStyle={{height:'45px'}}
                   altFontFamily='inherit'
                   tagRemoveIconColor="#6A6A6A"
@@ -171,12 +170,11 @@ export default function AdminAddUserScreen({ navigation, route}) {
                     selectText="Select department(s)"
                     searchInputPlaceholderText="Search Items..."
                     onChangeInput={ (text)=> console.log(text)}
-                    styleInputGroup={{borderBottomWidth:'1px', borderColor:'#DADADA'}}
-                    styleSelectorContainer={{borderWidth:'1px', borderColor:'#DADADA' , borderRadius:'12px'}}
-                    styleRowList={{padding:'5px', backgroundColor:'white'}}
-                    styleDropdownMenuSubsection={{borderWidth:'1px', borderRadius:'12px', height:'45px', borderColor:'#DADADA', paddingLeft:'20px'}}
+                    styleInputGroup={{borderBottomWidth:1, borderColor:'#DADADA'}}
+                    styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA' , borderRadius:12}}
+                    styleRowList={{padding:5, backgroundColor:'white'}}
+                    styleDropdownMenuSubsection={{borderWidth:1, borderRadius:12, height:45, borderColor:'#DADADA', paddingLeft:20}}
                     styleTextDropdown={{color:'#6A6A6A'}}
-
                     searchInputStyle={{height:'45px'}}
                     altFontFamily='inherit'
                     tagRemoveIconColor="#6A6A6A"
