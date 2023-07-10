@@ -14,7 +14,7 @@ export default function StartScreen({ navigation }) {
 
   
   useEffect(() => {
-    fetch("http://10.0.1.28:5000")
+    fetch("http://localhost:5000")
     .then((res) => res.json())
     .then((data) => setMessage(data))
 
