@@ -21,7 +21,7 @@ export default function AdminHomeScreen({ navigation }) {
   async function fetchData() {
     try {
 
-      fetch('http://10.0.1.28:5000/admin')
+      fetch('http://localhost:5000/admin')
       .then((res) => res.json())
       .then((data) => {
         console.log(data.users)
@@ -194,7 +194,7 @@ export default function AdminHomeScreen({ navigation }) {
 
   async function handleEditUser (selectedId) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://10.0.1.28:5000/admin/editUser', {
+    await fetch('http://localhost:5000/admin/editUser', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify({selectedId: selectedId})})
