@@ -28,7 +28,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
           alert("Expense added successfully!")
           navigation.goBack()
         } else {
-          alert("Error!")
+          alert(data.message)
         }
       })
   }
