@@ -24,14 +24,19 @@ export default function MyClaimsScreen({ navigation }) {
   async function fetchData() {
     const email = window.localStorage.getItem('session');
     const token = window.localStorage.getItem('token');
-    await fetch(`http://10.0.1.28:5000/myClaims/${email}/${token}`)
-    .then((response) => response.json())
-    .then((data) => {
-      data = data.reverse()
-      setFullData(data);
-      setData(data);
-    });
-    setIsLoading(false);
+    try {
+      await fetch(`http://10.0.1.28:5000/myClaims/${email}/${token}`)
+      .then((response) => response.json())
+      .then((data) => {
+        data = data.reverse()
+        setFullData(data);
+        setData(data);
+      });
+      setIsLoading(false);
+    } catch (error){
+      alert("error loading page")
+      setIsLoading(false)
+    }
   }
 
   async function handleEditClaim () {
