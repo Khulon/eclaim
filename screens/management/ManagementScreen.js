@@ -25,15 +25,20 @@ export default function ManagementScreen({ navigation }) {
   async function fetchData() {
     const email = userDetails.email
     const token = window.localStorage.getItem('token');
-    await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data)
-      data = data.reverse()
-      setFullData(data);
-      setData(data);
-    });
-    setIsLoading(false);
+    try {
+      await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        data = data.reverse()
+        setFullData(data);
+        setData(data);
+      });
+      setIsLoading(false);
+    } catch (error) {
+      alert("error loading page")
+      setIsLoading(false)
+    }
   }
 
   async function handleViewClaim () {
