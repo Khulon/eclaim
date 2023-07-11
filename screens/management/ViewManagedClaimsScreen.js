@@ -124,7 +124,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   } else {
     parsedDate = monthlyPeriod
   }
-  
+
   const user = window.localStorage.getItem('session')
 
   function approveClaim(claim) {
