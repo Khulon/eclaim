@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   infomationContainer: {
     width:'100%',
-    height:'80px',
+    height:'90px',
     minHeight:'60px',
     justifyContent:'center',
     alignItems:'center',
