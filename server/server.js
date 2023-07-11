@@ -784,9 +784,22 @@ app.post('/addMonthlyExpense', async (req, res) => {
     let with_GST = req.body.with_GST;
     let without_GST = req.body.without_GST;
 
-    if( !/^\d+(\.\d{2})?$/.test(parseFloat(with_GST)) || !/^\d+(\.\d{2})?$/.test(parseFloat(without_GST)) ) {
-      throw new Error("Please enter a valid amount!")
+    if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
+      return res.send({message: "Please fill in the amount!"})
+    } else {
+      if((with_GST == '' || with_GST == null)) {
+        with_GST = 0;
+        if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
+          return res.send({message: "Please enter a valid amount!"})
+        }
+      } else if(without_GST == '' || without_GST == null) {
+        without_GST = 0;
+        if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
+          return res.send({message: "Please enter a valid amount!"})
+        }
+      }
     }
+
     let total = parseFloat(with_GST) + parseFloat(without_GST);
 
     if(type == "Others") {
@@ -796,7 +809,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
       }
 
       if(otherType == "Others") {
-        throw new Error("Please enter a valid expense type!")
+        return res.send({message: "Please enter a valid expense type!"})
       }
       type = otherType;
     }
