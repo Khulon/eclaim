@@ -251,7 +251,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
                 />  
               </View>
             </View>
-            <View style={{height:'70px'}}/>
+            <View style={{height:'70px', zIndex:-1}}/>
           </ScrollView>
         </View>
 
@@ -286,7 +286,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     flexDirection: "column",
-    
   },
   topCard: {
     height: "70px",
@@ -294,32 +293,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     flexDirection: "column",
-
   },
   headerBar: {
-      height: '95px',
-      width:'60%',
-      flexWrap:'wrap',
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent:'center',
+    height: '95px',
+    width:'60%',
+    flexWrap:'wrap',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent:'center',
     },
-
   bigText: {
-      fontSize: "35px",
-      fontWeight: "900",
-      fontFamily: "inherit",
+    fontSize: "35px",
+    fontWeight: "900",
+    fontFamily: "inherit",
   },
   mediumText: {
-      fontSize: "20px",
-      fontWeight: "500",
-      color: "#6A6A6A",
-      fontFamily: "inherit",
+    fontSize: "20px",
+    fontWeight: "500",
+    color: "#6A6A6A",
+    fontFamily: "inherit",
   },
   backButtonBar: {
-      width:"90%",
+    width:"90%",
   },
-
   bottomCard: {
     bottom: "0",
     height: "70px",
@@ -331,7 +327,6 @@ const styles = StyleSheet.create({
     borderColor: "#DADADA",
     backgroundColor: "white",
   },
-
   text: {
     fontSize: "17px",
     fontWeight: "700",
@@ -346,64 +341,58 @@ const styles = StyleSheet.create({
     padding: "10px",
     borderColor: "#DADADA",
   },
-
   content: {
     width:"90%",
     flex:"1",
   },
-
   inputContainer: {
     width:'85%',
     paddingBottom: "20px",
   },
-
   normalBoldText: {
-      fontSize: "15px",
-      fontWeight: "700",
-      fontFamily: "inherit",
-      paddingVertical:'10px'
+    fontSize: "15px",
+    fontWeight: "700",
+    fontFamily: "inherit",
+    paddingVertical:'10px'
   },
   textInput: {
-      height: "45px",
-      color: "#6A6A6A",
-      borderWidth: "1px",
-      borderRadius: "12px",
-      padding: "15px",
-      borderColor: "#DADADA",
+    height: "45px",
+    color: "#6A6A6A",
+    borderWidth: "1px",
+    borderRadius: "12px",
+    padding: "15px",
+    borderColor: "#DADADA",
   },
-
   inputContainer: {
-      paddingVertical:'5px',
-      width:'90%',
-      maxWidth: '450px'
+    paddingVertical:'5px',
+    width:'90%',
+    maxWidth: '450px'
   },
-
   buttonContainer: {
-      width:"50%",
-      justifyContent:"center",
-      alignItems:"center"
+    width:"50%",
+    justifyContent:"center",
+    alignItems:"center"
   },
   dropdownStyles: {
-      position:"absolute",
-      width:"100%",
-      top:35,
-      zIndex:1,
-      backgroundColor:"white",
-      borderColor:"#DADADA"
-
+    position:"absolute",
+    width:"100%",
+    top:35,
+    zIndex:1,
+    backgroundColor:"white",
+    borderColor:"#DADADA"
   },
   dropdownItemStyles: {
-      marginHorizontal:"5px",
-      height:"40px",
+    marginHorizontal:"5px",
+    height:"40px",
   },
   dropdownTextStyles: {
-      color: "#6A6A6A",
+    color: "#6A6A6A",
   },
   boxStyles: {
-      borderColor:"#DADADA",
+    borderColor:"#DADADA",
   },
   inputStyles: {
-      color: "#6A6A6A",
+    color: "#6A6A6A",
   },
 
 });
