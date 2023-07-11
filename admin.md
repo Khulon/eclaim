@@ -1,10 +1,11 @@
-#User Guide for Admin Account
+# User Guide for Admin
 
+## Description
+The admin account is used to manage user account information 
 
-The admin account is to manage the user account information for all users of the application.
-
-Functions:
+## Functions
 1. Add User
 2. Edit User
 3. Delete User
 
+## 
