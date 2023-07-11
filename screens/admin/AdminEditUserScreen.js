@@ -165,6 +165,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
                   onChangeText={(email) => setUserDetails({...userDetails, newEmail: email})}
                   autoCapitalize="none" 
                   autoCorrect={false} 
+                  editable={false}
                 />
               </View>
               <View style={[styles.inputContainer,{zIndex:4}]}>
