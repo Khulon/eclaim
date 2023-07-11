@@ -6,43 +6,35 @@ import MultiSelect from 'react-native-multiple-select';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
 
-
 export default function AdminEditUserScreen({ navigation, route }) {        
-  const [userDepartments, setUserDepartments] = useState(fetchedDepartments);
-  const [approvingDepartments, setApprovingDepartments] = useState(fetchedAppDpts);
-  const fetchedDepartments = [];
-  const fetchedAppDpts = []
-  const [userDetails, setUserDetails] = useState({
-      name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
-      company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
-      approver: route.params.props.approver, processor: route.params.props.processor,
-      department: null, approvingDepartments: null});
+  const [userDepartments, setUserDepartments] = useState([]);
+  const [approvingDepartments, setApprovingDepartments] = useState([]);
+  const [userDetails, setUserDetails] = useState({name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
+    company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
+    approver: route.params.props.approver, processor: route.params.props.processor,
+    department: null, approvingDepartments: null
+  });
 
-  var dpts = '';
-  for (let i = 0; i < route.params.dpts.length; i++) {
-    if (i == route.params.dpts.length - 1) {
-      dpts += route.params.dpts[i].department;
-      break;
-    } else {
-      dpts += route.params.dpts[i].department + ', ';
+  useEffect(() => {
+    const fetchedDepartments = [];
+    const fetchedAppDpts = []
+    for(var i in route.params.dpts) {
+      fetchedDepartments.push(route.params.dpts[i].department);
     }
-  }
-
-  for(var i in route.params.dpts) {
-    fetchedDepartments.push(route.params.dpts[i].department);
-  }
-
-  for(var i in route.params.appDpts) {
-    fetchedAppDpts.push(route.params.appDpts[i].department);
-  }
+    for(var i in route.params.appDpts) {
+      fetchedAppDpts.push(route.params.appDpts[i].department);
+    }
+    setUserDepartments(fetchedDepartments)
+    setApprovingDepartments(fetchedAppDpts)
+  }, []);
 
   useEffect(() => {
     setUserDetails({...userDetails, department: userDepartments, approvingDepartments: approvingDepartments});
   }, [userDepartments, approvingDepartments]);
-  
+
   function deleteUser(userDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/deleteUser', {
+    fetch('http://localhost:5000/admin/deleteUser', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(userDetails)})
@@ -54,15 +46,15 @@ export default function AdminEditUserScreen({ navigation, route }) {
           } else {
             alert("User deletion failed!")
           }
-      	});
-      window.location.reload(false);   
+        });
+      window.location.reload(false);
   }
 
   function updateUser(userDetails) {
     console.log(userDepartments)
     console.log(userDetails)
     const header = {'Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/editUser/save', {
+    fetch('http://localhost:5000/admin/editUser/save', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(userDetails)})
@@ -75,8 +67,8 @@ export default function AdminEditUserScreen({ navigation, route }) {
             } else {
               alert("User update failed!")
             }
-        })
-    }
+          })
+  }
 
   return (
     <View style={styles.page}>
