@@ -6,43 +6,35 @@ import MultiSelect from 'react-native-multiple-select';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
 
-
 export default function AdminEditUserScreen({ navigation, route }) {        
-  const [userDepartments, setUserDepartments] = useState(fetchedDepartments);
-  const [approvingDepartments, setApprovingDepartments] = useState(fetchedAppDpts);
-  const fetchedDepartments = [];
-  const fetchedAppDpts = []
-  const [userDetails, setUserDetails] = useState({
-      name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
-      company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
-      approver: route.params.props.approver, processor: route.params.props.processor,
-      department: null, approvingDepartments: null});
+  const [userDepartments, setUserDepartments] = useState([]);
+  const [approvingDepartments, setApprovingDepartments] = useState([]);
+  const [userDetails, setUserDetails] = useState({name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
+    company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
+    approver: route.params.props.approver, processor: route.params.props.processor,
+    department: null, approvingDepartments: null
+  });
 
-  var dpts = '';
-  for (let i = 0; i < route.params.dpts.length; i++) {
-    if (i == route.params.dpts.length - 1) {
-      dpts += route.params.dpts[i].department;
-      break;
-    } else {
-      dpts += route.params.dpts[i].department + ', ';
+  useEffect(() => {
+    const fetchedDepartments = [];
+    const fetchedAppDpts = []
+    for(var i in route.params.dpts) {
+      fetchedDepartments.push(route.params.dpts[i].department);
     }
-  }
-
-  for(var i in route.params.dpts) {
-    fetchedDepartments.push(route.params.dpts[i].department);
-  }
-
-  for(var i in route.params.appDpts) {
-    fetchedAppDpts.push(route.params.appDpts[i].department);
-  }
+    for(var i in route.params.appDpts) {
+      fetchedAppDpts.push(route.params.appDpts[i].department);
+    }
+    setUserDepartments(fetchedDepartments)
+    setApprovingDepartments(fetchedAppDpts)
+  }, []);
 
   useEffect(() => {
     setUserDetails({...userDetails, department: userDepartments, approvingDepartments: approvingDepartments});
   }, [userDepartments, approvingDepartments]);
-  
+
   function deleteUser(userDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/deleteUser', {
+    fetch('http://localhost:5000/admin/deleteUser', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(userDetails)})
@@ -54,15 +46,15 @@ export default function AdminEditUserScreen({ navigation, route }) {
           } else {
             alert("User deletion failed!")
           }
-      	});
-      window.location.reload(false);   
+        });
+      window.location.reload(false);
   }
 
   function updateUser(userDetails) {
     console.log(userDepartments)
     console.log(userDetails)
     const header = {'Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/editUser/save', {
+    fetch('http://localhost:5000/admin/editUser/save', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(userDetails)})
@@ -75,8 +67,8 @@ export default function AdminEditUserScreen({ navigation, route }) {
             } else {
               alert("User update failed!")
             }
-        })
-    }
+          })
+  }
 
   return (
     <View style={styles.page}>
@@ -251,7 +243,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
                 />  
               </View>
             </View>
-            <View style={{height:'70px'}}/>
+            <View style={{height:'70px', zIndex:-1}}/>
           </ScrollView>
         </View>
 
@@ -286,7 +278,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     flexDirection: "column",
-    
   },
   topCard: {
     height: "70px",
@@ -294,32 +285,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     flexDirection: "column",
-
   },
   headerBar: {
-      height: '95px',
-      width:'60%',
-      flexWrap:'wrap',
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent:'center',
+    height: '95px',
+    width:'60%',
+    flexWrap:'wrap',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent:'center',
     },
-
   bigText: {
-      fontSize: "35px",
-      fontWeight: "900",
-      fontFamily: "inherit",
+    fontSize: "35px",
+    fontWeight: "900",
+    fontFamily: "inherit",
   },
   mediumText: {
-      fontSize: "20px",
-      fontWeight: "500",
-      color: "#6A6A6A",
-      fontFamily: "inherit",
+    fontSize: "20px",
+    fontWeight: "500",
+    color: "#6A6A6A",
+    fontFamily: "inherit",
   },
   backButtonBar: {
-      width:"90%",
+    width:"90%",
   },
-
   bottomCard: {
     bottom: "0",
     height: "70px",
@@ -331,7 +319,6 @@ const styles = StyleSheet.create({
     borderColor: "#DADADA",
     backgroundColor: "white",
   },
-
   text: {
     fontSize: "17px",
     fontWeight: "700",
@@ -346,64 +333,58 @@ const styles = StyleSheet.create({
     padding: "10px",
     borderColor: "#DADADA",
   },
-
   content: {
     width:"90%",
     flex:"1",
   },
-
   inputContainer: {
     width:'85%',
     paddingBottom: "20px",
   },
-
   normalBoldText: {
-      fontSize: "15px",
-      fontWeight: "700",
-      fontFamily: "inherit",
-      paddingVertical:'10px'
+    fontSize: "15px",
+    fontWeight: "700",
+    fontFamily: "inherit",
+    paddingVertical:'10px'
   },
   textInput: {
-      height: "45px",
-      color: "#6A6A6A",
-      borderWidth: "1px",
-      borderRadius: "12px",
-      padding: "15px",
-      borderColor: "#DADADA",
+    height: "45px",
+    color: "#6A6A6A",
+    borderWidth: "1px",
+    borderRadius: "12px",
+    padding: "15px",
+    borderColor: "#DADADA",
   },
-
   inputContainer: {
-      paddingVertical:'5px',
-      width:'90%',
-      maxWidth: '450px'
+    paddingVertical:'5px',
+    width:'90%',
+    maxWidth: '450px'
   },
-
   buttonContainer: {
-      width:"50%",
-      justifyContent:"center",
-      alignItems:"center"
+    width:"50%",
+    justifyContent:"center",
+    alignItems:"center"
   },
   dropdownStyles: {
-      position:"absolute",
-      width:"100%",
-      top:35,
-      zIndex:1,
-      backgroundColor:"white",
-      borderColor:"#DADADA"
-
+    position:"absolute",
+    width:"100%",
+    top:35,
+    zIndex:1,
+    backgroundColor:"white",
+    borderColor:"#DADADA"
   },
   dropdownItemStyles: {
-      marginHorizontal:"5px",
-      height:"40px",
+    marginHorizontal:"5px",
+    height:"40px",
   },
   dropdownTextStyles: {
-      color: "#6A6A6A",
+    color: "#6A6A6A",
   },
   boxStyles: {
-      borderColor:"#DADADA",
+    borderColor:"#DADADA",
   },
   inputStyles: {
-      color: "#6A6A6A",
+    color: "#6A6A6A",
   },
 
 });

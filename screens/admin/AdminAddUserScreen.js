@@ -207,7 +207,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
                 />  
               </View>
             </View>
-            <View style={{height:'70px'}}></View>
+            <View style={{height:'70px', zIndex:-1}}></View>
           </ScrollView>
         </View>
 
