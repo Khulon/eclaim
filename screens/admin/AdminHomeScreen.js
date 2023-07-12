@@ -28,7 +28,9 @@ export default function AdminHomeScreen({ navigation }) {
       fetch(`http://10.0.1.28:5000/admin/${token}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.users)
+        if(data.message == "Token expired!") {
+          throw new Error("Token expired!")
+        }
         setFullData(data.users);
         setData(data.users);
         for(let i = 0; i < data.departments.length; i++) {
@@ -42,7 +44,13 @@ export default function AdminHomeScreen({ navigation }) {
       })
       setIsLoading(false)
     } catch (error) {
-      alert("Failed to load. Please check your internet connection!")
+      if(error.message == "Token expired!") {
+        window.localStorage.clear()
+        window.location.reload(false)
+        alert("Session expired! Please login again.")
+      } else {
+        alert("Failed to load. Please check your internet connection!")
+      }
       setIsLoading(false)
     }
   } 

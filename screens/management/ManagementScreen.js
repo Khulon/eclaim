@@ -29,14 +29,13 @@ export default function ManagementScreen({ navigation }) {
       await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
         data = data.reverse()
         setFullData(data);
         setData(data);
       });
       setIsLoading(false);
     } catch (error) {
-      alert("error loading page")
+      alert("Error loading page!")
       setIsLoading(false)
     }
   }
