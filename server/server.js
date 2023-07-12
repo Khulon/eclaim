@@ -118,9 +118,9 @@ app.get('/admin/:token', authenticateAdmin, async (req, res) => {
 
 
 //Load all departments that the user belongs to
-app.post('/admin/editUser', async (req, res) => {
+app.get('/admin/editUser/:email/:token', authenticateAdmin, async (req, res) => {
   try {
-    let email = req.body.selectedId
+    const { email } = req.params;
     var request = new sql.Request();
 
     const rows = await request.query("SELECT department FROM BelongsToDepartments WHERE email = '"+email+"'")
