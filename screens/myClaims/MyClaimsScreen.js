@@ -42,7 +42,7 @@ export default function MyClaimsScreen({ navigation }) {
         window.location.reload(false)
         alert("Session expired! Please login again.")
       } else {
-        alert("Error loading page!")
+        alert("Error loading page. If error persists, log out and try again")
       }
       setIsLoading(false)
     }

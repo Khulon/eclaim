@@ -29,13 +29,22 @@ export default function ManagementScreen({ navigation }) {
       await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
+        if(data.message == "Token expired!") {
+          throw new Error("Token expired!")
+        }
         data = data.reverse()
         setFullData(data);
         setData(data);
       });
       setIsLoading(false);
     } catch (error) {
-      alert("Error loading page!")
+      if(error.message == "Token expired!") {
+        window.localStorage.clear()
+        window.location.reload(false)
+        alert("Session expired! Please login again.")
+      } else {
+        alert("Error loading page. If error persists, log out and try again")
+      }
       setIsLoading(false)
     }
   }
