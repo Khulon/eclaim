@@ -68,17 +68,28 @@ export default function AdminHomeScreen({ navigation }) {
   }, [userDepartments, approvingDepartments]);
 
   async function handleEditUser (selectedId) {
-    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://10.0.1.28:5000/admin/editUser', {
-      method: 'POST', 
-      headers: header,
-      body: JSON.stringify({selectedId: selectedId})})
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      setUserDepartments(data.dpts);
-      setApprovingDepartments(data.appDpts);
-    })
+    const email = selectedId
+    const token = window.localStorage.getItem('token')
+    try {
+      await fetch(`http://10.0.1.28:5000/admin/editUser/${email}/${token}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if(data.message == "Token expired!") {
+          throw new Error("Token expired!")
+        }
+        setUserDepartments(data.dpts);
+        setApprovingDepartments(data.appDpts);
+      })
+    } catch (error) {
+      if(error.message == "Token expired!") {
+        window.localStorage.clear()
+        window.location.reload(false)
+        alert("Session expired! Please login again.")
+      } else {
+        alert("Error loading user data!")
+      }
+    }
   }
 
   function handleSearch (search) {
