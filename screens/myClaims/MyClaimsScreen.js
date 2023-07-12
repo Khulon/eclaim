@@ -34,7 +34,7 @@ export default function MyClaimsScreen({ navigation }) {
       });
       setIsLoading(false);
     } catch (error){
-      alert("error loading page")
+      alert("Error loading page. If error persists, log out and try again")
       setIsLoading(false)
     }
   }

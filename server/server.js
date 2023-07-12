@@ -1146,7 +1146,7 @@ app.post('/submitClaim', async (req, res) => {
       console.log(total_amount)
       
       //Send email to approver
-      const filePath = path.join('server', '../../email/CreatorToApprover.html');
+      const filePath = './email/CreatorToApprover.html';
       const source = fs.readFileSync(filePath, 'utf-8').toString();
       const template = handlebars.compile(source);
       const approverReplacements = {
@@ -1202,6 +1202,8 @@ app.post('/submitClaim', async (req, res) => {
       }
       const confirmation = transporter.sendMail(confirmationMail);
       console.log('Email sent:', (await confirmation).response);
+      //return res.send({message: ('Email sent:', (await confirmation).response)})
+    
       
       res.send({message: "Claim submitted!"})
       
@@ -1210,7 +1212,7 @@ app.post('/submitClaim', async (req, res) => {
     } 
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 })
 
@@ -1326,7 +1328,7 @@ app.post('/approveClaim', async (req, res) => {
     await request.query(history)
     //trigger sending of email to next person
     
-    const filePath = path.join('server', '../../email/ApproverToFinance.html');
+    const filePath ='./email/ApproverToFinance.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const nextPerson = {
@@ -1422,7 +1424,7 @@ app.post('/processClaim', async (req, res) => {
         approverEmail += (approvers.recordset[i].person + ', ')
       }
     }
-    const filePath = path.join('server', '../../email/FinanceToCreator.html');
+    const filePath = './email/FinanceToCreator.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const creatorReplacements = {
@@ -1552,7 +1554,7 @@ app.post('/approverRejectClaim', async (req, res) => {
   
     
     //trigger send email back to form creator
-    const filePath = path.join('server', '../../email/Rejection.html');
+    const filePath = './email/Rejection.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
@@ -1645,7 +1647,7 @@ app.post('/processorRejectClaim', async (req, res) => {
     await request.query(history)
     //trigger send email back to approver
   
-    const filePath = path.join('server', '../../email/Rejection.html');
+    const filePath = './email/Rejection.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
