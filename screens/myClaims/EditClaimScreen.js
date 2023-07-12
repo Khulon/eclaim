@@ -45,6 +45,9 @@ export default function EditClaimScreen({ navigation, route}) {
       fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
+        if(data.message == "Token expired!") {
+          throw new Error("Token expired!")
+        }
         setFullData(data);
         setData(data)
         claim.current.total_amount = 0
@@ -74,7 +77,13 @@ export default function EditClaimScreen({ navigation, route}) {
     ])
       setIsLoading(false)
     } catch (error) {
-      alert("Failed to load. Please check your internet connection!")
+      if(error.message == "Token expired!") {
+        window.localStorage.clear()
+        window.location.reload(false)
+        alert("Session expired! Please login again.")
+      } else {
+        alert("Failed to load. Please check your internet connection!")
+      }
       setIsLoading(false)
     }
   }
@@ -324,7 +333,7 @@ export default function EditClaimScreen({ navigation, route}) {
             showsVerticalScrollIndicator={false}
             data={data}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            //keyExtractor={item => item.id}
           />
         </View>
 

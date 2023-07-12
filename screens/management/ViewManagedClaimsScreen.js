@@ -48,6 +48,9 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
+        if(data.message == "Token expired!") {
+          throw new Error("Token expired!")
+        }
         setFullData(data);
         setData(data);
         for(let i = 0; i < data.length; i++) {
@@ -66,12 +69,21 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
+        if(data.message == "Token expired!") {
+          throw new Error("Token expired!")
+        }
         setApprovers(data.approvers);
         setProcessor(data.processor);
       });
       setIsLoading(false)
     } catch (error) {
-      alert("Failed to load. Please check your internet connection!")
+      if(error.message == "Token expired!") {
+        window.localStorage.clear()
+        window.location.reload(false)
+        alert("Session expired! Please login again.")
+      } else {
+        alert("Failed to load. Please check your internet connection!")
+      }
       setIsLoading(false)
     }
   } 
@@ -377,7 +389,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             showsVerticalScrollIndicator={false}
             data={data}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            //keyExtractor={item => item.id}
           />
         </View>
 

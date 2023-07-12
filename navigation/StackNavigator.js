@@ -17,10 +17,11 @@ export default function StackNavigator() {
     
     const session = window.localStorage.getItem('session');
     const sessionType = window.localStorage.getItem('sessionType');
+    const token = window.localStorage.getItem('token');
 
     return (
         <Stack.Navigator>
-        {session != null ? (
+        {session != null && token != null ? (
             sessionType == 'Admin' ? (
                 <Stack.Screen name="AdminStack" component={AdminStack} options={{headerShown: false}}/> 
             ):(

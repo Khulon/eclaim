@@ -50,11 +50,11 @@ app.listen(port, () => {
 
 
 function generateAccessToken(username) {
-  return jwt.sign(username, tokenSecret);
+  return jwt.sign(username, tokenSecret, { expiresIn: '3600s' });
 }
 
 
-async function authenticateToken(req, res, next) {
+async function authenticateAdmin(req, res, next) {
   const {token} = req.params
   if (token == null) return res.sendStatus(401)
 
@@ -66,25 +66,14 @@ async function authenticateToken(req, res, next) {
     next()
 
   } catch(err) {
-    console.log(err)
-    return res.sendStatus(403)
+    if(err.name == 'TokenExpiredError') {
+      return res.send({message: "Token expired!"})
+    } else {
+      console.log(err)
+      return res.sendStatus(403)
+    }
   }
 } 
-
-
-app.get('/', function (req, res) {
-    // create Request object
-    var request = new sql.Request();
-        
-    // query to the database and get the records
-    request.query('SELECT * from Approvers;', function (err, rows) {
-        
-        if (err) console.log(err)
-        // send records as a response
-        res.send(rows.recordset);
-    });
-});
-
 
 
 //User registers an account
@@ -106,7 +95,7 @@ app.post('/register', (req, res) => {
 
 
 //Load all users on admin home page
-app.get('/admin/:token', authenticateToken, async (req, res) => {
+app.get('/admin/:token', authenticateAdmin, async (req, res) => {
   try {
     var request = new sql.Request();
         
@@ -171,9 +160,6 @@ app.post('/admin/editUser/save', async (req, res) => {
     }
   }
 
-  
-  
-
   var queryString = ""
 
   if(isApprover == 'No') {
@@ -187,10 +173,6 @@ app.post('/admin/editUser/save', async (req, res) => {
     }
   }
 
-  console.log(name)
-  console.log(insertDpts)
-  console.log(queryString)
-
   var request = new sql.Request();
   try{
       await request.query("SET XACT_ABORT ON " 
@@ -200,8 +182,6 @@ app.post('/admin/editUser/save', async (req, res) => {
       + "DELETE FROM BelongsToDepartments WHERE email = '"+newEmail+"'; "
         + "INSERT INTO BelongsToDepartments VALUES" + insertDpts
         + queryString + " COMMIT TRANSACTION");
-      
-      //localStorage.setItem('user', newEmail)
 
       res.send({message: "User Updated!"})
 
@@ -211,9 +191,6 @@ app.post('/admin/editUser/save', async (req, res) => {
   }
   
 });
-
-
-
 
 
 
@@ -534,17 +511,18 @@ async function authenticateUser(req, res, next) {
   try {
     const decoded = jwt.verify(token, tokenSecret)
     var request = new sql.Request();
-    console.log(email)
-    console.log(decoded.email)
-    console.log(decoded.password)
     const password = await request.query("SELECT password FROM Accounts WHERE email = '"+decoded.email+"'")
     console.log(password.recordset[0].password)
     if(decoded.email != email || decoded.password != password.recordset[0].password) return res.sendStatus(403)
     next()
 
   } catch(err) {
-    console.log(err)
-    return res.sendStatus(403)
+    if(err.name == 'TokenExpiredError') {
+      return res.send({message: "Token expired!"})
+    } else {
+      console.log(err)
+      return res.sendStatus(403)
+    }
   }
 } 
 
@@ -649,8 +627,12 @@ async function expenseAuthentication (req, res, next) {
     }
     return res.sendStatus(403)
   } catch(err) {
-    console.log(err)
-    return res.sendStatus(403)
+    if(err.name == 'TokenExpiredError') {
+      return res.send({message: "Token expired!"})
+    } else {
+      console.log(err)
+      return res.sendStatus(403)
+    }
   }
 } 
 
