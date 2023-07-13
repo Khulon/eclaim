@@ -56,7 +56,7 @@ export default function MonthlyExpenseForm({route}) {
                 <Text style={styles.normalBoldText}>Pay Period - From</Text>
                 <TextInput style={styles.textInput}
                   placeholder="dd/mm/yyyy" 
-                  onChangeText={(val) => setClaim({...claim, payPeriodFrom:val})} 
+                  onChangeText={(val) => setClaim({...claim, payPeriodFrom: val})} 
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />
@@ -65,7 +65,7 @@ export default function MonthlyExpenseForm({route}) {
                 <Text style={styles.normalBoldText}>Pay Period - To</Text>
                 <TextInput style={styles.textInput}
                   placeholder="dd/mm/yyyy" 
-                  onChangeText={(val) => setClaim({...claim, payPeriodTo:val})} 
+                  onChangeText={(val) => setClaim({...claim, payPeriodTo: val})} 
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />
@@ -74,7 +74,7 @@ export default function MonthlyExpenseForm({route}) {
                 <Text style={styles.normalBoldText}>Cost Center</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. SG Depot" 
-                  onChangeText={(val) => setClaim({...claim, costCenter:val})} 
+                  onChangeText={(val) => setClaim({...claim, costCenter: val})} 
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />

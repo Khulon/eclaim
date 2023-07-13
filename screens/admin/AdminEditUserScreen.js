@@ -53,8 +53,8 @@ export default function AdminEditUserScreen({ navigation, route }) {
   function updateUser(userDetails) {
     console.log(userDepartments)
     console.log(userDetails)
-    const header = {'Content-Type': 'application/json' };
-    fetch('http://10.0.1.28/admin/editUser/save', {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://10.0.1.28:5000/admin/editUser/save', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(userDetails)})
