@@ -240,8 +240,8 @@ function deleteExpense(expense) {
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Description</Text>
                 <TextInput style={[styles.textInput,{height:'100px'}]}
-                  placeholder="Desciption of expense" 
-                  value={expense.description} 
+                  placeholder="Description of expense" 
+                  value={expense.description == null ? "" : expense.description} 
                   multiline={true}
                   onChangeText={(description) => setNewExpense({...expense, description: description})}
                   autoCapitalize="none" 
