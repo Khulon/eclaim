@@ -317,6 +317,20 @@ app.post('/login', async (req, res) => {
 
 
 
+const generateRandomID = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+
+  for (let i = 0; i < 8; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    id += characters[randomIndex];
+  }
+
+  return id;
+};
+
+
+
 //User to add claim
 app.post('/addClaim', async (req, res) => {
   let formCreator = req.body.creator;
@@ -331,90 +345,79 @@ app.post('/addClaim', async (req, res) => {
     costCenter = null;
   }
   let note = req.body.note;
-  //Adding monthly claim
-  if (expenseType == "Monthly") {
-  
-  try {
 
-    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count, MAX(id) as id FROM Claims")
+  var newFormId = '';
 
-    if (result.recordset[0].count == 0) {
-      var newFormId = 1;
-    } else {
-      var newFormId = result.recordset[0].id + 1;
+  while (newFormId == '') {
+    const id = generateRandomID();
+    const checkId = await request.query("SELECT COUNT(*) AS count FROM Claims WHERE id = '"+id+"'");
+    let count = checkId.recordset[0].count;
+    if(count == 0) {
+      newFormId = id;
     }
-    
-    const fromDate = await request.query("SELECT PARSE('"+payPeriodFrom+"' as date USING 'AR-LB') AS fromDate")
-    const toDate = await request.query("SELECT PARSE('"+payPeriodTo+"' as date USING 'AR-LB') AS toDate")
-    const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
-    
-
-    const query = "SET XACT_ABORT ON " 
-    + "BEGIN TRANSACTION "
-    +"INSERT INTO Claims VALUES(@id, @total_amount, @formCreator, @expense_type, "
-      + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, @cd, @nextApprover);"
-      + "INSERT INTO MonthlyGeneral VALUES(@formid , @fromDate, @toDate, @costCenter, @note);"
-      + " COMMIT TRANSACTION";
-    console.log(formCreator)
-    console.log(checkApproval.recordset[0].levels_of_approval)
-    request.input('id', sql.Int, newFormId);
-    request.input('expense_type', sql.Text, expenseType)
-    request.input('total_amount', sql.Numeric(18,2), 0);
-    request.input('formCreator', sql.VarChar, formCreator);
-    request.input('levels', sql.Int, checkApproval.recordset[0].levels_of_approval);
-    request.input('claimees', sql.Int, 1);
-    request.input('status', sql.VarChar, "In Progress");
-    request.input('sd', sql.DateTime, null);
-    request.input('ad', sql.DateTime, null);
-    request.input('pd', sql.DateTime, null);
-    request.input('rd', sql.DateTime, null);
-    request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
-    request.input('nextApprover', sql.VarChar, null);
-    request.input('formid', sql.Int, newFormId);
-    request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
-    request.input('toDate', sql.Date, toDate.recordset[0].toDate);
-    request.input('costCenter', sql.VarChar, costCenter)
-    request.input('note', sql.Text, note);
-
-    await request.query(query);
-    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime, '"+formCreator+"')"
-    request.input('datetime', sql.DateTime, result.recordset[0].currentDateTime);
-    await request.query(history);
-  
-    res.send({message: "Monthly claim added successfully!", user: formCreator});
-        
-  } catch(err) {
-    console.log(err)
-    res.send({message: "Failed to add claim!"});
   }
 
+  //Adding monthly claim
+  if (expenseType == "Monthly") {
+    try {
+      const fromDate = await request.query("SELECT PARSE('"+payPeriodFrom+"' as date USING 'AR-LB') AS fromDate")
+      const toDate = await request.query("SELECT PARSE('"+payPeriodTo+"' as date USING 'AR-LB') AS toDate")
+      const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
 
+      const query = "SET XACT_ABORT ON " 
+      + "BEGIN TRANSACTION "
+      +"INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, @formCreator, @expense_type, "
+        + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, GETDATE(), @nextApprover);"
+        + "INSERT INTO MonthlyGeneral VALUES('"+newFormId+"', @fromDate, @toDate, @costCenter, @note);"
+        + " COMMIT TRANSACTION";
+      request.input('expense_type', sql.Text, expenseType)
+      request.input('total_amount', sql.Numeric(18,2), 0);
+      request.input('formCreator', sql.VarChar, formCreator);
+      request.input('levels', sql.Int, checkApproval.recordset[0].levels_of_approval);
+      request.input('claimees', sql.Int, 1);
+      request.input('status', sql.VarChar, "In Progress");
+      request.input('sd', sql.DateTime, null);
+      request.input('ad', sql.DateTime, null);
+      request.input('pd', sql.DateTime, null);
+      request.input('rd', sql.DateTime, null);
+      request.input('nextApprover', sql.VarChar, null);
+      request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
+      request.input('toDate', sql.Date, toDate.recordset[0].toDate);
+      request.input('costCenter', sql.VarChar, costCenter)
+      request.input('note', sql.Text, note);
+
+      await request.query(query);
+
+      const dateTime = await request.query("SELECT creation_date FROM Claims WHERE form_id = '"+newFormId+"'")
+
+      const history = "INSERT INTO History VALUES('"+newFormId+"', 'Created', @datetime, '"+formCreator+"')"
+      request.input('datetime', sql.DateTime, dateTime.recordset[0].creation_date);
+      await request.query(history);
+    
+      res.send({message: "Monthly claim added successfully!", user: formCreator});
+          
+    } catch(err) {
+      console.log(err)
+      res.send({message: "Failed to add claim!"});
+    }
 
 //Adding travelling claim
 } else {
 
   try {
-  
     let country = req.body.country;
     let exchangeRate = req.body.exchangeRate;
     let dateFrom = req.body.dateFrom;
     let dateTo = req.body.dateTo;
 
     var request = new sql.Request();
-
-    const result = await request.query("SELECT GETDATE() AS currentDateTime, COUNT(*) AS count, MAX(id) as id FROM Claims")
-    if (result.recordset[0].count == 0) {
-      var newFormId = 1;
-    } else {
-      var newFormId = result.recordset[0].id + 1;
-    }
     const fromDate = await request.query("SELECT PARSE('"+dateFrom+"' as date USING 'AR-LB') AS fromDate")
     const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
     const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + " INSERT INTO Claims VALUES("+newFormId+", @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, @cd, @nextApprover);"
-    + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, "+newFormId+"); COMMIT TRANSACTION";
+    + " INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, GETDATE(), @nextApprover);"
+    + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, '"+newFormId+"'); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
     request.input('total_amount', sql.Numeric(18,2), 0);
@@ -424,16 +427,17 @@ app.post('/addClaim', async (req, res) => {
     request.input('ad', sql.DateTime, null);
     request.input('pd', sql.DateTime, null);
     request.input('rd', sql.DateTime, null);
-    request.input('cd', sql.DateTime, result.recordset[0].currentDateTime);
     request.input('nextApprover', sql.VarChar, null);
     request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
     request.input('period_to', sql.Date, toDate.recordset[0].toDate);
     request.input('note', sql.Text, note);
 
-    console.log(query)
     await request.query(query);
-    const history = "INSERT INTO History VALUES("+newFormId+", 'Created', @datetime, '"+formCreator+"')"
-    request.input('datetime', sql.DateTime, result.recordset[0].currentDateTime);
+
+    const dateTime = await request.query("SELECT creation_date FROM Claims WHERE form_id = '"+newFormId+"'")
+
+    const history = "INSERT INTO History VALUES('"+newFormId+"', 'Created', @datetime, '"+formCreator+"')"
+    request.input('datetime', sql.DateTime, dateTime.recordset[0].creation_date);
     await request.query(history);
 
     res.send({message: "Travelling claim added successfully!", user: formCreator});
@@ -454,7 +458,7 @@ app.post('/joinClaim', async (req, res) => {
 
   try {
     var request = new sql.Request();
-    const results = await request.query("SELECT form_type, form_creator FROM Claims WHERE id = "+formId+"")
+    const results = await request.query("SELECT form_type, form_creator FROM Claims WHERE id = '"+formId+"'")
 
     if(results.recordset[0].form_type == "Travelling") {
       throw new Error("Travelling claims cannot be joined!")
@@ -558,14 +562,14 @@ async function expenseAuthentication (req, res, next) {
     const decoded = jwt.verify(token, tokenSecret)
     var request = new sql.Request();
     const status = await request.query("SELECT status FROM Claims WHERE id = '"+id+"'")
-    const claimees = await request.query("SELECT claimee from Claimees WHERE form_id = "+id+"")
-    const firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = "+id+"))")
+    const claimees = await request.query("SELECT claimee from Claimees WHERE form_id = '"+id+"'")
+    const firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var nextApprover;
-    const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = "+id+"))")
+    const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
 
     if(status.recordset[0].status == "Pending Next Approval") {
-      const next_Approver = await request.query("SELECT next_recipient FROM Claims WHERE id = "+id+"")
+      const next_Approver = await request.query("SELECT next_recipient FROM Claims WHERE id = '"+id+"'")
       nextApprover = next_Approver.recordset[0].next_recipient
       if(nextApprover == decoded.email) {
         return next()
@@ -585,7 +589,7 @@ async function expenseAuthentication (req, res, next) {
       }
     } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
       //everyone
-      const managers = await request.query("SELECT person FROM History WHERE id = "+id+" AND status != 'Created' AND status != 'Submitted'")
+      const managers = await request.query("SELECT person FROM History WHERE id = '"+id+"' AND status != 'Created' AND status != 'Submitted'")
       for (var i = 0; i < managers.recordset.length; i++) {
         if(managers.recordset[i].person == decoded.email) {
           return next()
@@ -596,14 +600,14 @@ async function expenseAuthentication (req, res, next) {
       }
     }
     //check if claim has been deleted
-    const deleteCheck = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND status = 'Deleted'")
+    const deleteCheck = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status = 'Deleted'")
 
     if(deleteCheck.recordset[0].count > 0) {
       //deleted before
-      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND date > (SELECT TOP 1 date FROM History WHERE id = "+id+" AND status = 'Deleted' ORDER BY date DESC) AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
+      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND date > (SELECT TOP 1 date FROM History WHERE id = '"+id+"' AND status = 'Deleted' ORDER BY date DESC) AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
       //rejected before
       if(checkReject.recordset[0].count > 0) {
-        const managers = await request.query("SELECT person FROM History WHERE id = "+id+" AND status != 'Created' AND status != 'Submitted' AND date > (SELECT TOP 1 date FROM History WHERE id = "+id+" AND status = 'Deleted' ORDER BY date DESC)")
+        const managers = await request.query("SELECT person FROM History WHERE id = '"+id+"' AND status != 'Created' AND status != 'Submitted' AND date > (SELECT TOP 1 date FROM History WHERE id = '"+id+"' AND status = 'Deleted' ORDER BY date DESC)")
         for (var i = 0; i < managers.recordset.length; i++) {
           if(managers.recordset[i].person == decoded.email) {
             return next()
@@ -613,10 +617,10 @@ async function expenseAuthentication (req, res, next) {
 
     } else {
       //not deleted before
-      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
+      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
       //rejected before
       if(checkReject.recordset[0].count > 0) {
-        const managers = await request.query("SELECT person FROM History WHERE id = "+id+" AND status != 'Created' AND status != 'Submitted'")
+        const managers = await request.query("SELECT person FROM History WHERE id = '"+id+"' AND status != 'Created' AND status != 'Submitted'")
         for (var i = 0; i < managers.recordset.length; i++) {
           if(managers.recordset[i].person == decoded.email) {
             return next()
@@ -645,21 +649,18 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
   try {
 
     //Check who is form creator
-    const query = 'SELECT form_creator FROM Claims WHERE id = @claimId'
-    request.input('claimId', sql.Int, id);
+    const query = "SELECT form_creator FROM Claims WHERE id = '"+id+"'";
     const form_creator = await request.query(query)
 
     //Form creator is not user
     if (form_creator.recordset[0].form_creator != user) {
-      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = @id AND claimee = '"+user+"'";
-      request.input('id', sql.Int, id);
+      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' AND claimee = '"+user+"'";
       const result = await request.query(queryString);
       res.send(result.recordset);
 
     //display all expenses
     } else {
-      const queryString = 'SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = @id';
-      request.input('id', sql.Int, id);
+      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"'";
       const result = await request.query(queryString);
       res.send(result.recordset);
   }
@@ -715,11 +716,9 @@ app.post('/addTravellingExpense', async (req, res) => {
     }
     const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
-    const query = ("INSERT INTO Expenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-     + "@withGst, @withoutGst, @amount, @description, @receipt, 'Yes', @da, @lm )");
-    request.input('id', sql.Int, id)
+    const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
+     + "@withGst, @withoutGst, @amount, @description, @receipt, 'Yes', GETDATE(), GETDATE())");
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     request.input('place', sql.VarChar, null);
@@ -730,8 +729,6 @@ app.post('/addTravellingExpense', async (req, res) => {
     request.input('amount', sql.Numeric(18,2), amount);
     request.input('description', sql.Text, description);
     request.input('receipt', sql.VarChar, receipt);
-    request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
 
 
     await request.query(query);
@@ -821,16 +818,14 @@ app.post('/addMonthlyExpense', async (req, res) => {
     }
     const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const form_creator = await request.query("SELECT form_creator FROM Claims WHERE id = '"+id+"'")
     if(form_creator.recordset[0].form_creator == claimee) {
       checked = 'Yes'
     }
-    const query = ("INSERT INTO Expenses VALUES(@id, '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-    + ""+with_GST+", "+without_GST+", "+total+", @description, @receipt, @checked, @da, @lm )");
+    const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
+    + ""+with_GST+", "+without_GST+", "+total+", @description, @receipt, @checked, GETDATE(), GETDATE() )");
     
-    request.input('id', sql.Int, id)
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     request.input('place', sql.VarChar, place);
@@ -839,9 +834,6 @@ app.post('/addMonthlyExpense', async (req, res) => {
     request.input('description', sql.Text, description);
     request.input('receipt', sql.VarChar, receipt);
     request.input('checked', sql.VarChar, checked)
-    request.input('da', sql.DateTime, currentTime.recordset[0].currentDateTime);
-    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
-
 
     await request.query(query);
 
@@ -926,14 +918,12 @@ app.post('/editTravellingExpense', async (req, res) => {
       await request.query(query);
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = '"+description+"', total_amount = @amount, receipt = '"+receipt+"', last_modified = @lm WHERE id = "+id+""
+    + "description = '"+description+"', total_amount = @amount, receipt = '"+receipt+"', last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
     request.input('amount', sql.Numeric(18,2), amount);
-    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('item_number', sql.Int, item_number);
     
     await request.query(query)
@@ -943,13 +933,12 @@ app.post('/editTravellingExpense', async (req, res) => {
     console.log(err)
     res.send({message: "Error!"});
   }
-  
 });
 
 
 
 
-//User edits monthyl expense
+//User edits monthly expense
 app.post('/editMonthlyExpense', async (req, res) => {
   let id = req.body.id;
   let claimee = req.body.claimee;
@@ -999,19 +988,17 @@ app.post('/editMonthlyExpense', async (req, res) => {
       await request.query(query);
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const form_creator = await request.query("SELECT form_creator FROM Claims where id = "+id+"")
+    const form_creator = await request.query("SELECT form_creator FROM Claims where id = '"+id+"'")
     if(form_creator.recordset[0].form_creator == claimee) {
       checked = 'Yes'
     }
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = '"+description+"', total_amount = "+total+", receipt = '"+receipt+"', last_modified = @lm, place = @place, customer_name = @customer,"
-    + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = "+id+""
+    + "description = '"+description+"', total_amount = "+total+", receipt = '"+receipt+"', last_modified = GETDATE(), place = @place, customer_name = @customer,"
+    + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
     request.input('amount', sql.Numeric(18,2), amount);
-    request.input('lm', sql.DateTime, currentTime.recordset[0].currentDateTime);
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
     request.input('company', sql.VarChar, company);
@@ -1038,9 +1025,7 @@ app.post('/deleteExpense', async (req, res) => {
 
   try {
     var request = new sql.Request();
-    const query = "DELETE FROM Expenses WHERE id = @id AND claimee = '"+claimee+"' AND item_number = @item_number";
-    request.input('id', sql.Int, id)
-    request.input('item_number', sql.Int, item_number);
+    const query = "DELETE FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
     await request.query(query);
     res.send({message: "Expense deleted!"})
   } catch(err) {
@@ -1061,12 +1046,9 @@ app.post('/deleteClaim', async (req, res) => {
 
   try {
     var request = new sql.Request();
-    const currentDate = await request.query("SELECT GETDATE() AS currentDateTime")
-    const query = "DELETE FROM Claims WHERE id = @id";
-    request.input('id', sql.Int, id)
+    const query = "DELETE FROM Claims WHERE id = '"+id+"'";
     await request.query(query);
-    const history = "INSERT INTO History VALUES("+id+", 'Deleted', @datetime, '"+form_creator+"')"	
-    request.input('datetime', sql.DateTime, currentDate.recordset[0].currentDateTime);
+    const history = "INSERT INTO History VALUES('"+id+"', 'Deleted', GETDATE(), '"+form_creator+"')"	
     await request.query(history);
     res.send({message: "Claim deleted!"})
   } catch(err) {
@@ -1085,9 +1067,7 @@ app.post('/checkExpense', async (req, res) => {
 
   try {
     var request = new sql.Request();
-    const query = "UPDATE Expenses SET checked = 'Yes' WHERE id = @id AND claimee = '"+claimee+"' AND item_number = @item_number";
-    request.input('id', sql.Int, id)
-    request.input('item_number', sql.Int, item_number);
+    const query = "UPDATE Expenses SET checked = 'Yes' WHERE id = '"+id+"' AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
     await request.query(query);
   } catch(err) {
     console.log(err)
@@ -1107,23 +1087,22 @@ app.post('/submitClaim', async (req, res) => {
   try {
     var request = new sql.Request();
     
-    const emptyClaim = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+"")
+    const emptyClaim = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = '"+id+"'")
     if(emptyClaim.recordset[0].count == 0) {
       throw new Error("Please add at least one expense!")
     }
     
-    const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = "+id+" AND checked = 'No'")
+    const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = '"+id+"' AND checked = 'No'")
     if(result.recordset[0].count == 0) {
       
-      const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-      const updateStatus = "UPDATE Claims SET status = 'Submitted', submission_date = @sd WHERE id = "+id+"";
-      request.input('sd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+      const updateStatus = "UPDATE Claims SET status = 'Submitted', submission_date = GETDATE() WHERE id = '"+id+"'";
       await request.query(updateStatus)
-      const history = "INSERT INTO History VALUES("+id+", 'Submitted', @datetime, '"+form_creator+"')"
-      request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+      const currentTime = await request.query("SELECT submission_date FROM Claims WHERE id = '"+id+"'")
+      const history = "INSERT INTO History VALUES('"+id+"', 'Submitted', @sd, '"+form_creator+"')"
+      request.input('sd', sql.DateTime, currentTime.recordset[0].submission_date)
       await request.query(history); 
 
-      const approver = await request.query("SELECT approver_name FROM Claims C JOIN BelongsToDepartments B ON C.form_creator = B.email JOIN Approvers A ON B.department = A.department  WHERE id = "+id+"")
+      const approver = await request.query("SELECT approver_name FROM Claims C JOIN BelongsToDepartments B ON C.form_creator = B.email JOIN Approvers A ON B.department = A.department  WHERE id = '"+id+"'")
       const approver_email = approver.recordset[0].approver_name;
       console.log(total_amount)
       
@@ -1272,11 +1251,11 @@ app.post('/approveClaim', async (req, res) => {
       const count = approversList.recordset[0].count
       //send to processor
       if(count == 0) {
-        const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = "+id+")")
+        const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = '"+id+"')")
         recipient = processor.recordset[0].processor_email
-        updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
+        updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
         description = 'A new claim has been approved and is awaiting your processing.'
-        history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime, '"+approver+"')"
+        history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent for processing.'
         subject = 'New claim to process'
         confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1285,28 +1264,28 @@ app.post('/approveClaim', async (req, res) => {
         //send to next approver
         const nextApprover = await request.query("SELECT approver_name from Approvers where department = '"+approver+"'")
         recipient = nextApprover.recordset[0].approver_name
-        updateStatus = "UPDATE Claims SET status = 'Pending Next Approval', approval_date = @ad, next_recipient = '"+recipient+"' WHERE id = "+id+"";
+        updateStatus = "UPDATE Claims SET status = 'Pending Next Approval', approval_date = GETDATE(), next_recipient = '"+recipient+"' WHERE id = '"+id+"'";
         description = "A new claim is awaiting your approval!"
-        history = "INSERT INTO History VALUES("+id+", 'Pending Next Approval', @datetime, '"+approver+"')"
+        history = "INSERT INTO History VALUES('"+id+"', 'Pending Next Approval', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
         subject = "New claim to approve"
         confirmationSubject = 'Claim sent to next approver - Confirmation Email'
       }
     //else, send to processor
     } else {
-      const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = "+id+")")
+      const processor = await request.query("SELECT processor_email FROM Processors WHERE company = (SELECT company_prefix FROM Employees E JOIN Claims C ON E.email = C.form_creator WHERE C.id = '"+id+"')")
       recipient = processor.recordset[0].processor_email
-      updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = @ad WHERE id = "+id+"";
+      updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
       description = 'A new claim has been approved and is awaiting your processing.'
-      history = "INSERT INTO History VALUES("+id+", 'Approved', @datetime, '"+approver+"')"
+      history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
       confirmationDescription = 'A claim that was approved by you has been sent for processing.'
       subject = 'New claim to process'
       confirmationSubject = 'Claim sent for processing - Confirmation Email'
     }
 
-    request.input('ad', sql.DateTime, currentTime.recordset[0].currentDateTime);
     await request.query(updateStatus)
-    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    const dateTime = await request.query("SELECT approval_date FROM Claims WHERE id = '"+id+"'")
+    request.input('datetime', sql.DateTime, dateTime.recordset[0].approval_date);
     await request.query(history)
     //trigger sending of email to next person
     
@@ -1388,16 +1367,15 @@ app.post('/processClaim', async (req, res) => {
     let total_amount = req.body.claim.total_amount
     let period = req.body.parsedDate
     var request = new sql.Request();
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
-    const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = @pd WHERE id = "+id+"";
-    request.input('pd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    const updateStatus = "UPDATE Claims SET status = 'Processed', processed_date = GETDATE() WHERE id = '"+id+"'";
     await request.query(updateStatus)
-    const history = "INSERT INTO History VALUES("+id+", 'Processed', @datetime, '"+processor+"')"
-    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    const getTime = await request.query("SELECT processed_date FROM Claims WHERE id = '"+id+"'")
+    const history = "INSERT INTO History VALUES('"+id+"', 'Processed', @datetime, '"+processor+"')"
+    request.input('datetime', sql.DateTime, getTime.recordset[0].processed_date);
     await request.query(history)
     //trigger sending of email to form creator
 
-    const approvers = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND (status = 'Approved' OR status = 'Pending Next Approval')")
+    const approvers = await request.query("SELECT DISTINCT person FROM History WHERE id = '"+id+"' AND (status = 'Approved' OR status = 'Pending Next Approval')")
     var approverEmail = ''
     for (var i = 0; i < approvers.recordset.length; i++) {
       if(i == approvers.recordset.length - 1) {
@@ -1486,7 +1464,6 @@ app.post('/approverRejectClaim', async (req, res) => {
     let total_amount = req.body.claim.total_amount
     let period = req.body.parsedDate
     let description = req.body.description
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     var recipient = ""
     var status = ""
     var emailDescription = "Your claim has been rejected"
@@ -1505,32 +1482,32 @@ app.post('/approverRejectClaim', async (req, res) => {
       if (previousApprover == creatorDepartment.recordset[0].department) {
           recipient = form_creator
           status = "Rejected"
-          const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
-          request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = GETDATE() WHERE id = '"+id+"'";
           await request.query(updateStatus)
-          const history = "INSERT INTO History VALUES("+id+", 'Rejected', @datetime, '"+approver+"')"
-          request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          const getTime = await request.query("SELECT rejection_date FROM Claims WHERE id = '"+id+"'")
+          const history = "INSERT INTO History VALUES('"+id+"', 'Rejected', @datetime, '"+approver+"')"
+          request.input('datetime', sql.DateTime, getTime.recordset[0].rejection_date);
           await request.query(history)
       } else {
           recipient = previousApprover
           status = "Rejecting"
           emailDescription = form_creator + "'s claim needs your rejection"
           subject = "Claim needs your rejection"
-          const updateStatus = "UPDATE Claims SET status = '"+status+"', next_recipient = '"+previousApprover+"', rejection_date = @rd WHERE id = "+id+"";
-          request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          const updateStatus = "UPDATE Claims SET status = '"+status+"', next_recipient = '"+previousApprover+"', rejection_date = GETDATE() WHERE id = '"+id+"'";
           await request.query(updateStatus)
-          const history = "INSERT INTO History VALUES("+id+", 'Rejected by approver', @datetime, '"+approver+"')"
-          request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+          const getTime = await request.query("SELECT rejection_date FROM Claims WHERE id = '"+id+"'")
+          const history = "INSERT INTO History VALUES('"+id+"', 'Rejected by approver', @datetime, '"+approver+"')"
+          request.input('datetime', sql.DateTime, getTime.recordset[0].rejection_date);
           await request.query(history)
       }
     } else {
         recipient = form_creator
         status = "Rejected"
-        const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = @rd WHERE id = "+id+"";
-        request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+        const updateStatus = "UPDATE Claims SET status = '"+status+"', rejection_date = GETDATE() WHERE id = '"+id+"'";
         await request.query(updateStatus)
-        const history = "INSERT INTO History VALUES("+id+", 'Rejected', @datetime, '"+approver+"')"
-        request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+        const currentTime = await request.query("SELECT rejection_date FROM Claims WHERE id = '"+id+"'")
+        const history = "INSERT INTO History VALUES('"+id+"', 'Rejected', @datetime, '"+approver+"')"
+        request.input('datetime', sql.DateTime, currentTime.recordset[0].rejection_date);
         await request.query(history)
     }
   
@@ -1617,15 +1594,14 @@ app.post('/processorRejectClaim', async (req, res) => {
     let total_amount = req.body.claim.total_amount
     let period = req.body.parsedDate
     let description = req.body.description
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     //check previous status
-    const previousApprover = await request.query("SELECT top 1 person FROM History WHERE id = "+id+" AND status = 'Approved' ORDER BY date DESC")
+    const previousApprover = await request.query("SELECT top 1 person FROM History WHERE id = '"+id+"' AND status = 'Approved' ORDER BY date DESC")
     const approver = previousApprover.recordset[0].person
-    const updateStatus = "UPDATE Claims SET status = 'Rejected by processor', next_recipient = '"+approver+"', rejection_date = @rd WHERE id = "+id+"";
-    request.input('rd', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    const updateStatus = "UPDATE Claims SET status = 'Rejected by processor', next_recipient = '"+approver+"', rejection_date = GETDATE() WHERE id = '"+id+"'";
     await request.query(updateStatus)
-    const history = "INSERT INTO History VALUES("+id+", 'Rejected by processor', @datetime, '"+processor+"')"
-    request.input('datetime', sql.DateTime, currentTime.recordset[0].currentDateTime);
+    const currentTime = await request.query("SELECT rejection_date FROM Claims WHERE id = '"+id+"'")
+    const history = "INSERT INTO History VALUES('"+id+"', 'Rejected by processor', @datetime, '"+processor+"')"
+    request.input('datetime', sql.DateTime, currentTime.recordset[0].rejection_date);
     await request.query(history)
     //trigger send email back to approver
   
@@ -1703,25 +1679,25 @@ app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res
   try {
     var request = new sql.Request();
 
-    const check = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = "+id+" AND status = 'Rejected'")
+    const check = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status = 'Rejected'")
     //get all approvers so far
     if(status == 'Approved' || status == 'Pending Next Approval' || status == 'Processed') {
       //rejected before
       if(check.recordset[0].count > 0) {
-          const query = "SELECT DISTINCT person FROM History WHERE id = "+id+" AND (status = 'Approved' OR status = 'Pending Next Approval') " +
-        "AND date > (SELECT top 1 date FROM History WHERE id = "+id+" AND status = 'Rejected')"
+          const query = "SELECT DISTINCT person FROM History WHERE id = '"+id+"' AND (status = 'Approved' OR status = 'Pending Next Approval') " +
+        "AND date > (SELECT top 1 date FROM History WHERE id = '"+id+"' AND status = 'Rejected')"
           const approvers = await request.query(query)
           if(status == 'Processed') {
-            const processors = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND status = 'Processed' AND date > (SELECT top 1 date FROM History WHERE id = "+id+" AND status = 'Rejected')")
+            const processors = await request.query("SELECT DISTINCT person FROM History WHERE id = '"+id+"' AND status = 'Processed' AND date > (SELECT top 1 date FROM History WHERE id = '"+id+"' AND status = 'Rejected')")
             res.send({approvers: approvers.recordset, processor: processors.recordset})
           } else {
             res.send({approvers: approvers.recordset, processor: []})
           }
       //never rejected before
       } else {
-          const result = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND (status = 'Approved' OR status = 'Pending Next Approval')")
+          const result = await request.query("SELECT DISTINCT person FROM History WHERE id = '"+id+"' AND (status = 'Approved' OR status = 'Pending Next Approval')")
           if(status == 'Processed') {
-            const processors = await request.query("SELECT DISTINCT person FROM History WHERE id = "+id+" AND status = 'Processed'")
+            const processors = await request.query("SELECT DISTINCT person FROM History WHERE id = '"+id+"' AND status = 'Processed'")
             res.send({approvers: result.recordset, processor: processors.recordset})
           } else {
             res.send({approvers: result.recordset, processor: []})
