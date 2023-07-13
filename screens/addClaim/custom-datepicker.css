@@ -1,0 +1,17 @@
+.custom-input {
+    flex: auto;
+    height: 45px;
+    color: #6A6A6A;
+    border-width: 1px;
+    border-radius: 12px;
+    border-color: #DADADA;
+    width: 100%;
+    min-width: 50px;
+    box-shadow: none;
+
+    border-top-color: #ffffff81;
+    border-left-color: #ffffff81;
+
+    padding: 15px;
+    box-sizing: border-box;
+  }
