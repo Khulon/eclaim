@@ -79,7 +79,7 @@ export default function MonthlyExpenseForm({route}) {
                 <Text style={styles.normalBoldText}>Cost Center</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. SG Depot" 
-                  onChangeText={(val) => setClaim({...claim, costCenter:val})} 
+                  onChangeText={(val) => setClaim({...claim, costCenter: val})} 
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />
