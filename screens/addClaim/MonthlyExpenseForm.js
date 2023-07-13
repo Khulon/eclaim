@@ -1,17 +1,23 @@
 import { TextInput, StyleSheet, Text, View, ScrollView} from 'react-native';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./custom-datepicker.css";
+import { parseDown } from '../../functions/Parsers.js'
 
 export default function MonthlyExpenseForm({route}) {        
 
   const addClaim = route.params.props;
+  const [ startDate, setStartDate ] = useState(new Date());
+  const [ endDate, setEndDate ] = useState(new Date());
   const [claim, setClaim] = useState(
     {creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, 
     payPeriodFrom: null, payPeriodTo: null, costCenter: null, note: null});
 
   function addMonthlyClaim (claim) {
-    console.log(claim)
+    console.log(claim.payPeriodFrom, claim.payPeriodTo)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     fetch('http://10.0.1.28:5000/addClaim', {
           method: 'POST',
@@ -28,6 +34,14 @@ export default function MonthlyExpenseForm({route}) {
           }
         });
   }; 
+
+  useEffect(() => { 
+    setClaim(prevClaim => ({ 
+      ...prevClaim, 
+      payPeriodFrom: parseDown(startDate), 
+      payPeriodTo: parseDown(endDate) 
+    })); 
+  }, [startDate, endDate]);
 
   return (
     <View style={styles.page}>
@@ -52,23 +66,14 @@ export default function MonthlyExpenseForm({route}) {
               </View>
             </View>
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
-              <View style={[styles.inputContainer]}>
-                <Text style={styles.normalBoldText}>Pay Period - From</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="dd/mm/yyyy" 
-                  onChangeText={(val) => setClaim({...claim, payPeriodFrom:val})} 
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                />
+              <View style={[styles.inputContainer, {zIndex:99}]}>
+                  <Text style={styles.normalBoldText}>Pay Period - From</Text>
+                  <DatePicker className="custom-input" selected={startDate} onChange={(date) => setStartDate(date)} />
               </View>
-              <View style={[styles.inputContainer]}>
-                <Text style={styles.normalBoldText}>Pay Period - To</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="dd/mm/yyyy" 
-                  onChangeText={(val) => setClaim({...claim, payPeriodTo:val})} 
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                />
+
+              <View style={[styles.inputContainer, {zIndex:98}]}>
+                  <Text style={styles.normalBoldText}>Pay Period - To</Text>
+                  <DatePicker className="custom-input" selected={endDate} onChange={(date) => setEndDate(date)} />
               </View>
               <View style={[styles.inputContainer]}>
                 <Text style={styles.normalBoldText}>Cost Center</Text>
@@ -158,24 +163,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily: "inherit",
   },
-  textInput: {
-    height: "35px",
-    color: "#6A6A6A",
-    backgroundColor: "#D9D9D9",
-    borderWidth: "1px",
-    borderRadius: "12px",
-    padding: "10px",
-    borderColor: "#DADADA",
-  },
+
   content: {
     width:"90%",
     flex:"1",
   },
-  inputContainer: {
-    width:'85%',
-    paddingBottom: "20px",
-  },
-normalBoldText: {
+
+  normalBoldText: {
     fontSize: "15px",
     fontWeight: "700",
     fontFamily: "inherit",
