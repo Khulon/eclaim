@@ -59,7 +59,7 @@ export default function TravellingExpenseForm({ route }) {
                   <Text style={styles.bigText}>Travelling</Text>
                 </View>
                 <View style={{paddingHorizontal: '7px'}}>
-                  <Text style={styles.bigText}>Expense</Text>
+                  <Text style={styles.bigText}>Form</Text>
                 </View>
               </View>
             </View>

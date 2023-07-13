@@ -61,7 +61,7 @@ export default function MonthlyExpenseForm({route}) {
                   <Text style={styles.bigText}>Monthly</Text>
                 </View>
                 <View style={{paddingHorizontal: '7px'}}>
-                  <Text style={styles.bigText}>Expense</Text>
+                  <Text style={styles.bigText}>Form</Text>
                 </View>
               </View>
             </View>

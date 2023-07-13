@@ -434,7 +434,7 @@ app.post('/addClaim', async (req, res) => {
 
     await request.query(query);
 
-    const dateTime = await request.query("SELECT creation_date FROM Claims WHERE form_id = '"+newFormId+"'")
+    const dateTime = await request.query("SELECT creation_date FROM Claims WHERE id = '"+newFormId+"'")
 
     const history = "INSERT INTO History VALUES('"+newFormId+"', 'Created', @datetime, '"+formCreator+"')"
     request.input('datetime', sql.DateTime, dateTime.recordset[0].creation_date);
