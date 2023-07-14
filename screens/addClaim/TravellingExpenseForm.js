@@ -1,18 +1,15 @@
 import { TextInput, StyleSheet, Text, View, ScrollView} from 'react-native';
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./custom-datepicker.css";
-import { parseDown } from '../../functions/Parsers.js'
+import "../../components/custom-datepicker.css";
 
 export default function TravellingExpenseForm({ route }) {      
-  const [ startDate, setStartDate ] = useState(new Date());
-  const [ endDate, setEndDate ] = useState(new Date());  
   const addClaim = route.params.props;
   const [claim, setClaim] = useState({creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType,
-    country: null, exchangeRate:null, dateFrom: null, dateTo: null});
+    country: null, exchangeRate:null, dateFrom:  new Date(), dateTo:  new Date()});
 
   function addTravellingClaim (claim) {
     console.log(claim)
@@ -32,14 +29,6 @@ export default function TravellingExpenseForm({ route }) {
           }
         });
   }; 
-
-  useEffect(() => { 
-    setClaim(prevClaim => ({ 
-      ...prevClaim, 
-      dateFrom: parseDown(startDate), 
-      dateTo: parseDown(endDate) 
-    })); 
-  }, [startDate, endDate]);
 
   return (
     <View style={styles.page}>
@@ -66,11 +55,11 @@ export default function TravellingExpenseForm({ route }) {
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
               <View style={[styles.inputContainer, {zIndex:99}]}>
                   <Text style={styles.normalBoldText}>Date - From</Text>
-                  <DatePicker className="custom-input" selected={startDate} onChange={(date) => setStartDate(date)} />
+                  <DatePicker className="custom-input" selected={claim.dateFrom} onChange={(date) => setClaim({...claim, dateFrom: date})} />
               </View>
               <View style={[styles.inputContainer, {zIndex:98}]}>
                   <Text style={styles.normalBoldText}>Date - To</Text>
-                  <DatePicker className="custom-input" selected={endDate} onChange={(date) => setEndDate(date)} />
+                  <DatePicker className="custom-input" selected={claim.dateTo} onChange={(date) => setClaim({...claim, dateTo: date})} />
               </View>
               <View style={[styles.inputContainer, {}]}>
                 <Text style={styles.normalBoldText}>Country</Text>
