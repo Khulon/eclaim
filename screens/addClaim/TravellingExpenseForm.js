@@ -55,11 +55,11 @@ export default function TravellingExpenseForm({ route }) {
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
               <View style={[styles.inputContainer, {zIndex:99}]}>
                   <Text style={styles.normalBoldText}>Date - From</Text>
-                  <DatePicker className="custom-input" selected={claim.dateFrom} onChange={(date) => setClaim({...claim, dateFrom: date})} />
+                  <DatePicker className="custom-input" selected={claim.dateFrom} onChange={(date) => setClaim({...claim, dateFrom: date})} dateFormat="dd/MM/yyyy"/>
               </View>
               <View style={[styles.inputContainer, {zIndex:98}]}>
                   <Text style={styles.normalBoldText}>Date - To</Text>
-                  <DatePicker className="custom-input" selected={claim.dateTo} onChange={(date) => setClaim({...claim, dateTo: date})} />
+                  <DatePicker className="custom-input" selected={claim.dateTo} onChange={(date) => setClaim({...claim, dateTo: date})} dateFormat="dd/MM/yyyy"/>
               </View>
               <View style={[styles.inputContainer, {}]}>
                 <Text style={styles.normalBoldText}>Country</Text>

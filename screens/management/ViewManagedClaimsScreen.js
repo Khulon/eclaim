@@ -395,7 +395,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
         <View style={[styles.bottomCard, {height: ((userDetails.approver == "Yes" && claim.status == "Approved") || claim.status == "Processed" || claim.status == "Rejected" || claim.status == "Rejected by processor") ? "90px" : "140px"}]}>
           <View style={{position:'absolute', width:'100%', height:'100%', flexDirection:'row-reverse'}}>
-            <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.id}</Text>
+            <Text style={{paddingTop:'5px', paddingRight:'10px', fontSize:'18px', fontWeight:500}}>ID: {claim.id}</Text>
           </View>
           <Text style={{paddingTop:"15px"}}>Total:</Text>
           <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>{totalAmount()}</Text>

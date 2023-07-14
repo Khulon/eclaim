@@ -1,8 +1,9 @@
 import { View, Image, FlatList, Text, TouchableOpacity } from 'react-native';
 import React, {useEffect, useState} from "react";
 import { Ionicons } from "react-native-vector-icons";
+import BackButton from '../../components/BackButton';
 
-export default function pdf({route}) { 
+export default function pdf({route, navigation}) { 
     const [options, setOptions] = useState(0)
     const [hide, setHide] = useState(false)
     const fullData = route.params.data
@@ -39,6 +40,12 @@ export default function pdf({route}) {
             {hide ? (
                 <View/>
             ) : (
+                <View style={{width:'100%', height:'100%', alignItems:'center'}}>
+                <View style={{ position:'absolute', height:'40px', width:'100%', padding:'50px'}}>
+                    <View style={{width:'150px',fontFamily: "Arial"}}>
+                        <BackButton onPress={() => navigation.goBack()}/>
+                    </View>
+                </View>
                 <View style={{alignItems:'center', justifyContent:'space-between', flexDirection:'row', height:'200px', borderWidth:'3px', borderColor:'black', width:'450px', borderRadius:'20px', position:'absolute', opacity:'0.5', backgroundColor:'white', zIndex:999}}>
                 <TouchableOpacity onPress={()=>options != 0 ? setOptions(options-1) : 0} style={{paddingHorizontal:'20px'}}>
                     <Text> <Text><Ionicons name="chevron-back-outline" color="#444" size='30px'/></Text> </Text>
@@ -55,6 +62,7 @@ export default function pdf({route}) {
                 <TouchableOpacity onPress={()=>options != 6 ? setOptions(options+1) : 6} style={{paddingHorizontal:'20px'}}>
                     <Text> <Text><Ionicons name="chevron-forward-outline" color="#444" size='30px'/></Text> </Text>
                 </TouchableOpacity>
+                </View>
                 </View>
             )}
 

@@ -57,12 +57,12 @@ export default function MonthlyExpenseForm({route}) {
             </View>
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
               <View style={[styles.inputContainer, {zIndex:99}]}>
-                  <Text style={styles.normalBoldText}>Pay Period - From</Text>
-                  <DatePicker className="custom-input" selected={claim.payPeriodFrom} onChange={(date) => setClaim({...claim, payPeriodFrom: date})} />
+                <Text style={styles.normalBoldText}>Pay Period - From</Text>
+                <DatePicker className="custom-input" selected={claim.payPeriodFrom} onChange={(date) => setClaim({...claim, payPeriodFrom: date})} dateFormat="dd/MM/yyyy" />
               </View>
               <View style={[styles.inputContainer, {zIndex:98}]}>
-                  <Text style={styles.normalBoldText}>Pay Period - To</Text>
-                  <DatePicker className="custom-input" selected={claim.payPeriodTo} onChange={(date) =>  setClaim({...claim, payPeriodTo: date})} />
+                <Text style={styles.normalBoldText}>Pay Period - To</Text>
+                <DatePicker className="custom-input" selected={claim.payPeriodTo} onChange={(date) =>  setClaim({...claim, payPeriodTo: date})} dateFormat="dd/MM/yyyy" />
               </View>
               <View style={[styles.inputContainer]}>
                 <Text style={styles.normalBoldText}>Cost Center</Text>
