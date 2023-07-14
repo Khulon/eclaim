@@ -730,7 +730,6 @@ app.post('/addTravellingExpense', async (req, res) => {
     request.input('description', sql.Text, description);
     request.input('receipt', sql.VarChar, receipt);
 
-
     await request.query(query);
 
     res.send({message: "Success!"});
@@ -919,11 +918,16 @@ app.post('/editTravellingExpense', async (req, res) => {
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = "+description+", total_amount = @amount, receipt = '"+receipt+"', last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = "+description+", total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
     request.input('amount', sql.Numeric(18,2), amount);
+    if(receipt == null) {
+      request.input('receipt', sql.VarChar, null);
+    } else {
+      request.input('receipt', sql.VarChar, receipt);
+    }
     request.input('item_number', sql.Int, item_number);
     
     await request.query(query)
@@ -931,7 +935,7 @@ app.post('/editTravellingExpense', async (req, res) => {
 
   } catch(err) { 
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 });
 
@@ -943,7 +947,6 @@ app.post('/editMonthlyExpense', async (req, res) => {
   let id = req.body.id;
   let claimee = req.body.claimee;
   let item_number = req.body.item_number;
-  let amount = req.body.amount;
   let type = req.body.type;
   let place = req.body.place;
   let customer = req.body.customer;
@@ -993,12 +996,16 @@ app.post('/editMonthlyExpense', async (req, res) => {
       checked = 'Yes'
     }
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = "+description+", total_amount = "+total+", receipt = '"+receipt+"', last_modified = GETDATE(), place = @place, customer_name = @customer,"
+    + "description = "+description+", total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
     + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
-    request.input('amount', sql.Numeric(18,2), amount);
+    if(receipt == null) {
+      request.input('receipt', sql.VarChar, null);
+    } else {
+      request.input('receipt', sql.VarChar, receipt);
+    }
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
     request.input('company', sql.VarChar, company);
@@ -1011,7 +1018,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
 
   } catch(err) { 
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
   
 });
