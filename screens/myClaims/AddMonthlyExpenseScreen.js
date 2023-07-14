@@ -102,7 +102,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
               )}
               <View style={[styles.inputContainer, {zIndex:4}]}>
                 <Text style={styles.normalBoldText}>Date</Text>
-                <DatePicker className="custom-input" selected={expense.date} onChange={(date) => setExpense({...expense, date: date})} />
+                <DatePicker className="custom-input" selected={expense.date} onChange={(date) => setExpense({...expense, date: date})} dateFormat="dd/MM/yyyy"/>
               </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Amount without GST</Text>

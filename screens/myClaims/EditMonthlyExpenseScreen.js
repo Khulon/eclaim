@@ -174,7 +174,8 @@ function deleteExpense(expense) {
                   className="custom-input" 
                   selected={expense.date} 
                   onChange={(date) => setNewExpense({...expense, date: date})} 
-                  readOnly={!isEditing}  
+                  readOnly={!isEditing}
+                  dateFormat="dd/MM/yyyy"
                 />
               </View>
               <View style={styles.inputContainer}>
