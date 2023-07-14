@@ -87,7 +87,7 @@ app.post('/register', (req, res) => {
       res.json({user: email, userType: "Normal", message: "Account Created!"});})
     .catch((err) => {
       console.log(err)
-      res.json({message: "Error!"});
+      res.json({message: err.message});
     });
     
   });
@@ -110,7 +110,7 @@ app.get('/admin/:token', authenticateAdmin, async (req, res) => {
     res.send({users: users.recordset, departments: departments.recordset, companies: companies.recordset});
   } catch(err) {
     console.log(err)
-    res.send({message: 'Error!'});
+    res.send({message: err.message});
   }
 
 });
@@ -130,7 +130,7 @@ app.get('/admin/editUser/:email/:token', authenticateAdmin, async (req, res) => 
 
    } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
    }
 
 });
@@ -548,7 +548,7 @@ app.get('/myClaims/:email/:token', authenticateUser, async (req, res) => {
 
   } catch(err) {
       console.log(err)
-      res.send({message: "Error!"});
+      res.send({message: err.message});
   }
 
 });
@@ -667,7 +667,7 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
   
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -856,7 +856,7 @@ app.get('/getTravellingExpenseTypes', async (req, res) => {
     res.send(result.recordset);
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -871,7 +871,7 @@ app.get('/getMonthlyExpenseTypes', async (req, res) => {
     res.send(result.recordset);
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -1037,7 +1037,7 @@ app.post('/deleteExpense', async (req, res) => {
     res.send({message: "Expense deleted!"})
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -1060,7 +1060,7 @@ app.post('/deleteClaim', async (req, res) => {
     res.send({message: "Claim deleted!"})
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -1078,7 +1078,7 @@ app.post('/checkExpense', async (req, res) => {
     await request.query(query);
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 });
 
@@ -1217,7 +1217,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
     }
   } catch(err) {
       console.log(err)
-      res.send({message: "Error!"});
+      res.send({message: err.message});
   }
 
 });
@@ -1358,7 +1358,7 @@ app.post('/approveClaim', async (req, res) => {
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -1454,7 +1454,7 @@ app.post('/processClaim', async (req, res) => {
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 });
@@ -1584,7 +1584,7 @@ app.post('/approverRejectClaim', async (req, res) => {
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 })
@@ -1675,7 +1675,7 @@ app.post('/processorRejectClaim', async (req, res) => {
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"});
+    res.send({message: err.message});
   }
 
 })
@@ -1716,7 +1716,7 @@ app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res
 
   } catch(err) {
     console.log(err)
-    res.send({message: "Error!"})
+    res.send({message: err.message})
   }
 
 })
