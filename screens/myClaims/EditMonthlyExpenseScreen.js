@@ -7,13 +7,16 @@ import * as ImagePicker from 'expo-image-picker';
 import FullScreenImage from '../../components/FullScreenImage';
 import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../../components/custom-datepicker.css";
 
 export default function AddMonthlyExpenseScreen({ navigation, route }) {        
   const [isExpand, setIsExpand] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);
   const expenseDetails = route.params.expense
-  const date = new Date(expenseDetails.date_of_expense).toLocaleDateString("en-UK");
+  const date = new Date(expenseDetails.date_of_expense)
   const expenseTypeDropdown = route.params.monthlyExpenseTypes
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
@@ -22,6 +25,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
     description: expenseDetails.description, receipt: expenseDetails.receipt});
 
   function updateExpense(expense) {
+    console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     fetch('http://10.0.1.28:5000/editMonthlyExpense', {
       method: 'POST', 
@@ -164,15 +168,13 @@ function deleteExpense(expense) {
               ) : (
                 <View/>
               )}
-              <View style={styles.inputContainer}>
+              <View style={[styles.inputContainer, {zIndex:4}]}>
                 <Text style={styles.normalBoldText}>Date</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="dd/mm/yyyy"
-                  value={expense.date}
-                  onChangeText={(date) => setNewExpense({...expense, date: date})}
-                  autoCapitalize="none"
-                  autoCorrect={false} 
-                  editable={isEditing}
+                <DatePicker 
+                  className="custom-input" 
+                  selected={expense.date} 
+                  onChange={(date) => setNewExpense({...expense, date: date})} 
+                  readOnly={!isEditing}  
                 />
               </View>
               <View style={styles.inputContainer}>
