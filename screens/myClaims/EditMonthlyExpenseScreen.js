@@ -51,9 +51,9 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
       aspect: [4, 3],
       quality: 1,
     });
-    if (!result.canceled) {
-      setNewExpense({...expense, receipt: result.uri});
-    }
+    
+    setNewExpense({...expense, receipt: result.uri});
+    
   }
 
 function deleteExpense(expense) {
