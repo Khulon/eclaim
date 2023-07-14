@@ -80,7 +80,7 @@ async function authenticateAdmin(req, res, next) {
 app.post('/register', (req, res) => {
     let email = req.body.companyEmail;
     let password = req.body.password;
-    let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"')";
+    let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"', 'No')";
     var query = new sql.Request();
      query.query(statement)
     .then((result) => {
@@ -218,6 +218,32 @@ app.post('/admin/deleteUser', async (req, res) => {
 });
 
 
+//lock user account
+app.post('/admin/lockUser', async (req, res) => {
+  let email = req.body.email;
+  var request = new sql.Request();
+  try {
+    await request.query("UPDATE Accounts SET locked = 'Yes' WHERE email = '"+email+"'")
+    res.send({message: "User Locked!"});
+  } catch(err) {
+    console.log(err)
+    res.json({message: err.message});
+  }
+})
+
+//unlock user account
+app.post('/admin/unlockUser', async (req, res) => {
+  let email = req.body.email;
+  var request = new sql.Request();
+  try {
+    await request.query("UPDATE Accounts SET locked = 'No' WHERE email = '"+email+"'")
+    res.send({message: "User Unlocked!"});
+  } catch(err) {
+    console.log(err)
+    res.json({message: err.message});
+  }
+})
+
 
 //Admin adds user
 app.post('/admin/addUser', async (req, res) => {
@@ -274,7 +300,7 @@ app.post('/login', async (req, res) => {
     let email = req.body.companyEmail;
     let password = req.body.password;
     var request = new sql.Request();
-    let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'";
+    let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"' and locked = 'No'";
     let checkAdmin = await request.query("SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'");
     let count = checkAdmin.recordset[0].count;
 
@@ -282,7 +308,6 @@ app.post('/login', async (req, res) => {
     if (count == 1) {
 
       const token = generateAccessToken({ email: email, password: password });
-      console.log(token)
       res.send({ email: email, userType: "Admin", token: token, message: "Login Successful!"});	
 
     } else {
@@ -301,7 +326,7 @@ app.post('/login', async (req, res) => {
 
        
         const token = generateAccessToken({ email: email, password: password });
-        console.log(token)
+        
         res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records});
         
 
@@ -516,7 +541,7 @@ async function authenticateUser(req, res, next) {
     const decoded = jwt.verify(token, tokenSecret)
     var request = new sql.Request();
     const password = await request.query("SELECT password FROM Accounts WHERE email = '"+decoded.email+"'")
-    console.log(password.recordset[0].password)
+
     if(decoded.email != email || decoded.password != password.recordset[0].password) return res.sendStatus(403)
     next()
 
@@ -1049,7 +1074,6 @@ app.post('/deleteClaim', async (req, res) => {
   
   let id = req.body.current.id;
   let form_creator = req.body.current.form_creator;
-  console.log(id)
 
   try {
     var request = new sql.Request();

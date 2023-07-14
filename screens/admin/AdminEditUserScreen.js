@@ -5,6 +5,7 @@ import ConfirmationButton from '../../components/ConfirmationButton';
 import MultiSelect from 'react-native-multiple-select';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
+import { update } from 'lodash';
 
 export default function AdminEditUserScreen({ navigation, route }) {        
   const [userDepartments, setUserDepartments] = useState([]);
@@ -69,6 +70,43 @@ export default function AdminEditUserScreen({ navigation, route }) {
             }
           })
   }
+
+  function lockUser(email) {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://10.0.1.28:5000/admin/lockUser', {
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify({email: email})})
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if(data.message == "User Locked!") {
+              alert("User account has been locked!")
+              window.location.reload(false);
+            } else {
+              alert("Failed to lock user account!")
+            }
+          })
+  }
+
+  function unlockUser(email) {
+    const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
+    fetch('http://10.0.1.28:5000/admin/unlockUser', {
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify({email: email})})
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if(data.message == "User Unlocked!") {
+              alert("User account has been unlocked!")
+              window.location.reload(false);
+            } else {
+              alert("Failed to unlock user account!")
+            }
+          })
+  }
+
 
   return (
     <View style={styles.page}>
