@@ -22,13 +22,3 @@ export function parseDatePeriod (dateFrom, dateTo) {
     var final = dateFrom + " - " + dateTo
     return final 
   }
-
-export function parseDown (date) {
-  date = new Date(date).toLocaleDateString("en-UK")
-  var day = date.substring(0,2)
-  var month = date.substring(3,5)
-  var year = date.substring(8,10)
-
-  return day + '/' + month + '/' + year
-
-}

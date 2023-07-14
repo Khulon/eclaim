@@ -6,13 +6,16 @@ import ConfirmationButton from '../../components/ConfirmationButton';
 import * as ImagePicker from 'expo-image-picker';
 import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../../components/custom-datepicker.css";
 
 export default function AddMonthlyExpenseScreen({ navigation, route }) {        
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
-    with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: null, description: null, receipt: null});
+    with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: new Date(), description: null, receipt: null});
 
   async function handleAddExpense() {
     console.log(expense)
@@ -97,15 +100,9 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
               ) : (
                 <View/>
               )}
-              <View style={styles.inputContainer}>
+              <View style={[styles.inputContainer, {zIndex:4}]}>
                 <Text style={styles.normalBoldText}>Date</Text>
-                  <TextInput style={styles.textInput}
-                    placeholder="dd/mm/yyyy" 
-                    value={expense.date} 
-                    onChangeText={(date) => setExpense({...expense, date:date})} 
-                    autoCapitalize="none" 
-                    autoCorrect={false} 
-                  />
+                <DatePicker className="custom-input" selected={expense.date} onChange={(date) => setExpense({...expense, date: date})} />
               </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Amount without GST</Text>

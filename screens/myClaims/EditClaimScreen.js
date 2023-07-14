@@ -1,4 +1,4 @@
-import { Animated, TextInput, StyleSheet, Text, View, Button, TouchableOpacity, FlatList } from 'react-native';
+import { TextInput, StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
 import React, { useRef, useState, useEffect } from "react";
 import { Ionicons, Feather } from "react-native-vector-icons";
 import filter from "lodash.filter"
@@ -175,6 +175,7 @@ export default function EditClaimScreen({ navigation, route}) {
           window.location.reload(false)
         } else {
           alert('Claim could not be submitted!')
+          window.location.reload(false)
         }
       })
   }

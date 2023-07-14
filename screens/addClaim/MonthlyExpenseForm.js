@@ -1,20 +1,17 @@
 import { TextInput, StyleSheet, Text, View, ScrollView} from 'react-native';
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./custom-datepicker.css";
-import { parseDown } from '../../functions/Parsers.js'
+import "../../components/custom-datepicker.css";
 
 export default function MonthlyExpenseForm({route}) {        
 
   const addClaim = route.params.props;
-  const [ startDate, setStartDate ] = useState(new Date());
-  const [ endDate, setEndDate ] = useState(new Date());
   const [claim, setClaim] = useState(
     {creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, 
-    payPeriodFrom: null, payPeriodTo: null, costCenter: null, note: null});
+    payPeriodFrom: new Date(), payPeriodTo: new Date(), costCenter: null, note: null});
 
   function addMonthlyClaim (claim) {
     console.log(claim.payPeriodFrom, claim.payPeriodTo)
@@ -35,13 +32,6 @@ export default function MonthlyExpenseForm({route}) {
         });
   }; 
 
-  useEffect(() => { 
-    setClaim(prevClaim => ({ 
-      ...prevClaim, 
-      payPeriodFrom: parseDown(startDate), 
-      payPeriodTo: parseDown(endDate) 
-    })); 
-  }, [startDate, endDate]);
 
   return (
     <View style={styles.page}>
@@ -68,12 +58,11 @@ export default function MonthlyExpenseForm({route}) {
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
               <View style={[styles.inputContainer, {zIndex:99}]}>
                   <Text style={styles.normalBoldText}>Pay Period - From</Text>
-                  <DatePicker className="custom-input" selected={startDate} onChange={(date) => setStartDate(date)} />
+                  <DatePicker className="custom-input" selected={claim.payPeriodFrom} onChange={(date) => setClaim({...claim, payPeriodFrom: date})} />
               </View>
-
               <View style={[styles.inputContainer, {zIndex:98}]}>
                   <Text style={styles.normalBoldText}>Pay Period - To</Text>
-                  <DatePicker className="custom-input" selected={endDate} onChange={(date) => setEndDate(date)} />
+                  <DatePicker className="custom-input" selected={claim.payPeriodTo} onChange={(date) =>  setClaim({...claim, payPeriodTo: date})} />
               </View>
               <View style={[styles.inputContainer]}>
                 <Text style={styles.normalBoldText}>Cost Center</Text>
