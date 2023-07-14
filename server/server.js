@@ -101,7 +101,7 @@ app.get('/admin/:token', authenticateAdmin, async (req, res) => {
         
     // query to the database and get the records
     const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
-    + 'processor_email FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
+    + 'processor_email, locked FROM Employees E LEFT JOIN Accounts ON E.email = Accounts.email JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
     + ' JOIN Processors P ON E.company_prefix = P.company WHERE approver_name IS NULL OR (E.email != approver_name)')
 
     const departments = await request.query('SELECT department_name FROM Departments')
