@@ -275,10 +275,6 @@ export default function EditClaimScreen({ navigation, route}) {
     )
   }
 
-
-
-  
-
   return (
     <View style={styles.page}>
       <LoadingPage isLoading={isLoading}/>
@@ -340,7 +336,7 @@ export default function EditClaimScreen({ navigation, route}) {
 
         <View style={[styles.bottomCard, {height: claim.current.status == 'In Progress' || claim.current.status == 'Rejected' ? "140px" : '90px'}]}>
           <View style={{position:'absolute', width:'100%', height:'100%', flexDirection:'row-reverse'}}>
-            <Text style={{paddingTop:'5px', paddingRight:'10px'}}>ID: {claim.current.id}</Text>
+            <Text style={{paddingTop:'5px', paddingRight:'10px', fontSize:'18px', fontWeight:500}}>ID: {claim.current.id}</Text>
           </View>
           <Text style={{paddingTop:"15px"}}>Total:</Text>
           <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${claim.current.total_amount}</Text>
