@@ -226,9 +226,9 @@ export default function EditClaimScreen({ navigation, route}) {
       <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
         <View style={{width:'15%', height:'100%'}}></View>
         {checked == 'No' ? (
-          <View style={{width:'30px', flexDirection:'row-reverse'}}>
-            <Tooltip text={'Unchecked'}>
-              <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="25px"></Ionicons></Text>
+          <View>
+            <Tooltip text={'Pending Check'}>
+              <Ionicons name="alert-circle-outline" color="#E04F4F" size="25px"></Ionicons>
             </Tooltip>
           </View>
         ):(
@@ -237,7 +237,7 @@ export default function EditClaimScreen({ navigation, route}) {
         {receipt != null ? (
           <View>
             <Tooltip text={'Reciept'}>
-              <Text><Ionicons name="document-attach-outline" color="#444" size="23px"></Ionicons></Text>
+              <Ionicons name="document-attach-outline" color="#444" size="23px"></Ionicons>
             </Tooltip>
           </View>
         ):(
