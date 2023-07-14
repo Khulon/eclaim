@@ -1,19 +1,21 @@
-import { TextInput, StyleSheet, Text, View, ScrollView} from 'react-native';
+import { TextInput, StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
 import React, { useEffect, useState } from "react";
 import { SelectList } from 'react-native-dropdown-select-list';
 import ConfirmationButton from '../../components/ConfirmationButton';
 import MultiSelect from 'react-native-multiple-select';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
+import { Ionicons } from "react-native-vector-icons";
 import { update } from 'lodash';
 
 export default function AdminEditUserScreen({ navigation, route }) {        
+  const [isLockButtonHover, setIsLockButtonHover] = useState(false);
   const [userDepartments, setUserDepartments] = useState([]);
   const [approvingDepartments, setApprovingDepartments] = useState([]);
   const [userDetails, setUserDetails] = useState({name: route.params.props.name, oldEmail: route.params.props.email, newEmail: route.params.props.email,
     company: route.params.props.company_prefix, supervisor: route.params.props.supervisor,
     approver: route.params.props.approver, processor: route.params.props.processor,
-    department: null, approvingDepartments: null
+    department: null, approvingDepartments: null, locked: route.params.props.locked
   });
 
   useEffect(() => {
@@ -113,8 +115,40 @@ export default function AdminEditUserScreen({ navigation, route }) {
       <View style={styles.pageDefault}>
 
         <View style={styles.topCard}>
-          <View style={styles.backButtonBar}>
-            <BackButton onPress={() => navigation.goBack()}/>
+          <View style={{width:'100%', position:'absolute',zIndex:999, justifyContent:'space-between', flexDirection:'row'}}>
+            <View style={{width:'23%', alignItems:'center'}}>
+              <BackButton hideText={true} onPress={() => navigation.goBack()}/>
+            </View>
+            {userDetails.locked == 'Yes' ? (
+              <View style={{width:'23%', alignItems:'center'}}>
+              <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsLockButtonHover(true)} onMouseLeave={() => setIsLockButtonHover(false)} 
+                onPress={() => ConfirmationButton('Are you sure you want to enable this user?', 'User will be allowed to log in',() => unlockUser(userDetails.oldEmail))}>
+                <View style={styles.LockButton}>
+                  {isLockButtonHover?(
+                    <Ionicons name="lock-open" color="#9C2424" size="33px"/>
+                  ):(
+                    <Ionicons name="lock-closed" color="#9C2424" size="30px"/>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+            ):( userDetails.locked == null ? (
+              <View/>
+            ) : (
+              <View style={{width:'23%', alignItems:'center'}}>
+              <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsLockButtonHover(true)} onMouseLeave={() => setIsLockButtonHover(false)} 
+                onPress={() => ConfirmationButton('Are you sure you want to disable this user?', 'User will no longer be able to log in',() => lockUser(userDetails.oldEmail))}>
+                <View style={styles.lockButton}>
+                  {isLockButtonHover?(
+                    <Ionicons name="lock-closed" color="#9C2424" size="33px"/>
+                  ):(
+                    <Ionicons name="lock-open" color="#9C2424" size="30px"/>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+            )
+            )}
           </View>
         </View>
 
