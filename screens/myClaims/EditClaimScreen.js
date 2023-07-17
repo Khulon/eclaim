@@ -145,9 +145,10 @@ export default function EditClaimScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == "Claim deleted!") {
-          alert("Claim deleted successfully!")
+          alert(data.message)
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert("Claim could not be deleted!")
         }
       })

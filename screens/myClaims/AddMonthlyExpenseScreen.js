@@ -30,8 +30,11 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
         if(data.message == "Success!") {
           alert("Expense added successfully!")
           navigation.goBack()
-        } else {
+        } else if (data.message == "Invalid date! Date of expense must be within pay period!" || data.error == "known") {
           alert(data.message)
+        } else {
+          console.log(data.message)
+          alert("Failed to add monthly expense!")
         }
       })
   }
