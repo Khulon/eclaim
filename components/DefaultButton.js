@@ -2,6 +2,16 @@ import { StyleSheet, TouchableOpacity, Animated} from 'react-native';
 import React, { useRef } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../assets/animation/AllAnimations';
 
+/**
+ * DefaultButton Component
+ *
+ * A reusable button component with customizable styles and animations.
+ *
+ * @param {string} description - The text or label displayed on the button.
+ * @param {function} onPress - The callback function to be called when the button is pressed.
+ * @param {object} customStyle - Custom styles to be applied to the button.
+ * @param {string} buttonColor - The background color of the button. If not provided, the default color red is used.
+ */
 export default function DefaultButton({description, onPress, customStyle, buttonColor}) {
 
     const buttonHover = useRef(new Animated.Value(0)).current;

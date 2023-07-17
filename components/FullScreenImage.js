@@ -1,10 +1,16 @@
-
 import { View, Image, TouchableOpacity } from 'react-native';
 import React from "react";
 
-
+/**
+ * FullScreenImage Component
+ *
+ * A component that displays an image in full-screen mode with a translucent overlay.
+ *
+ * @param {object} image - The source of the image to be displayed.
+ * @param {function} myFunction - The callback function to be called when the image is pressed.
+ * @param {boolean} show - Determines whether to show or hide the full-screen image component.
+ */
 export default function FullScreenImage ({image, myFunction, show}) {
-
     
     const handleButtonPress = () => {
         myFunction();
@@ -26,6 +32,4 @@ export default function FullScreenImage ({image, myFunction, show}) {
             <View></View>
         )
     }
-
-    
 }

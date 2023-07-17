@@ -1,9 +1,14 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, Animated } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Animated } from 'react-native'
 import { Ionicons } from "react-native-vector-icons";
 import React, {useRef, useState, useEffect} from 'react'
-import { MoveNegAnimation, MovePosAnimation } from '../assets/animation/AllAnimations';
 
-
+/**
+ * BottomNavigation Component
+ *
+ * A custom navigation component for displaying a bottom navigation bar.
+ *
+ * @param {object} navigation - The navigation object for navigating between screens.
+ */
 
 export default function BottomNavigaton({navigation}) {
 
@@ -15,7 +20,9 @@ export default function BottomNavigaton({navigation}) {
 
     const stackScreen = window.localStorage.getItem('stackScreen')
 
-    
+    /**
+    * Get the active stack screen from local storage and update the iconUnderline state accordingly.
+    */
     useEffect(() => {
         switch(stackScreen) {
             case 'Home':
@@ -45,8 +52,6 @@ export default function BottomNavigaton({navigation}) {
         HoverSet(buttonHover)
     }, [showHover]);
 
-
-
     function HoverTransition (translation) {
         Animated.spring(translation, {
             toValue: buttonNumber*60,
@@ -71,41 +76,6 @@ export default function BottomNavigaton({navigation}) {
             useNativeDriver: true,
           }).start();
     }
-
-    const styles = StyleSheet.create({
-        navigationBar: {
-            height: "100%",
-            width: "100%",
-            backgroundColor: '#fff',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: "Arial",
-            borderTopWidth:'1px',
-            borderColor:'#D9D9D9'
-        },
-        iconContainer: {
-            width:'60px',
-            height:'50px',
-            alignItems:'center',
-            justifyContent:'center',
-            borderRadius:'12px'
-        },
-        button: {
-            width:'100%',
-            height:'100%',
-            justifyContent:'center',
-            alignItems:'center'
-        },
-        buttonHover: {
-            width:'60px',
-            height:'50px',
-            backgroundColor: 'black',
-            opacity:'10%',
-            borderRadius:'10px'
-        }
-
-    
-      });
     
     return(
         <View style={styles.navigationBar}>
@@ -123,35 +93,35 @@ export default function BottomNavigaton({navigation}) {
             </Animated.View>
             </Animated.View>
 
-            <Animated.View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(0)}>
+            <View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(0)}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('HomeStack') } >
                 <Ionicons name="home-outline" color="#444" size='25px'/>
             </TouchableOpacity>
-            </Animated.View>
+            </View>
 
-            <Animated.View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(1)}>
+            <View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(1)}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ManagementStack')} >
                 <Ionicons name="file-tray-full-outline" color="#444" size='26px'/>
             </TouchableOpacity>
-            </Animated.View>
+            </View>
 
-            <Animated.View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(2)}>
+            <View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(2)}>
             <TouchableOpacity style={[styles.button, {height:'45px', paddingBottom:'5px'}]} onPress={() => navigation.navigate('AddClaimStack')} >
                 <Ionicons name="duplicate-outline" color="#9C2424" size='30px'/>
             </TouchableOpacity>
-            </Animated.View>
+            </View>
 
-            <Animated.View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(3)}>
+            <View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(3)}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MyClaimsStack')} >
                 <Ionicons name="document-text-outline" color="#444" size='25px'/>
             </TouchableOpacity>
-            </Animated.View>
+            </View>
 
-            <Animated.View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(4)}>
+            <View style={styles.iconContainer} onMouseEnter={() => setButtonNumber(4)}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ProfileStack')} >
                 <Ionicons name="people-outline" color="#444" size='25px'/>
             </TouchableOpacity>
-            </Animated.View>
+            </View>
 
 
         </View>
@@ -161,4 +131,36 @@ export default function BottomNavigaton({navigation}) {
 
 }
 
+const styles = StyleSheet.create({
+    navigationBar: {
+        height: "100%",
+        width: "100%",
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: "Arial",
+        borderTopWidth:'1px',
+        borderColor:'#D9D9D9'
+    },
+    iconContainer: {
+        width:'60px',
+        height:'50px',
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:'12px'
+    },
+    button: {
+        width:'100%',
+        height:'100%',
+        justifyContent:'center',
+        alignItems:'center'
+    },
+    buttonHover: {
+        width:'60px',
+        height:'50px',
+        backgroundColor: 'black',
+        opacity:'10%',
+        borderRadius:'10px'
+    }
+  });
 
