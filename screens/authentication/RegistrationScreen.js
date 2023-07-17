@@ -14,13 +14,15 @@ export default function RegistrationScreen({ navigation }) {
 
   function register() {
     try{
+      console.log(loginDetails.password)
+      console.log(loginDetails.confirmPassword)
       if(loginDetails.password != loginDetails.confirmPassword) {
-        alert("Passwords do not match");
-        throw new Error("Passwords do not match");
+        alert("Passwords do not match!");
+        throw new Error("Passwords do not match!");
       } 
       if (!validationResults.every(result => result.color == 'green')) {
-        alert("Password must pass all conditions in red")
-        throw new Error("Password must pass all conditions in red");
+        alert("Password must pass all conditions in red!")
+        throw new Error("Password must pass all conditions in red!");
       }
       createUser(loginDetails);
     } catch (error) {
