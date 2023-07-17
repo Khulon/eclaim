@@ -300,7 +300,7 @@ app.post('/login', async (req, res) => {
     let email = req.body.companyEmail;
     let password = req.body.password;
     var request = new sql.Request();
-    let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"' and locked = 'No'";
+    
     let checkAdmin = await request.query("SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'");
     let count = checkAdmin.recordset[0].count;
 
@@ -311,6 +311,11 @@ app.post('/login', async (req, res) => {
       res.send({ email: email, userType: "Admin", token: token, message: "Login Successful!"});	
 
     } else {
+      let locked = await request.query("SELECT locked FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'")
+      if(locked.recordset[0].locked == 'Yes') {
+        throw new Error('Account is locked!')
+      }
+      let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"' and locked = 'No'";
       const result = await request.query(statement)
       let count = result.recordset[0].count;
 
@@ -336,7 +341,7 @@ app.post('/login', async (req, res) => {
     }
 } catch(err) {
     console.log(err)
-    res.json({message: "Login Failed!"});
+    res.json({message: err.message});
 }
 });
 

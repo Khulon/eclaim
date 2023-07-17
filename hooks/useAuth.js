@@ -25,6 +25,8 @@ export const AuthProvider = ({children}) => {
           
           window.location.reload(false);
           
+        } else if(resp.message == 'Account is locked!') {
+          alert('Account is locked!');
         } else {
           alert('Login Failed!');
         }
