@@ -35,7 +35,7 @@ sql.connect(config, function (err) {
 });
 
 
-var port =  process.env.port || process.env.PORT;
+var port =  5000//process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -82,7 +82,7 @@ app.post('/register', async (req, res) => {
     } else {
       let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"', 'No')";
       await request.query(statement)
-      res.json({user: email, userType: "Normal", message: "Account Created!", error: "none"});
+      res.json({user: email, userType: "Normal", message: "Account Created!"});
     }
   } catch(err) {
     console.log(err)
@@ -337,7 +337,7 @@ app.post('/login', async (req, res) => {
        
         const token = generateAccessToken({ email: email, password: password });
         
-        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records, error: "none"});
+        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records});
       } else {
         return res.json({error: "known", message: "Invalid email and/or password!"});
       }
@@ -373,6 +373,7 @@ app.post('/addClaim', async (req, res) => {
 
   let payPeriodFrom = req.body.payPeriodFrom;
   let payPeriodTo = req.body.payPeriodTo;
+
   let costCenter = req.body.costCenter;
   if (costCenter == "") {
     costCenter = null;
@@ -394,6 +395,9 @@ app.post('/addClaim', async (req, res) => {
   //Adding monthly claim
   if (expenseType == "Monthly") {
     try {
+      if(payPeriodFrom > payPeriodTo) {
+        return res.json({error: "known", message: "Pay Period(From) cannot be later than Pay Period(To)!"})
+      }
       const fromDate = await request.query("SELECT PARSE('"+payPeriodFrom+"' as date USING 'AR-LB') AS fromDate")
       const toDate = await request.query("SELECT PARSE('"+payPeriodTo+"' as date USING 'AR-LB') AS toDate")
       const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
@@ -432,7 +436,7 @@ app.post('/addClaim', async (req, res) => {
           
     } catch(err) {
       console.log(err)
-      res.send({message: "Failed to add claim!"});
+      res.send({error: "unknown", message: err.message});
     }
 
 //Adding travelling claim
@@ -445,8 +449,18 @@ app.post('/addClaim', async (req, res) => {
     let dateTo = req.body.dateTo;
 
     var request = new sql.Request();
+
+    if(country == null || exchangeRate == null || country == "" || exchangeRate == "") {
+      return res.json({error: "known", message: "Please fill in all the fields!"})
+    }
+    
     const fromDate = await request.query("SELECT PARSE('"+dateFrom+"' as date USING 'AR-LB') AS fromDate")
-    const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate") 
+    const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate")
+    
+    if(fromDate.recordset[0].fromDate > toDate.recordset[0].toDate) {
+      return res.json({error: "known", message: "Date(From) cannot be later than Date(To)!"})
+    }
+
     const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
@@ -478,7 +492,7 @@ app.post('/addClaim', async (req, res) => {
 
   } catch(err) {
       console.log(err)
-      res.send({message: "Failed to add travelling claim!"});
+      res.send({error: "unknown", message: err.message});
   }
 
   }
@@ -520,7 +534,7 @@ app.post('/joinClaim', async (req, res) => {
 
   } catch(err) {
     console.log(err)
-    res.send({message: err.message});
+    res.send({error: "unknown", message: err.message});
   }
 
 });
