@@ -42,7 +42,7 @@ export default function EditClaimScreen({ navigation, route}) {
       const user = window.localStorage.getItem('session');
       const token = window.localStorage.getItem('token');
       let [res1, res2, res3] = await Promise.all([
-      fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
+      fetch(`http://localhost:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         if(data.message == "Token expired!") {
@@ -56,7 +56,7 @@ export default function EditClaimScreen({ navigation, route}) {
         }
         console.log(claim.current.total_amount)
       }),
-      fetch('http://10.0.1.28:5000/getTravellingExpenseTypes')
+      fetch('http://localhost:5000/getTravellingExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -65,7 +65,7 @@ export default function EditClaimScreen({ navigation, route}) {
         }
         setTravellingExpenseTypes(data)
       }),
-      fetch('http://10.0.1.28:5000/getMonthlyExpenseTypes')
+      fetch('http://localhost:5000/getMonthlyExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -101,7 +101,7 @@ export default function EditClaimScreen({ navigation, route}) {
       navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.current.status})
     } else {
       if (userDetails.email == claim.current.form_creator) {
-        fetch('http://10.0.1.28:5000/checkExpense', {
+        fetch('http://localhost:5000/checkExpense', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -135,7 +135,7 @@ export default function EditClaimScreen({ navigation, route}) {
 
   function handleDeleteClaim (claim) {
     console.log(claim)
-    fetch('http://10.0.1.28:5000/deleteClaim', {
+    fetch('http://localhost:5000/deleteClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -160,7 +160,7 @@ export default function EditClaimScreen({ navigation, route}) {
     } else {
       parsedDate = monthlyPeriod
     }
-    fetch('http://10.0.1.28:5000/submitClaim', {
+    fetch('http://localhost:5000/submitClaim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -14,7 +14,7 @@ export default function TravellingExpenseForm({ route }) {
   function addTravellingClaim (claim) {
     console.log(claim)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/addClaim', {
+    fetch('http://localhost:5000/addClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})
@@ -22,10 +22,13 @@ export default function TravellingExpenseForm({ route }) {
         .then(data => {
           console.log(data);
           if(data.message == "Travelling claim added successfully!") {
-            alert("Travelling claim added successfully!")
+            alert(data.message)
             window.location.reload(false)
+          } else if(data.error == "known") {
+            alert(data.message)
           } else {
-            alert("Error adding travelling claim!")
+            console.log(data.message)
+            alert("Failed to add travelling claim!")
           }
         });
   }; 
