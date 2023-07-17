@@ -2,7 +2,6 @@ const express = require('express');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars')
-const path = require('path');
 const cors = require('cors');
 const sql = require('mssql');
 const jwt = require('jsonwebtoken');
@@ -36,14 +35,7 @@ sql.connect(config, function (err) {
 });
 
 
-/*
-
-var server = app.listen(5000, function () {
-  console.log('Server is running on port ' + server.address().port + '...');
-});
-*/ 
-
-var port = process.env.port || process.env.PORT;
+var port =  process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -77,20 +69,26 @@ async function authenticateAdmin(req, res, next) {
 
 
 //User registers an account
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
+  try {
     let email = req.body.companyEmail;
     let password = req.body.password;
-    let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"', 'No')";
-    var query = new sql.Request();
-     query.query(statement)
-    .then((result) => {
-      res.json({user: email, userType: "Normal", message: "Account Created!"});})
-    .catch((err) => {
-      console.log(err)
-      res.json({message: err.message});
-    });
-    
-  });
+    var request = new sql.Request();
+    const count = await request.query("SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"'")
+    if (count.recordset[0].count == 0) {
+      return res.json({error: "known", message: "Email does not exist! Contact admin to add you as a user."})
+    } else if (count.recordset[0].count == 1) {
+      return res.json({error: "known", message: "Account already exists!"})
+    } else {
+      let statement = "INSERT INTO Accounts VALUES ('"+email+"','"+password+"', 'No')";
+      await request.query(statement)
+      res.json({user: email, userType: "Normal", message: "Account Created!", error: "none"});
+    }
+  } catch(err) {
+    console.log(err)
+    res.json({error: "unknown", message: err.message});
+  }  
+});
 
 
 
@@ -303,45 +301,50 @@ app.post('/login', async (req, res) => {
     
     let checkAdmin = await request.query("SELECT COUNT(*) AS count FROM SystemAdmins WHERE email = '"+email+"' and password = '"+password+"'");
     let count = checkAdmin.recordset[0].count;
+    
 
     //Admin login
     if (count == 1) {
-
       const token = generateAccessToken({ email: email, password: password });
       res.send({ email: email, userType: "Admin", token: token, message: "Login Successful!"});	
 
     } else {
-      let locked = await request.query("SELECT locked FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'")
-      if(locked.recordset[0].locked == 'Yes') {
-        throw new Error('Account is locked!')
+
+      let user = await request.query("SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' AND password = '"+password+"'")
+      
+      if(user.recordset[0].count == 0) {
+        return res.json({error: "known", message: 'Invalid email and/or password!'})
       }
+
+      let locked = await request.query("SELECT locked FROM Accounts WHERE email = '"+email+"' and password = '"+password+"'")
+      
+      if(locked.recordset[0].locked == 'Yes') {
+       return res.json({error: "known", message: 'Account is locked!'})
+      }
+
       let statement = "SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"' and password = '"+password+"' and locked = 'No'";
       const result = await request.query(statement)
       let count = result.recordset[0].count;
 
       //Normal user login  
       if(count == 1) {
-        var request = new sql.Request();
         
         const result = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, password, '
         + 'processor_email, profile FROM Employees E JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
         + " JOIN Processors P ON E.company_prefix = P.company JOIN Accounts ON Accounts.email = E.email WHERE E.email = '"+email+"'");
 
         let records = result.recordset[0];
-
        
         const token = generateAccessToken({ email: email, password: password });
         
-        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records});
-        
-
+        res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records, error: "none"});
       } else {
-        res.json({message: "Login Failed!"});
+        return res.json({error: "known", message: "Invalid email and/or password!"});
       }
     }
 } catch(err) {
     console.log(err)
-    res.json({message: err.message});
+    res.json({error: "unknown", message: err.message});
 }
 });
 
@@ -374,6 +377,7 @@ app.post('/addClaim', async (req, res) => {
   if (costCenter == "") {
     costCenter = null;
   }
+
   let note = req.body.note;
 
   var newFormId = '';
@@ -488,27 +492,35 @@ app.post('/joinClaim', async (req, res) => {
 
   try {
     var request = new sql.Request();
+    const claimExists = await request.query("SELECT COUNT(*) AS count FROM Claims WHERE id = '"+formId+"'")
+    if (claimExists.recordset[0].count == 0) {
+      return res.json({error: "known", message: "Claim does not exist!"})
+    }
     const results = await request.query("SELECT form_type, form_creator FROM Claims WHERE id = '"+formId+"'")
 
     if(results.recordset[0].form_type == "Travelling") {
-      throw new Error("Travelling claims cannot be joined!")
+      return res.json({error: "known", message: "Travelling claims cannot be joined!"})
     } else {
       //Check same department and form_creator is supervisor
       const form_creator = results.recordset[0].form_creator
       const query = "SELECT COUNT(*) AS count FROM BelongsToDepartments WHERE email = '"+formCreator+"' AND department IN (SELECT department FROM Supervisors WHERE supervisor = '"+form_creator+"')"
       const check = await request.query(query)
       if(check.recordset[0].count == 0) {
-        throw new Error("This is not your supervisor's form!")
+        return res.json({error: "known", message: "This is not your supervisor's form!"})
       }
     }
     //handles case where form creator joins claim as it will throw error
+    const claimCreator = await request.query("SELECT form_creator FROM Claims WHERE id = '"+formId+"'")
+    if(claimCreator.recordset[0].form_creator == formCreator) {
+      return res.json({error: "known", message: "You cannot join your own claim!"})
+    }
     await request.query("INSERT INTO Claimees VALUES('"+formId+"', '"+formCreator+"' )");
 
     res.send({message: "Joined claim successfully!", user: formCreator})
 
   } catch(err) {
     console.log(err)
-    res.send({message: "Failed to join claim!"});
+    res.send({message: err.message});
   }
 
 });
