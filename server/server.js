@@ -540,7 +540,6 @@ app.post('/joinClaim', async (req, res) => {
 });
 
 
-
 //Add or change profile photo
 app.post('/uploadImage', async (req, res) => {
   try {
@@ -974,10 +973,15 @@ app.post('/editTravellingExpense', async (req, res) => {
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = "+description+", total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = @description, total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
+    if (description == null) {
+      request.input('description', sql.Varchar, null)
+      } else {
+      request.input('description', sql.Varchar, description)
+    }
     request.input('amount', sql.Numeric(18,2), amount);
     if(receipt == null) {
       request.input('receipt', sql.VarChar, null);
@@ -1052,7 +1056,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
       checked = 'Yes'
     }
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = "+description+", total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
+    + "description = @description, total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
     + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 

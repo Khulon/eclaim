@@ -44,7 +44,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       const user = claim.form_creator;
       const status = claim.status;
       const token  = window.localStorage.getItem('token');
-      await fetch(`http://localhost:5000/getExpenses/${user}/${id}/${token}`)
+      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -65,7 +65,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
       });
 
-      fetch(`http://localhost:5000/getHistory/${id}/${status}/${token}}`)
+      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -140,7 +140,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const user = window.localStorage.getItem('session')
 
   function approveClaim(claim) {
-    fetch('http://localhost:5000/approveClaim', {
+    fetch('http://10.0.1.28:5000/approveClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -160,7 +160,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function processClaim(claim) {
-    fetch('http://localhost:5000/processClaim', {
+    fetch('http://10.0.1.28:5000/processClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -180,7 +180,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function approverReject(claim, description) {
-    fetch('http://localhost:5000/approverRejectClaim', {
+    fetch('http://10.0.1.28:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -200,7 +200,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function processorReject(claim, description) {
-    fetch('http://localhost:5000/processorRejectClaim', {
+    fetch('http://10.0.1.28:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -349,7 +349,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                   <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadPdfButtonHover(true)} onMouseLeave={() => setIsDownloadPdfButtonHover(false)} 
                     onPress={() => handleDownloadPdfClaim(claim)}>
                     <View style={styles.downloadButton}>
-                      <Tooltip text={'Pdf'} bottom={true}>
+                      <Tooltip text={'Print Receipt'} bottom={true}>
                         {isDownloadPdfButtonHover?(
                           <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="27px"/></Text>
                         ):(

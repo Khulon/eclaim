@@ -27,7 +27,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   function updateExpense(expense) {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://localhost:5000/editMonthlyExpense', {
+    fetch('http://10.0.1.28:5000/editMonthlyExpense', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify(expense)})
@@ -58,7 +58,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
 
 function deleteExpense(expense) {
   const header = {'Content-Type': 'application/json' };
-  fetch('http://localhost:5000/deleteExpense', {
+  fetch('http://10.0.1.28:5000/deleteExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})
