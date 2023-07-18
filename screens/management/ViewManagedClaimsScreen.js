@@ -353,7 +353,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                   <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadPdfButtonHover(true)} onMouseLeave={() => setIsDownloadPdfButtonHover(false)} 
                     onPress={() => handleDownloadPdfClaim(claim)}>
                     <View style={styles.downloadButton}>
-                      <Tooltip text={'Print Receipt'} bottom={true}>
+                      <Tooltip text={'Receipts'} bottom={true}>
                         {isDownloadPdfButtonHover?(
                           <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="27px"/></Text>
                         ):(
