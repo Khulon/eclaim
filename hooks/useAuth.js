@@ -2,9 +2,24 @@ import React, { createContext, useContext } from 'react';
 
 const AuthContext = createContext({});
 
+/**
+ * AuthProvider Component
+ *
+ * A provider component that wraps the application and provides authentication-related functions and state.
+ *
+ * @param {ReactNode} children - The child components wrapped by the AuthProvider.
+ */
 export const AuthProvider = ({children}) => {
 
-
+  /**
+   * loginUser Function
+   *
+   * Logs in the user by sending a POST request to the login endpoint with the provided login details.
+   * Stores the user session and other information in the local storage upon successful login.
+   * Reloads the page to update the user session.
+   *
+   * @param {object} loginDetails - The login details of the user.
+   */
   async function loginUser (loginDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     await fetch('http://localhost:5000/login', {
@@ -34,6 +49,11 @@ export const AuthProvider = ({children}) => {
       
   }; 
 
+  /**
+   * logoutUser Function
+   *
+   * Logs out the user by clearing the user session and reloading the page.
+   */
   async function logoutUser() {
     try {
       window.localStorage.clear();
@@ -45,6 +65,14 @@ export const AuthProvider = ({children}) => {
 
   }; 
 
+  /**
+   * createUser Function
+   *
+   * Creates a new user by sending a POST request to the register endpoint with the provided details.
+   * Reloads the page upon successful account creation.
+   *
+   * @param {object} loginDetails - The registration details of the user.
+   */
   const createUser = async (loginDetails) => {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     await fetch('http://localhost:5000/register', {
@@ -82,6 +110,11 @@ export const AuthProvider = ({children}) => {
 
 };
 
+/**
+ * useAuth Hook
+ *
+ * A custom hook that provides access to the authentication-related functions and state in the AuthContext.
+ */
 export default function useAuth() {
   return useContext(AuthContext);
 }
