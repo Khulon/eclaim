@@ -35,7 +35,7 @@ sql.connect(config, function (err) {
 });
 
 
-var port =  5000//process.env.port || process.env.PORT;
+var port =  process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -1189,7 +1189,7 @@ app.post('/submitClaim', async (req, res) => {
     
     const emptyClaim = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = '"+id+"'")
     if(emptyClaim.recordset[0].count == 0) {
-      throw new Error("Please add at least one expense!")
+      return res.json({error: "known", message: "Please add at least one expense!"})
     }
     
     const result = await request.query("SELECT COUNT(*) AS count FROM Expenses WHERE id = '"+id+"' AND checked = 'No'")
@@ -1263,17 +1263,15 @@ app.post('/submitClaim', async (req, res) => {
       }
       const confirmation = transporter.sendMail(confirmationMail);
       console.log('Email sent:', (await confirmation).response);
-      //return res.send({message: ('Email sent:', (await confirmation).response)})
-    
       
       res.send({message: "Claim submitted!"})
       
     } else {
-      throw new Error("Please check all expenses before submitting!")
+      return res.json({error: "known", message: "Please check all expenses before submitting!"})
     } 
   } catch(err) {
     console.log(err)
-    res.send({message: err.message});
+    res.send({error: "unknown", message: err.message});
   }
 })
 
@@ -1327,7 +1325,6 @@ app.post('/approveClaim', async (req, res) => {
     let total_amount = req.body.claim.total_amount
     let period = req.body.parsedDate
     var request = new sql.Request();
-    const currentTime = await request.query("SELECT GETDATE() AS currentDateTime")
     var recipient = ""
     var description = ""
     var updateStatus = ""
