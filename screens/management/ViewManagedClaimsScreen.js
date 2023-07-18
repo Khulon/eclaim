@@ -44,7 +44,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       const user = claim.form_creator;
       const status = claim.status;
       const token  = window.localStorage.getItem('token');
-      await fetch(`http://localhost:5000/getExpenses/${user}/${id}/${token}`)
+      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -65,7 +65,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
       });
 
-      fetch(`http://localhost:5000/getHistory/${id}/${status}/${token}}`)
+      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -140,7 +140,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const user = window.localStorage.getItem('session')
 
   function approveClaim(claim) {
-    fetch('http://localhost:5000/approveClaim', {
+    fetch('http://10.0.1.28:5000/approveClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -154,13 +154,14 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim approved!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be approved!')
         }
       })
   }
 
   function processClaim(claim) {
-    fetch('http://localhost:5000/processClaim', {
+    fetch('http://10.0.1.28:5000/processClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -174,13 +175,14 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim processed!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be processed!')
         }
       })
   }
 
   function approverReject(claim, description) {
-    fetch('http://localhost:5000/approverRejectClaim', {
+    fetch('http://10.0.1.28:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -194,13 +196,14 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim rejected!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be rejected!')
         }
       })
   }
 
   function processorReject(claim, description) {
-    fetch('http://localhost:5000/processorRejectClaim', {
+    fetch('http://10.0.1.28:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -214,6 +217,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim rejected!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be rejected!')
         }
       })

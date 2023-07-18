@@ -20,7 +20,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   async function handleAddExpense() {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/addTravellingExpense', {
+    await fetch('http://10.0.1.28:5000/addTravellingExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})
@@ -30,8 +30,11 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         if(data.message == "Success!") {
           alert("Expense added successfully!")
           navigation.goBack()
+        } else if (data.message == 'Invalid date! Date of expense must be within travelling period!' || data.error == "known") {
+          alert(data.message)
         } else {
-          alert("Error!")
+          console.log(data.message)
+          alert("Failed to add expense!")
         }
       })    
   }
