@@ -1,6 +1,12 @@
 
-
-
+/**
+ * parseDate Function
+ *
+ * Converts a type date to a formatted date string in "dd MMM yy" format.
+ *
+ * @param {string} date - The date string to be parsed.
+ * @returns {string} - The parsed date string in "dd MMM yy" format.
+ */
 export function parseDate (date) {
     date = new Date(date).toLocaleDateString("en-UK")
     var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
@@ -13,6 +19,15 @@ export function parseDate (date) {
     return day + ' ' + month + ' ' + year
   }
 
+/**
+ * parseDatePeriod Function
+ *
+ * Converts date strings representing a date range to a formatted string in "dd MMM yy - dd MMM yy" format.
+ *
+ * @param {string} dateFrom - The start date of the date range.
+ * @param {string} dateTo - The end date of the date range.
+ * @returns {string} - The formatted date range string in "dd MMM yy - dd MMM yy" format.
+ */
 export function parseDatePeriod (dateFrom, dateTo) {
     //console.log('hi')
     dateFrom = parseDate(dateFrom)

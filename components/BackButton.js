@@ -2,6 +2,15 @@ import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import React, { useState } from "react";
 import { Ionicons } from "react-native-vector-icons";
 
+/**
+ * BackButton Component
+ *
+ * A reusable component that represents a back button with an optional text label.
+ *
+ * @param {function} onPress - The callback function to be called when the button is pressed.
+ * @param {boolean} hideText - Determines whether to hide the text label of the button. ("Go Back")
+ */
+
 export default function BackButton({onPress, hideText}) {
     const [isBackButtonHover, setIsBackButtonHover] = useState(false);
 
@@ -20,7 +29,6 @@ export default function BackButton({onPress, hideText}) {
         
             cursor: "pointer"
           },
-
     })
 
     return (
