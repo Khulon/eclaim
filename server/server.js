@@ -453,7 +453,7 @@ app.post('/addClaim', async (req, res) => {
     if(country == null || exchangeRate == null || country == "" || exchangeRate == "") {
       return res.json({error: "known", message: "Please fill in all the fields!"})
     }
-    
+
     const fromDate = await request.query("SELECT PARSE('"+dateFrom+"' as date USING 'AR-LB') AS fromDate")
     const toDate = await request.query("SELECT PARSE('"+dateTo+"' as date USING 'AR-LB') AS toDate")
     
@@ -741,6 +741,10 @@ app.post('/addTravellingExpense', async (req, res) => {
 
   try {
 
+    if(type == null) {
+      return res.json({error: "known", message: "Please enter a valid expense type!"})
+    }
+
     if(type == "Others") {
 
       if(otherType == "") {
@@ -748,11 +752,14 @@ app.post('/addTravellingExpense', async (req, res) => {
       }
 
       if(otherType == "Others") {
-        throw new Error("Please enter a valid expense type!")
+        return res.json({error: "known", message: "Please enter a valid expense type!"})
       }
 
       type = otherType;
+    }
 
+    if(!/^\d+(\.\d{2})?$/.test(parseFloat(amount))) {
+      return res.send({error: "known", message: "Please enter a valid amount!"})
     }
 
     let date = req.body.date;
@@ -791,7 +798,7 @@ app.post('/addTravellingExpense', async (req, res) => {
     res.send({message: "Success!"});
   } catch(err) {
     console.log(err)
-    res.send({message: "Failed to add travelling expense!"});
+    res.send({error: "unknown", message: err.message});
   }
 
 });
@@ -819,22 +826,26 @@ app.post('/addMonthlyExpense', async (req, res) => {
     let without_GST = req.body.without_GST;
 
     if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
-      return res.send({message: "Please fill in the amount!"})
+      return res.send({error: "known", message: "Please fill in the amount!"})
     } else {
       if((with_GST == '' || with_GST == null)) {
         with_GST = 0;
         if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
-          return res.send({message: "Please enter a valid amount!"})
+          return res.send({error: "known", message: "Please enter a valid amount!"})
         }
       } else if(without_GST == '' || without_GST == null) {
         without_GST = 0;
         if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
-          return res.send({message: "Please enter a valid amount!"})
+          return res.send({error: "known", message: "Please enter a valid amount!"})
         }
       }
     }
 
     let total = parseFloat(with_GST) + parseFloat(without_GST);
+
+    if(type == null) {
+      return res.send({error: "known", message: "Please select an expense type!"})
+    }
 
     if(type == "Others") {
 
@@ -843,7 +854,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
       }
 
       if(otherType == "Others") {
-        return res.send({message: "Please enter a valid expense type!"})
+        return res.send({error: "known", message: "Please enter a valid expense type!"})
       }
       type = otherType;
     }
@@ -895,7 +906,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
     res.send({message: "Success!", total: total});
   } catch(err) {
     console.log(err)
-    res.send({message: "Failed to add monthly expense!"});
+    res.send({error: "unknown", message: err.message});
   }
 
 });
@@ -950,6 +961,11 @@ app.post('/editTravellingExpense', async (req, res) => {
   try{
 
     var request = new sql.Request();
+
+    if(type == null) {
+      return res.json({error: "known", message: "Please enter a valid expense type!"})
+    }
+
     if(type == "Others") {
 
       if(otherType == "") {
@@ -957,10 +973,14 @@ app.post('/editTravellingExpense', async (req, res) => {
       }
 
       if(otherType == "Others") {
-        throw new Error("Please enter a valid expense type!")
+        return res.json({error: "known", message: "Please enter a valid expense type!"})
       }
 
       type = otherType;
+    }
+
+    if(!/^\d+(\.\d{2})?$/.test(parseFloat(amount))) {
+      return res.send({error: "known", message: "Please enter a valid amount!"})
     }
 
     if(description == "") {
@@ -991,7 +1011,7 @@ app.post('/editTravellingExpense', async (req, res) => {
 
   } catch(err) { 
     console.log(err)
-    res.send({message: err.message});
+    res.send({error: "unknown", message: err.message});
   }
 });
 
@@ -1018,12 +1038,30 @@ app.post('/editMonthlyExpense', async (req, res) => {
     let with_GST = req.body.with_GST;
     let without_GST = req.body.without_GST;
 
-    if( !/^\d+(\.\d{2})?$/.test(parseFloat(with_GST)) || !/^\d+(\.\d{2})?$/.test(parseFloat(without_GST)) ) {
-      throw new Error("Please enter a valid amount!")
+    if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
+      return res.send({error: "known", message: "Please fill in the amount!"})
+    } else {
+      if((with_GST == '' || with_GST == null)) {
+        with_GST = 0;
+        if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
+          return res.send({error: "known", message: "Please enter a valid amount!"})
+        }
+      } else if(without_GST == '' || without_GST == null) {
+        without_GST = 0;
+        if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
+          return res.send({error: "known", message: "Please enter a valid amount!"})
+        }
+      }
     }
+
     let total = parseFloat(with_GST) + parseFloat(without_GST);
 
     var request = new sql.Request();
+
+    if(type == null) {
+      return res.send({error: "known", message: "Please select an expense type!"})
+    }
+
     if(type == "Others") {
 
       if(otherType == "") {
@@ -1031,7 +1069,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
       }
 
       if(otherType == "Others") {
-        throw new Error("Please enter a valid expense type!")
+        return res.send({error: "known", message: "Please enter a valid expense type!"})
       }
 
       type = otherType;
@@ -1074,7 +1112,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
 
   } catch(err) { 
     console.log(err)
-    res.send({message: err.message});
+    res.send({error: "unknown", message: err.message});
   }
   
 });

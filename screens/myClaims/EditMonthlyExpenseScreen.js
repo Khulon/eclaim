@@ -66,9 +66,10 @@ function deleteExpense(expense) {
       .then(data => {
           console.log(data);
           if(data.message == "Expense deleted!") {
-            alert("Expense deleted!")
+            alert(data.message)
             navigation.goBack();
           } else {
+            console.log(data.message)
             alert("Failed to delete expense!")
           }
         })

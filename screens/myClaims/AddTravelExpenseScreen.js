@@ -30,8 +30,11 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
         if(data.message == "Success!") {
           alert("Expense added successfully!")
           navigation.goBack()
+        } else if (data.message == 'Invalid date! Date of expense must be within travelling period!' || data.error == "known") {
+          alert(data.message)
         } else {
-          alert("Error!")
+          console.log(data.message)
+          alert("Failed to add expense!")
         }
       })    
   }
