@@ -37,7 +37,10 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
         if(resp.message == 'Expense updated!') {
           alert('Monthly expense updated!');
           navigation.goBack();
+        } else if (resp.message == "Invalid date! Date of expense must be within pay period!" || resp.error == "known") {
+          alert(resp.message)
         } else {
+          console.log(resp.message)
           alert('Failed to update expense!');
         }
       });
@@ -66,9 +69,10 @@ function deleteExpense(expense) {
       .then(data => {
           console.log(data);
           if(data.message == "Expense deleted!") {
-            alert("Expense deleted!")
+            alert(data.message)
             navigation.goBack();
           } else {
+            console.log(data.message)
             alert("Failed to delete expense!")
           }
         })

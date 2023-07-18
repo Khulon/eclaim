@@ -62,9 +62,12 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
         .then(data => {
             console.log(data);
             if(data.message == "Expense deleted!") {
-              alert("Expense deleted!")
+              alert(data.message)
               navigation.goBack();
+            } else if (data.message == 'Invalid date! Date of expense must be within travelling period!' || data.error == "known") {
+              alert(data.message)
             } else {
+              console.log(data.message)
               alert("Failed to delete expense!")
             }
             })

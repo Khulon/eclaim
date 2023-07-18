@@ -145,9 +145,10 @@ export default function EditClaimScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == "Claim deleted!") {
-          alert("Claim deleted successfully!")
+          alert(data.message)
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert("Claim could not be deleted!")
         }
       })
@@ -172,11 +173,12 @@ export default function EditClaimScreen({ navigation, route}) {
         console.log(data)
         if(data.message == "Claim submitted!") {
           alert('Claim submitted successfully!')
-          window.location.reload(false)
+        } else if (data.error == "known") {
+          alert(data.message)
         } else {
           alert('Claim could not be submitted!')
-          window.location.reload(false)
         }
+        window.location.reload(false)
       })
   }
 

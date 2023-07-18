@@ -154,6 +154,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim approved!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be approved!')
         }
       })
@@ -174,6 +175,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim processed!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be processed!')
         }
       })
@@ -194,6 +196,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim rejected!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be rejected!')
         }
       })
@@ -214,6 +217,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           alert('Claim rejected!')
           window.location.reload(false)
         } else {
+          console.log(data.message)
           alert('Claim could not be rejected!')
         }
       })
