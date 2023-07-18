@@ -353,7 +353,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                   <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadPdfButtonHover(true)} onMouseLeave={() => setIsDownloadPdfButtonHover(false)} 
                     onPress={() => handleDownloadPdfClaim(claim)}>
                     <View style={styles.downloadButton}>
-                      <Tooltip text={'Pdf'} bottom={true}>
+                      <Tooltip text={'Receipts'} bottom={true}>
                         {isDownloadPdfButtonHover?(
                           <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="27px"/></Text>
                         ):(
@@ -393,7 +393,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             showsVerticalScrollIndicator={false}
             data={data}
             renderItem={renderItem}
-            //keyExtractor={item => item.id}
+            keyExtractor={item => (item.email, item.item_number)}
           />
         </View>
 
@@ -424,7 +424,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                   <DefaultButton description='Process' onPress = {() => ConfirmationButton('Are you sure you want to process?', 'The form creator will be notified', () => processClaim(claim))} customStyle={{width: "90%", maxWidth: "400px"}} buttonColor={"#45B097"}/>
                 </View>
                 <View style={styles.buttonContainer}>
-                  <DefaultButton description='Reject' onPress={() => inputConfirmationButton('Input rejection message', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} customStyle={{width: "90%", maxWidth: "400px"}} buttonColor={"#45B097"}/>
+                  <DefaultButton description='Reject' onPress={() => inputConfirmationButton('Input rejection message', 'Confirm rejection with message: ', (description) => processorReject(claim, description))} customStyle={{width: "90%", maxWidth: "400px"}}/>
                 </View>
               </View>
               ) : (

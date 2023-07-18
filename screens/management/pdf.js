@@ -40,8 +40,8 @@ export default function pdf({route, navigation}) {
             {hide ? (
                 <View/>
             ) : (
-                <View style={{width:'100%', height:'100%', alignItems:'center'}}>
-                <View style={{ position:'absolute', height:'40px', width:'100%', padding:'50px'}}>
+                <View style={{width:'100%', height:'100%', alignItems:'center', position:'absolute',zIndex:999}}>
+                <View style={{ height:'40px', width:'100%', padding:'50px'}}>
                     <View style={{width:'150px',fontFamily: "Arial"}}>
                         <BackButton onPress={() => navigation.goBack()}/>
                     </View>
