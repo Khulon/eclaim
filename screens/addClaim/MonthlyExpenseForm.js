@@ -16,7 +16,7 @@ export default function MonthlyExpenseForm({route}) {
   function addMonthlyClaim (claim) {
     console.log(claim.payPeriodFrom, claim.payPeriodTo)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/addClaim', {
+    fetch('http://localhost:5000/addClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})
@@ -24,10 +24,13 @@ export default function MonthlyExpenseForm({route}) {
         .then(data => {
           console.log(data);
           if(data.message == "Monthly claim added successfully!") {
-            alert("Monthly claim added successfully!")
+            alert(data.message)
             window.location.reload(false)
+          } else if (data.error == "known") {
+            alert(data.message);
           } else {
-            alert("Error adding monthly claim!")
+            console.log(data.message)
+            alert("Failed to add monthly claim!")
           }
         });
   }; 

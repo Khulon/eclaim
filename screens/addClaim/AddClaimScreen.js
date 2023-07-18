@@ -8,13 +8,13 @@ import BackButton from '../../components/BackButton';
 export default function AddClaimScreen({ navigation }) {        
   const expenseTypes = [{key: '0', value: 'Travelling'},{key: '1', value: 'Monthly'}]
   const [isExistingClaim, setIsExistingClaim] = useState(null);
-  const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId:null, expenseType:null});
+  const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null});
 
   function handleAddClaim() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     switch(isExistingClaim) {
       case 'Yes':
-        fetch('http://10.0.1.28:5000/joinClaim', {
+        fetch('http://localhost:5000/joinClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})
@@ -22,10 +22,13 @@ export default function AddClaimScreen({ navigation }) {
         .then(data => {
           console.log(data);
           if(data.message == "Joined claim successfully!") {
-            alert("Joined claim successfully!")
+            alert(data.message)
             window.location.reload(false)
+          } else if (data.error == "known") {
+            alert(data.message);
           } else {
-            alert("Error joining claim!")
+            console.log(data.message)
+            alert("Failed to join claim!")
           }
         });
         break;
@@ -38,7 +41,7 @@ export default function AddClaimScreen({ navigation }) {
           )
         }
         else {
-          alert("Please fill in all relevant fields!")
+          alert("Please fill in the expense form type!")
         }
         break;
       default:

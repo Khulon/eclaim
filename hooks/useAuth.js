@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 
 const AuthContext = createContext({});
 
@@ -7,7 +7,7 @@ export const AuthProvider = ({children}) => {
 
   async function loginUser (loginDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://10.0.1.28:5000/login', {
+    await fetch('http://localhost:5000/login', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify(loginDetails)})
@@ -22,31 +22,32 @@ export const AuthProvider = ({children}) => {
           window.localStorage.setItem('image', resp.image);
           window.localStorage.setItem('details', JSON.stringify(resp.details));
           window.localStorage.setItem('token', resp.token)
-          
           window.location.reload(false);
           
-        } else if(resp.message == 'Account is locked!') {
-          alert('Account is locked!');
+        } else if (resp.error == "known") {
+          alert(resp.message);
         } else {
-          alert('Login Failed!');
+          console.log(resp.message)
+          alert("Login Failed!");
         }
       });
       
   }; 
 
-  async function logoutUser () {
+  async function logoutUser() {
     try {
       window.localStorage.clear();
       window.location.reload(false);
     } catch (error) {
       console.log(error)
+      alert(error.message)
     }
 
   }; 
 
   const createUser = async (loginDetails) => {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://10.0.1.28:5000/register', {
+    await fetch('http://localhost:5000/register', {
       method: 'POST',	
       headers: header,
       body: JSON.stringify(loginDetails)})
@@ -56,9 +57,11 @@ export const AuthProvider = ({children}) => {
         if(resp.message == 'Account Created!') {
           window.location.reload(false);
           alert('Account Created!');
-        }
-        else {
-          alert('Account creation failed!');
+        } else if (resp.error == "known") {
+          alert(resp.message);
+        } else {
+          console.log(resp.message)
+          alert("Login Failed!");
         }
       });
       
