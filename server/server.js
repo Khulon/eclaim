@@ -955,7 +955,7 @@ app.post('/editTravellingExpense', async (req, res) => {
   let date = req.body.date;
   let receipt = req.body.receipt;
   let description = req.body.description;
-    
+     
   
   try{
 
@@ -998,9 +998,9 @@ app.post('/editTravellingExpense', async (req, res) => {
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
     if (description == null) {
-      request.input('description', sql.Varchar, null)
+      request.input('description', sql.VarChar, null)
       } else {
-      request.input('description', sql.Varchar, description)
+      request.input('description', sql.VarChar, description)
     }
     request.input('amount', sql.Numeric(18,2), amount);
     if(receipt == null) {
@@ -1089,6 +1089,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
       await request.query(query);
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
+    
     const form_creator = await request.query("SELECT form_creator FROM Claims where id = '"+id+"'")
     if(form_creator.recordset[0].form_creator == claimee) {
       checked = 'Yes'
@@ -1099,6 +1100,11 @@ app.post('/editMonthlyExpense', async (req, res) => {
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
+    if (description == null) {
+      request.input('description', sql.VarChar, null)
+      } else {
+      request.input('description', sql.VarChar, description)
+    }
     if(receipt == null) {
       request.input('receipt', sql.VarChar, null);
     } else {
