@@ -2,6 +2,13 @@
 import { StyleSheet, View, ActivityIndicator} from 'react-native';
 import React from "react";
 
+/**
+ * LoadingPage Component
+ *
+ * A component that displays a loading indicator in a full-screen overlay.
+ *
+ * @param {boolean} isLoading - Determines whether to show or hide the loading page component.
+ */
 export default function LoadingPage({isLoading}) {
 
     const styles = StyleSheet.create({
