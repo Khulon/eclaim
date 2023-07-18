@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+/**
+ * Tooltip Component
+ *
+ * A component that displays a tooltip on hover.
+ *
+ * @param {string} text - The text content of the tooltip.
+ * @param {ReactNode} children - The content that triggers the tooltip on hover.
+ * @param {boolean} bottom - Determines whether to display the tooltip below the content.
+ */
 const Tooltip = ({ text, children, bottom }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [ isBottom, setIsBottom ] = useState(false)

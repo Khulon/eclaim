@@ -4,6 +4,13 @@ import useAuth from '../hooks/useAuth';
 import { Ionicons } from "react-native-vector-icons";
 import ConfirmationButton from './ConfirmationButton';
 
+/**
+ * LogoutButton Component
+ *
+ * A button component for logging out the user.
+ * Displays a confirmation dialog before logging out.
+ * Uses the ConfirmationButton component for the confirmation dialog.
+ */
 export default function LogoutButton() {
     const { logoutUser } = useAuth();
     const [isLogoutButtonHover, setIsLogoutButtonHover] = useState(false);
