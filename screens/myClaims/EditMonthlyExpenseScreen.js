@@ -206,7 +206,7 @@ function deleteExpense(expense) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Place</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="eg. 23.00" 
+                      placeholder="Place" 
                       value={expense.place} 
                       onChangeText={(place) => setNewExpense({...expense, place: place})}
                       autoCapitalize="none" 
@@ -217,7 +217,7 @@ function deleteExpense(expense) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Customer Name</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="eg. 23.00" 
+                      placeholder="name(s)" 
                       value={expense.customer} 
                       onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
                       autoCapitalize="none" 
@@ -228,7 +228,7 @@ function deleteExpense(expense) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Company</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="eg. 23.00" 
+                      placeholder="eg. Yang Ming" 
                       value={expense.company} 
                       onChangeText={(company) => setNewExpense({...expense, company: company})}
                       autoCapitalize="none" 
