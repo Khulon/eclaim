@@ -1336,6 +1336,8 @@ app.post('/approveClaim', async (req, res) => {
     let period = req.body.parsedDate
     var request = new sql.Request();
     var recipient = ""
+    var header = ""
+    var toCreator = ""
     var description = ""
     var updateStatus = ""
     var history = ""
@@ -1363,6 +1365,8 @@ app.post('/approveClaim', async (req, res) => {
         updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
         description = 'A new claim has been approved and is awaiting your processing.'
         history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
+	toCreator = "Your claim has been approved and sent for processing"
+	header = "Claim Approved"
         confirmationDescription = 'A claim that was approved by you has been sent for processing.'
         subject = 'New claim to process'
         confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1375,6 +1379,8 @@ app.post('/approveClaim', async (req, res) => {
         description = "A new claim is awaiting your approval!"
         history = "INSERT INTO History VALUES('"+id+"', 'Pending Next Approval', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
+	toCreator = "Your claim has been sent to next approver"
+	header = "Claim Sent For Next Approval"
         subject = "New claim to approve"
         confirmationSubject = 'Claim sent to next approver - Confirmation Email'
       }
@@ -1385,6 +1391,8 @@ app.post('/approveClaim', async (req, res) => {
       updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
       description = 'A new claim has been approved and is awaiting your processing.'
       history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
+      toCreator = "Your claim has been approved and sent for processing"
+      header = "Claim Approved"
       confirmationDescription = 'A claim that was approved by you has been sent for processing.'
       subject = 'New claim to process'
       confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1419,8 +1427,21 @@ app.post('/approveClaim', async (req, res) => {
       creator: form_creator,
       approvedBy: approver
     };
+
+    const confirmationContent = {
+      user: form_creator,
+      header: header,
+      description: toCreator,
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      approvedBy: approver
+    };
+	  
     const htmlToSend = template(nextPerson);
     const conf = template(confirmationReplacements);
+    const toFormCreator = template(confirmationContent)
 
     // Create a transporter
     const transporter = nodemailer.createTransport({
@@ -1444,7 +1465,7 @@ app.post('/approveClaim', async (req, res) => {
     };
     // Send the email
     const approverInfo = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await approverInfo).response);
+    console.log('Email sent to recipient:', (await approverInfo).response);
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
@@ -1453,7 +1474,17 @@ app.post('/approveClaim', async (req, res) => {
       html: conf,
     }
     const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
+    console.log('Email sent back to approver:', (await confirmation).response);
+
+    const confirmationDetails = {
+      from: 'eclaim@engkong.com',
+      to: form_creator,
+      subject: confirmationSubject, 
+      html: toFormCreator,
+    }
+    
+    const sendToCreator = transporter.sendMail(confirmationDetails);
+    console.log('Email sent to form creator:', (await sendToCreator).response);
 
     res.send({message: "Success!"})
   } catch(err) {
