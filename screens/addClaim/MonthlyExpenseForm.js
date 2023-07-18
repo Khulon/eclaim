@@ -16,7 +16,7 @@ export default function MonthlyExpenseForm({route}) {
   function addMonthlyClaim (claim) {
     console.log(claim.payPeriodFrom, claim.payPeriodTo)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://localhost:5000/addClaim', {
+    fetch('http://10.0.1.28:5000/addClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})

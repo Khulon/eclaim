@@ -36,7 +36,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
 
   function updateExpense(expense) {
     const header = {'Content-Type': 'application/json' };
-    fetch('http://localhost:5000/editTravellingExpense', {
+    fetch('http://10.0.1.28:5000/editTravellingExpense', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(expense)})
@@ -54,7 +54,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
 
   function deleteExpense(expense) {
     const header = {'Content-Type': 'application/json' };
-    fetch('http://localhost:5000/deleteExpense', {
+    fetch('http://10.0.1.28:5000/deleteExpense', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(expense)})
@@ -64,6 +64,8 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
             if(data.message == "Expense deleted!") {
               alert(data.message)
               navigation.goBack();
+            } else if (data.message == 'Invalid date! Date of expense must be within travelling period!' || data.error == "known") {
+              alert(data.message)
             } else {
               console.log(data.message)
               alert("Failed to delete expense!")

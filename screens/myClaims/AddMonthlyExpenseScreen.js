@@ -20,7 +20,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   async function handleAddExpense() {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://localhost:5000/addMonthlyExpense', {
+    await fetch('http://10.0.1.28:5000/addMonthlyExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})
