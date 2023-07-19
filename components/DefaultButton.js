@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Animated} from 'react-native';
+import { StyleSheet, TouchableOpacity, Animated, Text} from 'react-native';
 import React, { useRef } from "react";
 import { MoveNegAnimation, MovePosAnimation } from '../assets/animation/AllAnimations';
 
@@ -12,7 +12,7 @@ import { MoveNegAnimation, MovePosAnimation } from '../assets/animation/AllAnima
  * @param {object} customStyle - Custom styles to be applied to the button.
  * @param {string} buttonColor - The background color of the button. If not provided, the default color red is used.
  */
-export default function DefaultButton({description, onPress, customStyle, buttonColor}) {
+export default function DefaultButton({description, onPress, customStyle, buttonColor, fontSize}) {
 
     const buttonHover = useRef(new Animated.Value(0)).current;
 
@@ -25,7 +25,7 @@ export default function DefaultButton({description, onPress, customStyle, button
             padding: "10px",
             color: "white",
             textAlign: "center",
-            fontSize: "16px",
+            fontSize: fontSize == null ? "16px" : (fontSize),
             fontWeight: "700",
             
             width: "100%",
@@ -37,8 +37,8 @@ export default function DefaultButton({description, onPress, customStyle, button
 
     return (
         <Animated.View onMouseEnter={() => MoveNegAnimation(buttonHover)} onMouseLeave={() => MovePosAnimation(buttonHover)} style={[{transform: [{translateY: buttonHover }]}, customStyle]} >
-            <TouchableOpacity onPress={onPress} style={styles.defaultButton} > 
-                {description} 
+            <TouchableOpacity onPress={onPress} style={styles.defaultButton}> 
+                    {description} 
             </TouchableOpacity>
         </Animated.View>
     )

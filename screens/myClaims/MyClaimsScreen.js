@@ -31,9 +31,9 @@ export default function MyClaimsScreen({ navigation }) {
         if(data.message == "Token expired!") {
           throw new Error("Token expired!")
         }
-        data = data.reverse()
         setFullData(data);
         setData(data);
+        console.log(data)
       });
       setIsLoading(false);
     } catch (error){

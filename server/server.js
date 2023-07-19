@@ -595,7 +595,7 @@ app.get('/myClaims/:email/:token', authenticateUser, async (req, res) => {
   
     const queryString = 'SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to,'
     + 'period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id' 
-    + ' JOIN Claimees ON C.id = Claimees.form_id WHERE claimee = @email';
+    + ' JOIN Claimees ON C.id = Claimees.form_id WHERE claimee = @email ORDER BY creation_date DESC';
 
     request.input('email', sql.VarChar, email);
     const result = await request.query(queryString);
@@ -630,12 +630,7 @@ async function expenseAuthentication (req, res, next) {
         return next()
       }
     }
-    //check all claimees
-    for (var i = 0; i < claimees.recordset.length; i++) {
-      if(claimees.recordset[i].claimee == decoded.email) {
-        return next()
-      }
-    }
+
 
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
@@ -1303,7 +1298,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
       + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
       + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
-      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"'AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted')))")
+      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"'AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted'))) ORDER BY submission_date DESC")
       res.send(approverClaims.recordset)
 
     //Processor
@@ -1311,7 +1306,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
      const processorClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
      + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
       + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
-      + " WHERE P.processor_email = '"+email+"')")
+      + " WHERE P.processor_email = '"+email+"') ORDER BY submission_date DESC")
       res.send(processorClaims.recordset)
     } else {
       res.send([])
@@ -1811,7 +1806,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
-app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
+app.get('/getHistory/:id/:status/:token', async (req, res) => {
   const { id, status} = req.params;   
   
   try {

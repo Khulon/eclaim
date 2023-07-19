@@ -32,7 +32,6 @@ export default function ManagementScreen({ navigation }) {
         if(data.message == "Token expired!") {
           throw new Error("Token expired!")
         }
-        data = data.reverse()
         setFullData(data);
         setData(data);
       });
@@ -81,7 +80,7 @@ export default function ManagementScreen({ navigation }) {
   const Item = ({date, creator_Name, total, claimees, status, claimId, expense_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
-        {expense_type == 'Travel Claim' ? (
+        {expense_type == 'Travelling' ? (
             <Tooltip text={'Travel claim'}>
               <Text><Ionicons  name="airplane-outline" color="#444" size="25px"/></Text>
             </Tooltip>
