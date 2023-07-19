@@ -630,12 +630,7 @@ async function expenseAuthentication (req, res, next) {
         return next()
       }
     }
-    //check all claimees
-    for (var i = 0; i < claimees.recordset.length; i++) {
-      if(claimees.recordset[i].claimee == decoded.email) {
-        return next()
-      }
-    }
+
 
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
