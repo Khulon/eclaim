@@ -32,7 +32,6 @@ export default function ManagementScreen({ navigation }) {
         if(data.message == "Token expired!") {
           throw new Error("Token expired!")
         }
-        data = data.reverse()
         setFullData(data);
         setData(data);
       });
