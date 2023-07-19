@@ -27,6 +27,10 @@ export default function ChangePasswordModal({ closeModal, route }) {
     }
   }
 
+  function handleChangePassword(){
+
+  }
+
   const validatePassword = (input) => {
     setLoginDetails({...loginDetails, password: input})
     const results = [];
@@ -153,7 +157,7 @@ export default function ChangePasswordModal({ closeModal, route }) {
         </ScrollView>
             
         <View style={{ width: '100%', height:'60px', justifyContent:'center', alignItems: 'center'}}>
-          <DefaultButton description='Confirm' onPress={() => register()} customStyle={{width: "90%", maxWidth: "400px"}}/>
+          <DefaultButton description='Confirm' onPress={() => handleChangePassword()} customStyle={{width: "90%", maxWidth: "400px"}}/>
         </View>
       </View>
     </View>
