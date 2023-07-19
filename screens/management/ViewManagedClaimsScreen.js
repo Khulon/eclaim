@@ -53,16 +53,20 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
         setFullData(data);
         setData(data);
+        const newTable = []
         for(let i = 0; i < data.length; i++) {
           if(claim.form_type == "Travelling") {
-            setTable([...table, {item_number: data[i].item_number, description: data[i].description, expense_type: data[i].expense_type, 
-              date_of_expense: parseDate(data[i].date_of_expense), total_amount: data[i].total_amount, receipt: data[i].receipt}])
+            newTable.push({item_number: data[i].item_number, description: data[i].description, expense_type: data[i].expense_type,
+              date_of_expense: parseDate(data[i].date_of_expense), total_amount: data[i].total_amount, receipt: data[i].receipt})
+
           } else {
-            setTable([...table, {claimee: data[i].claimee, item_number: data[i].item_number, date_of_expense: parseDate(data[i].date_of_expense), 
+            newTable.push({claimee: data[i].claimee, item_number: data[i].item_number, date_of_expense: parseDate(data[i].date_of_expense), 
               description: data[i].description, expense_type: data[i].expense_type, total_amount: data[i].total_amount, receipt: data[i].receipt,
-            place: data[i].place, customers: data[i].customer_name, company: data[i].company_name}])
+            place: data[i].place, customers: data[i].customer_name, company: data[i].company_name})
           }
         }
+        setTable(newTable)
+        console.log(newTable)
       });
 
       fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}}`)
@@ -74,6 +78,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
         setApprovers(data.approvers);
         setProcessor(data.processor);
+        console.log(data.approvers)
+        console.log(data.processor)
       });
       setIsLoading(false)
     } catch (error) {

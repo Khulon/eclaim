@@ -1811,7 +1811,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
-app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
+app.get('/getHistory/:id/:status/:token', async (req, res) => {
   const { id, status} = req.params;   
   
   try {
