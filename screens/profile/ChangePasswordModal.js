@@ -98,7 +98,6 @@ export default function ChangePasswordModal({ closeModal, route }) {
 
     setValidationResults(results);
   };
-
   
   return (
     <View style={styles.page}>
@@ -109,57 +108,50 @@ export default function ChangePasswordModal({ closeModal, route }) {
         </View>
 
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} style={{width:'100%',height:'0px'}} showsVerticalScrollIndicator={false}>
-        <View style={{height: '64%', width:'100%', alignItems:'center', justifyContent:'center'}}>
-        <View style={styles.headerBar}>
-          <View style={{paddingHorizontal: '7px'}}>
-            <Text style={styles.bigText}>Change</Text>
-          </View>
-          <View style={{padding: '7px'}}>
-            <Text style={styles.bigText}>Password</Text>
-          </View>
-        </View>
-
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.normalBoldText}>New Password</Text>
-            <TextInput style={styles.textInput}
-              placeholder="......." 
-              value={loginDetails.password} 
-              onChangeText={validatePassword}
-              autoCapitalize="none" 
-              autoCorrect={false} 
-              secureTextEntry={true}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.normalBoldText}>Confirm New Password</Text>
-            <TextInput style={styles.textInput}
-              placeholder="......." 
-              value={loginDetails.confirmPassword} 
-              onChangeText={(confirmPassword) => setLoginDetails({...loginDetails, confirmPassword: confirmPassword})} 
-              autoCapitalize="none" 
-              autoCorrect={false} 
-              secureTextEntry={true}
-            />
-          </View>
-
-          <View style={{height:'130px', justifyContent:'center', width:'90%', maxWidth:'450px'}}>
-              {validationResults.map((result, index) => (
-                <Text
-                  key={index}
-                  style={[styles.validationText, { color: result.color, fontWeight:500 }]}
-                >
-                  {result.text}
-                </Text>
-              ))}
+            <View style={{height: '64%', width:'100%', alignItems:'center', justifyContent:'center'}}>
+                <View style={styles.headerBar}>
+                    <View style={{paddingHorizontal: '7px'}}>
+                        <Text style={styles.bigText}>Change</Text>
+                    </View>
+                    <View style={{padding: '7px'}}>
+                        <Text style={styles.bigText}>Password</Text>
+                    </View>
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.normalBoldText}>New Password</Text>
+                    <TextInput style={styles.textInput}
+                        placeholder="......." 
+                        value={loginDetails.password} 
+                        onChangeText={validatePassword}
+                        autoCapitalize="none" 
+                        autoCorrect={false} 
+                        secureTextEntry={true}
+                    />
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.normalBoldText}>Confirm New Password</Text>
+                    <TextInput style={styles.textInput}
+                        placeholder="......." 
+                        value={loginDetails.confirmPassword} 
+                        onChangeText={(confirmPassword) => setLoginDetails({...loginDetails, confirmPassword: confirmPassword})} 
+                        autoCapitalize="none" 
+                        autoCorrect={false} 
+                        secureTextEntry={true}
+                    />
+                </View>
+                <View style={{height:'130px', justifyContent:'center', width:'90%', maxWidth:'450px'}}>
+                    {validationResults.map((result, index) => (
+                    <Text
+                        key={index}
+                        style={[styles.validationText, { color: result.color, fontWeight:500 }]}
+                    >
+                        {result.text}
+                    </Text>
+                    ))}
+                </View>
             </View>
-
-        
-        </View>
         </ScrollView>
             
-
         <View style={{ width: '100%', height:'60px', justifyContent:'center', alignItems: 'center'}}>
           <DefaultButton description='Confirm' onPress={() => register()} customStyle={{width: "90%", maxWidth: "400px"}}/>
         </View>
