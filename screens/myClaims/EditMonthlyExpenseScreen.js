@@ -221,7 +221,7 @@ function deleteExpense(expense) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Customer Name</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="name(s)" 
+                      placeholder="Name(s)" 
                       value={expense.customer} 
                       onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
                       autoCapitalize="none" 

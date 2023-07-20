@@ -134,7 +134,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Place</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="eg. 23.00" 
+                      placeholder="Place" 
                       value={expense.place} 
                       onChangeText={(place) => setExpense({...expense, place: place})}
                       autoCapitalize="none" 
@@ -145,7 +145,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Customer Name</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="eg. 23.00" 
+                      placeholder="Name(s)" 
                       value={expense.customer_name} 
                       onChangeText={(customer_name) => setExpense({...expense, customer_name: customer_name})}
                       autoCapitalize="none" 
@@ -156,7 +156,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Company</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="eg. 23.00" 
+                      placeholder="eg. Yang Ming" 
                       value={expense.company} 
                       onChangeText={(company) => setExpense({...expense, company: company})}
                       autoCapitalize="none" 
@@ -172,7 +172,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                 <Text style={styles.normalBoldText}>Description</Text>
                 <TextInput style={[styles.textInput,{height:'100px'}]}
                   placeholder="Desciption of expense" 
-                  value={expense.description} 
+                  value={expense.description}
                   multiline={true}
                   onChangeText={(description) => setExpense({...expense, description: description})}
                   autoCapitalize="none" 

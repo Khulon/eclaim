@@ -630,6 +630,13 @@ async function expenseAuthentication (req, res, next) {
         return next()
       }
     }
+    //check all claimees
+    for (var i = 0; i < claimees.recordset.length; i++) {
+      if(claimees.recordset[i].claimee == decoded.email) {
+        return next()
+      }
+    }
+    
 
 
     if(status.recordset[0].status == 'Submitted') {
@@ -1806,7 +1813,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
-app.get('/getHistory/:id/:status/:token', async (req, res) => {
+app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
   const { id, status} = req.params;   
   
   try {
