@@ -40,8 +40,8 @@ export default function pdf({route, navigation}) {
             {hide ? (
                 <View/>
             ) : (
-                <View style={{width:'100%', height:'100%', alignItems:'center'}}>
-                <View style={{ position:'absolute', height:'40px', width:'100%', padding:'50px'}}>
+                <View style={{width:'100%', height:'100%', alignItems:'center', position:'absolute',zIndex:999}}>
+                <View style={{ height:'40px', width:'100%', padding:'50px'}}>
                     <View style={{width:'150px',fontFamily: "Arial"}}>
                         <BackButton onPress={() => navigation.goBack()}/>
                     </View>
@@ -50,11 +50,11 @@ export default function pdf({route, navigation}) {
                 <TouchableOpacity onPress={()=>options != 0 ? setOptions(options-1) : 0} style={{paddingHorizontal:'20px'}}>
                     <Text> <Text><Ionicons name="chevron-back-outline" color="#444" size='30px'/></Text> </Text>
                 </TouchableOpacity>
-                <View style={{width:'200px', justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{fontWeight:600, fontSize:'25px'}}>{presets[options].receiptsPerPage} per page</Text>
-                    <Text style={{fontWeight:400, fontSize:'20px'}}>Click print, or ctrl-P, </Text>
-                    <Text style={{fontWeight:400, fontSize:'20px'}}>then select layout </Text>
-                    <Text style={{fontWeight:400, fontSize:'20px'}}>options ({presets[options].layout})</Text>
+                <View style={{width:'230px', justifyContent:'center', alignItems:'center'}}>
+                    <Text style={{fontWeight:700, fontSize:'25px'}}>{presets[options].receiptsPerPage} per page</Text>
+                    <Text style={{fontWeight:400, fontSize:'20px'}}>1.Print/ ctrl-P, </Text>
+                    <Text style={{fontWeight:400, fontSize:'20px'}}>2.({presets[options].layout})</Text>
+                    <Text style={{fontWeight:400, fontSize:'20px'}}>3.Background Graphics</Text>
                     <TouchableOpacity style={{alignItems:'center'}} onPress={()=> setHide(true)}>
                         <Text> <Text><Ionicons name="print-outline" color="#444" size='30px'/></Text> </Text>
                     </TouchableOpacity>

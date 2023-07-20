@@ -539,7 +539,6 @@ app.post('/joinClaim', async (req, res) => {
 });
 
 
-
 //Add or change profile photo
 app.post('/uploadImage', async (req, res) => {
   try {
@@ -595,7 +594,7 @@ app.get('/myClaims/:email/:token', authenticateUser, async (req, res) => {
   
     const queryString = 'SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to,'
     + 'period_from, period_to FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id' 
-    + ' JOIN Claimees ON C.id = Claimees.form_id WHERE claimee = @email';
+    + ' JOIN Claimees ON C.id = Claimees.form_id WHERE claimee = @email ORDER BY creation_date DESC';
 
     request.input('email', sql.VarChar, email);
     const result = await request.query(queryString);
@@ -630,12 +629,7 @@ async function expenseAuthentication (req, res, next) {
         return next()
       }
     }
-    //check all claimees
-    for (var i = 0; i < claimees.recordset.length; i++) {
-      if(claimees.recordset[i].claimee == decoded.email) {
-        return next()
-      }
-    }
+
 
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
@@ -955,7 +949,7 @@ app.post('/editTravellingExpense', async (req, res) => {
   let date = req.body.date;
   let receipt = req.body.receipt;
   let description = req.body.description;
-    
+     
   
   try{
 
@@ -993,10 +987,15 @@ app.post('/editTravellingExpense', async (req, res) => {
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = "+description+", total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = @description, total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
+    if (description == null) {
+      request.input('description', sql.VarChar, null)
+      } else {
+      request.input('description', sql.VarChar, description)
+    }
     request.input('amount', sql.Numeric(18,2), amount);
     if(receipt == null) {
       request.input('receipt', sql.VarChar, null);
@@ -1084,6 +1083,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
       await request.query(query);
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
+    
     const form_creator = await request.query("SELECT form_creator FROM Claims where id = '"+id+"'")
     if(form_creator.recordset[0].form_creator == claimee) {
       checked = 'Yes'
@@ -1092,11 +1092,16 @@ app.post('/editMonthlyExpense', async (req, res) => {
   
 
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = "+description+", total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
+    + "description = @description, total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
     + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
+    if (description == null) {
+      request.input('description', sql.VarChar, null)
+      } else {
+      request.input('description', sql.VarChar, description)
+    }
     if(receipt == null) {
       request.input('receipt', sql.VarChar, null);
     } else {
@@ -1296,7 +1301,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
       + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
       + " WHERE (submission_date IS NOT NULL AND form_creator IN (SELECT B.email FROM BelongsToDepartments B JOIN Approvers"
       + " A ON B.department = A.department WHERE A.approver_name = '"+email+"' AND form_creator != A.approver_name) OR (approval_date IS NOT NULL AND next_recipient = '"+email+"')"
-      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"'AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted')))")
+      + " OR C.id IN (SELECT id FROM History WHERE person = '"+email+"'AND status != 'Created' AND id NOT IN (select id FROM History where status = 'Deleted'))) ORDER BY submission_date DESC")
       res.send(approverClaims.recordset)
 
     //Processor
@@ -1304,7 +1309,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
      const processorClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
      + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id"
       + " WHERE approval_date IS NOT NULL AND form_creator IN (SELECT email FROM Employees E JOIN Processors P ON E.company_prefix = P.company"
-      + " WHERE P.processor_email = '"+email+"')")
+      + " WHERE P.processor_email = '"+email+"') ORDER BY submission_date DESC")
       res.send(processorClaims.recordset)
     } else {
       res.send([])
@@ -1329,6 +1334,8 @@ app.post('/approveClaim', async (req, res) => {
     let period = req.body.parsedDate
     var request = new sql.Request();
     var recipient = ""
+    var header = ""
+    var toCreator = ""
     var description = ""
     var updateStatus = ""
     var history = ""
@@ -1356,6 +1363,8 @@ app.post('/approveClaim', async (req, res) => {
         updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
         description = 'A new claim has been approved and is awaiting your processing.'
         history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
+	toCreator = "Your claim has been approved and sent for processing"
+	header = "Claim Approved"
         confirmationDescription = 'A claim that was approved by you has been sent for processing.'
         subject = 'New claim to process'
         confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1368,6 +1377,8 @@ app.post('/approveClaim', async (req, res) => {
         description = "A new claim is awaiting your approval!"
         history = "INSERT INTO History VALUES('"+id+"', 'Pending Next Approval', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
+	toCreator = "Your claim has been sent to next approver"
+	header = "Claim Sent For Next Approval"
         subject = "New claim to approve"
         confirmationSubject = 'Claim sent to next approver - Confirmation Email'
       }
@@ -1378,6 +1389,8 @@ app.post('/approveClaim', async (req, res) => {
       updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
       description = 'A new claim has been approved and is awaiting your processing.'
       history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
+      toCreator = "Your claim has been approved and sent for processing"
+      header = "Claim Approved"
       confirmationDescription = 'A claim that was approved by you has been sent for processing.'
       subject = 'New claim to process'
       confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1412,8 +1425,21 @@ app.post('/approveClaim', async (req, res) => {
       creator: form_creator,
       approvedBy: approver
     };
+
+    const confirmationContent = {
+      user: form_creator,
+      header: header,
+      description: toCreator,
+      type: type,
+      total_amount: total_amount,
+      period: period,
+      creator: form_creator,
+      approvedBy: approver
+    };
+	  
     const htmlToSend = template(nextPerson);
     const conf = template(confirmationReplacements);
+    const toFormCreator = template(confirmationContent)
 
     // Create a transporter
     const transporter = nodemailer.createTransport({
@@ -1437,7 +1463,7 @@ app.post('/approveClaim', async (req, res) => {
     };
     // Send the email
     const approverInfo = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await approverInfo).response);
+    console.log('Email sent to recipient:', (await approverInfo).response);
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
@@ -1446,7 +1472,17 @@ app.post('/approveClaim', async (req, res) => {
       html: conf,
     }
     const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
+    console.log('Email sent back to approver:', (await confirmation).response);
+
+    const confirmationDetails = {
+      from: 'eclaim@engkong.com',
+      to: form_creator,
+      subject: confirmationSubject, 
+      html: toFormCreator,
+    }
+    
+    const sendToCreator = transporter.sendMail(confirmationDetails);
+    console.log('Email sent to form creator:', (await sendToCreator).response);
 
     res.send({message: "Success!"})
   } catch(err) {
@@ -1773,7 +1809,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
-app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
+app.get('/getHistory/:id/:status/:token', async (req, res) => {
   const { id, status} = req.params;   
   
   try {

@@ -31,9 +31,9 @@ export default function MyClaimsScreen({ navigation }) {
         if(data.message == "Token expired!") {
           throw new Error("Token expired!")
         }
-        data = data.reverse()
         setFullData(data);
         setData(data);
+        console.log(data)
       });
       setIsLoading(false);
     } catch (error){
@@ -67,11 +67,10 @@ export default function MyClaimsScreen({ navigation }) {
     //console.log(filteredData)
   }
 
-  const contains = ({form_creator}, query) => {
-    console.log(form_creator)
-    console.log(query)
+  const contains = ({form_creator, id}, query) => {
+    id = id.toLowerCase()
     form_creator = form_creator.toLowerCase()
-    if (form_creator.includes(query)) {
+    if (form_creator.includes(query) || id.includes(query)) {
       return true
     }
     return false

@@ -6,9 +6,10 @@ export default function excel(claim, fullData, approvers, processor) {
         
     try {
 
-        console.log(fullData)
+        //console.log(fullData)
         console.log(approvers)
         console.log(processor)
+        //console.log(fullData.length)
         for(let i = 0; i < fullData.length; i++){
             if(fullData[i].receipt != null){
                 fullData[i].receipt = "Yes"            
@@ -36,15 +37,12 @@ export default function excel(claim, fullData, approvers, processor) {
         const columnWidths = columns.map(column => ({
         width: column.length + 2
         }));
-        
-        
-        
         for(let i = 0; i < fullData.length; i++) {
             for(let j = 0; j < columns.length; j++) {
                 const cellAddress = XLSX.utils.encode_cell({ c: j, r: i + 7 });
                 const value = worksheet[cellAddress].v;
                 console.log(value)
-                if(value.length + 2 > columnWidths[j].width) {
+                if(value != null && value.toString().length + 2 > columnWidths[j].width) {
                     columnWidths[j].width = value.length + 2;
                 }
             }

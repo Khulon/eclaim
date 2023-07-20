@@ -1,14 +1,17 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} from 'react-native';
 import React, { useState} from "react";
 import BottomNavigator from '../../components/BottomNavigation';
 import { Ionicons } from "react-native-vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import LogoutButton from '../../components/LogoutButton';
+import ChangePasswordModal from './ChangePasswordModal';
+import DefaultButton from '../../components/DefaultButton';
 
 export default function ProfileScreen({ navigation }) {
 
   window.localStorage.setItem('stackScreen', 'Profile');
 
+  const [modalVisible, setModalVisible] = useState(false);
   const [ showPassword, setShowPassword ] = useState(false)
   const [ isEyeHover, setIsEyeHover ] = useState(false)
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
@@ -45,6 +48,14 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={styles.page}>
+      {modalVisible && (
+        <Modal transparent animationType="fade">
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <ChangePasswordModal closeModal={()=>setModalVisible(!modalVisible)} />
+            </View>
+          </View>
+        </Modal>)}
       <View style={styles.defaultPage}>
 
         <View style={{width:'100%', height:'100px', justifyContent:'flex-end', alignItems:'center'}}>
@@ -64,7 +75,7 @@ export default function ProfileScreen({ navigation }) {
             <View style={styles.displayContainer}>
               <View style={styles.circle}>
                 <TouchableOpacity onPress={()=> pickImage()}>
-                  <Image style={{width: 170, height: 170, borderRadius:85, borderWidth:'1px', borderColor:'#444' }} source={image}/>
+                  <Image style={{width: 170, height: 170, borderRadius:85, borderWidth:'1px', borderColor:'#C4C4C4' }} source={image}/>
                   <View style={[styles.circle, {position:"absolute", backgroundColor:'#D9D9D9', zIndex:-1}]}>
                     <Text><Ionicons name="images-outline" color="#444444" size='25px'/></Text>
                   </View>
@@ -118,6 +129,11 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.normalInfoText}>....</Text>
               </View>
             )}
+            <View style={{width:'100%', justifyContent:'center', alignItems:'center'}}>
+              <DefaultButton description='Change' onPress = {() => setModalVisible(!modalVisible)} customStyle={{ fontSize:'10px', width:'110px'}} buttonColor={'#4BA7C5'} fontSize={'14px'}/>
+            </View>
+
+            <View style={{height:'70px'}}/>
         
           </ScrollView>
         </View>
@@ -130,6 +146,21 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 15,
+    height:'70%',
+    minHeight:'400px',
+    width:'25%',
+    minWidth:'300px'
+  },
   page: {
     height: "100%",
     width: "100%",
@@ -158,7 +189,7 @@ const styles = StyleSheet.create({
   },
   displayContainer: {
     width:'100%',
-    height:'40%',
+    height:'230px',
     alignItems:'center',
     justifyContent:'center',
   },
