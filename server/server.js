@@ -34,8 +34,7 @@ sql.connect(config, function (err) {
     console.log("Connected!");
 });
 
-
-var port =  process.env.port || process.env.PORT;
+var port = process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -336,6 +335,7 @@ app.post('/login', async (req, res) => {
         let records = result.recordset[0];
        
         const token = generateAccessToken({ email: email, password: password });
+        console.log("Login: " + token)
         
         res.send({userType: "Normal", image: records.profile, email: records.email, name: records.name, token: token, message: "Login Successful!", details: records});
       } else {
@@ -623,11 +623,9 @@ async function expenseAuthentication (req, res, next) {
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
 
-    if(status.recordset[0].status == "Pending Next Approval") {
-      const next_Approver = await request.query("SELECT next_recipient FROM Claims WHERE id = '"+id+"'")
-      nextApprover = next_Approver.recordset[0].next_recipient
-      if(nextApprover == decoded.email) {
-        return next()
+    for (var i = 0; i < claimees.recordset.length; i++) {
+      if(claimees.recordset[i].claimee == decoded.email) {
+        next()
       }
     }
     //check all claimees
@@ -638,55 +636,31 @@ async function expenseAuthentication (req, res, next) {
     }
     
 
-
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
       if(firstApprover.recordset[0].approver_name == decoded.email) {
-        return next()
+        next()
       }
     } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
-      //everyone
-      const managers = await request.query("SELECT person FROM History WHERE id = '"+id+"' AND status != 'Created' AND status != 'Submitted'")
-      for (var i = 0; i < managers.recordset.length; i++) {
-        if(managers.recordset[i].person == decoded.email) {
-          return next()
-        }
+        //everyone
+      const managers = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status IN ('Pending Next Approval', 'Approved', 'Processed') AND person = '"+decoded.email+"'")
+      if(managers.recordset[0].count == 1) {
+          next()
       }
-      if(processor == decoded.email) {
-        return next()
+    } else if (status.recordset[0].status == "Pending Next Approval") {
+      const next_Approver = await request.query("SELECT next_recipient FROM Claims WHERE id = '"+id+"'")
+      nextApprover = next_Approver.recordset[0].next_recipient
+      if(nextApprover == decoded.email) {
+        next()
       }
-    }
-    //check if claim has been deleted
-    const deleteCheck = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status = 'Deleted'")
-
-    if(deleteCheck.recordset[0].count > 0) {
-      //deleted before
-      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND date > (SELECT TOP 1 date FROM History WHERE id = '"+id+"' AND status = 'Deleted' ORDER BY date DESC) AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
-      //rejected before
-      if(checkReject.recordset[0].count > 0) {
-        const managers = await request.query("SELECT person FROM History WHERE id = '"+id+"' AND status != 'Created' AND status != 'Submitted' AND date > (SELECT TOP 1 date FROM History WHERE id = '"+id+"' AND status = 'Deleted' ORDER BY date DESC)")
-        for (var i = 0; i < managers.recordset.length; i++) {
-          if(managers.recordset[i].person == decoded.email) {
-            return next()
-          }
-        }
-      }
-
-    } else {
-      //not deleted before
-      const checkReject = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND (status = 'Rejected' OR status = 'Rejected by approver' OR status = 'Rejected by processor')")
-      //rejected before
-      if(checkReject.recordset[0].count > 0) {
-        const managers = await request.query("SELECT person FROM History WHERE id = '"+id+"' AND status != 'Created' AND status != 'Submitted'")
-        for (var i = 0; i < managers.recordset.length; i++) {
-          if(managers.recordset[i].person == decoded.email) {
-            return next()
-          }
-        }
-      
+    } else if (status.recordset[0].status == "Rejected" || status.recordset[0].status == "Rejected by approver" || status.recordset[0].status == "Rejected by processor") {
+      let currentStatus = status.recordset[0].status
+      const everyone = await request.query("select count(*) as count from (select DISTINCT person from History where date < (select top 1 date from History where id = '"+id+"' AND status = '"+currentStatus+"')) T WHERE person = '"+decoded.email+"'")
+      if(everyone.recordset[0].count == 1) {
+        next()
       }
     }
-    return res.sendStatus(403)
+    
   } catch(err) {
     if(err.name == 'TokenExpiredError') {
       return res.send({message: "Token expired!"})
@@ -1096,6 +1070,9 @@ app.post('/editMonthlyExpense', async (req, res) => {
     if(form_creator.recordset[0].form_creator == claimee) {
       checked = 'Yes'
     }
+
+  
+
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
     + "description = @description, total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
     + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
@@ -1118,6 +1095,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
     request.input('with_GST', sql.Numeric(18,2), with_GST);
     request.input('without_GST', sql.Numeric(18,2), without_GST);
 
+    console.log(query)
     
     await request.query(query)
     res.send({message: "Expense updated!"})
@@ -1814,8 +1792,8 @@ app.post('/processorRejectClaim', async (req, res) => {
 })
 
 app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
-  const { id, status} = req.params;   
-  
+  const { id, status, token} = req.params;   
+  console.log(token)
   try {
     var request = new sql.Request();
 

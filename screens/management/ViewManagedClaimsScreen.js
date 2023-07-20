@@ -68,8 +68,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         setTable(newTable)
         console.log(newTable)
       });
-
-      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}}`)
+      
+      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
