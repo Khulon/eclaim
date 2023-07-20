@@ -8,7 +8,7 @@ import BackButton from '../../components/BackButton';
 export default function AddClaimScreen({ navigation }) {        
   const expenseTypes = [{key: '0', value: 'Travelling'},{key: '1', value: 'Monthly'}]
   const [isExistingClaim, setIsExistingClaim] = useState(null);
-  const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null});
+  const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null, company: null});
 
   function handleAddClaim() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
@@ -73,7 +73,7 @@ export default function AddClaimScreen({ navigation }) {
             </View>
       
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
-              <View style={[styles.inputContainer,{zIndex:3}]}>
+              <View style={[styles.inputContainer,{zIndex:99}]}>
               <Text style={styles.normalBoldText}>Join Existing?</Text>
               <SelectList
                 dropdownStyles={styles.dropdownStyles}
@@ -88,7 +88,7 @@ export default function AddClaimScreen({ navigation }) {
                 search = {false}
               />  
             </View>
-            {isExistingClaim == '' ? (
+            {isExistingClaim == null ? (
               <Text></Text>
             ):(isExistingClaim == 'Yes') ? (
               <View style={[styles.inputContainer, {}]}>
@@ -101,8 +101,8 @@ export default function AddClaimScreen({ navigation }) {
                 />
               </View>
             ):(
-              <View style={{width:'100%', alignItems:'center'}}>
-                <View style={[styles.inputContainer,{zIndex:2}]}>
+              <View style={{width:'100%', justifyContent:'center', alignItems:'center'}}>
+                <View style={[styles.inputContainer,{zIndex:98}]}>
                   <Text style={styles.normalBoldText}>Expense Form Type</Text>
                   <SelectList
                     dropdownStyles={styles.dropdownStyles}
@@ -117,9 +117,23 @@ export default function AddClaimScreen({ navigation }) {
                     search = {false}
                   />  
                 </View>
+                <View style={[styles.inputContainer,{zIndex:1}]}>
+                  <Text style={styles.normalBoldText}>Company</Text>
+                  <SelectList
+                    dropdownStyles={styles.dropdownStyles}
+                    dropdownItemStyles={styles.dropdownItemStyles}
+                    dropdownTextStyles={styles.dropdownTextStyles}
+                    boxStyles={styles.boxStyles}
+                    inputStyles={styles.inputStyles}  
+                    setSelected={(val) => setClaim({...claim, company:val})} 
+                    data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
+                    save="value"
+                    showsVerticalScrollIndicator = {false}
+                    search = {false}
+                  />  
+                </View>
               </View>
             )}
-
             </View>
           </ScrollView>
         </View>
