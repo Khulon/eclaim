@@ -34,8 +34,7 @@ sql.connect(config, function (err) {
     console.log("Connected!");
 });
 
-
-var port =  process.env.port || process.env.PORT;
+var port = process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
@@ -1089,6 +1088,9 @@ app.post('/editMonthlyExpense', async (req, res) => {
     if(form_creator.recordset[0].form_creator == claimee) {
       checked = 'Yes'
     }
+
+  
+
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
     + "description = "+description+", total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
     + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
@@ -1106,6 +1108,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
     request.input('with_GST', sql.Numeric(18,2), with_GST);
     request.input('without_GST', sql.Numeric(18,2), without_GST);
 
+    console.log(query)
     
     await request.query(query)
     res.send({message: "Expense updated!"})
