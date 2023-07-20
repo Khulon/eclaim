@@ -15,7 +15,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.travellingExpenseTypes;
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
-    amount: null, date: new Date(), description: null, receipt: null});
+    amount: null, date: new Date(), description: null, receipt: null, place: null, customer_name: null, company: null});
 
   async function handleAddExpense() {
     console.log(expense)
@@ -117,6 +117,44 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
                   autoCorrect={false} 
                 />
               </View>
+              {expense.type == 'Entertainment and Gifts' ? (
+                <View style={{width:'100%', alignItems:'center'}}>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.normalBoldText}>Place</Text>
+                    <TextInput style={styles.textInput}
+                      placeholder="Place" 
+                      value={expense.place} 
+                      onChangeText={(place) => setExpense({...expense, place: place})}
+                      autoCapitalize="none" 
+                      autoCorrect={false} 
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.normalBoldText}>Customer Name</Text>
+                    <TextInput style={styles.textInput}
+                      placeholder="Name(s)" 
+                      value={expense.customer_name} 
+                      onChangeText={(customer_name) => setExpense({...expense, customer_name: customer_name})}
+                      autoCapitalize="none" 
+                      autoCorrect={false} 
+                    />
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.normalBoldText}>Company</Text>
+                    <TextInput style={styles.textInput}
+                      placeholder="eg. Yang Ming" 
+                      value={expense.company} 
+                      onChangeText={(company) => setExpense({...expense, company: company})}
+                      autoCapitalize="none" 
+                      autoCorrect={false} 
+                    />
+                  </View>
+                </View>
+              ):(
+                  <View/>
+              )}
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Description</Text>
                 <TextInput style={[styles.textInput,{height:'100px'}]}

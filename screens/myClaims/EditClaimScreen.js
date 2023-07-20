@@ -190,8 +190,8 @@ export default function EditClaimScreen({ navigation, route}) {
             <Tooltip text={'Transport Expense'}>
               <Ionicons  name="car-outline" color="#444" size="25px"/>
             </Tooltip>
-          ):type=='Entertainment'?(
-            <Tooltip text={'Entertainment Expense'}>
+          ):type=='Entertainment and Gifts'?(
+            <Tooltip text={'Entertainment and Gifts'}>
               <Ionicons  name="gift-outline" color="#444" size="25px"/>
             </Tooltip>
           ):type=='Mobile'?(

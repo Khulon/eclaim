@@ -20,7 +20,8 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
   const expenseTypeDropdown = route.params.travellingExpenseTypes
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-    amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+    amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt,
+    place: null, customer_name: null, company: null, });
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -186,6 +187,45 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
                 editable={isEditing}
               />
             </View>
+            {expense.type == 'Entertainment and Gifts' ? (
+              <View style={{width:'100%', alignItems:'center'}}>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>Place</Text>
+                  <TextInput style={styles.textInput}
+                    placeholder="Place" 
+                    value={expense.place} 
+                    onChangeText={(place) => setNewExpense({...expense, place: place})}
+                    autoCapitalize="none" 
+                    autoCorrect={false} 
+                    editable={isEditing}
+                  />
+                </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>Customer Name</Text>
+                  <TextInput style={styles.textInput}
+                    placeholder="Name(s)" 
+                    value={expense.customer} 
+                    onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
+                    autoCapitalize="none" 
+                    autoCorrect={false} 
+                    editable={isEditing}
+                  />
+                </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>Company</Text>
+                  <TextInput style={styles.textInput}
+                    placeholder="eg. Yang Ming" 
+                    value={expense.company} 
+                    onChangeText={(company) => setNewExpense({...expense, company: company})}
+                    autoCapitalize="none" 
+                    autoCorrect={false} 
+                    editable={isEditing}
+                  />
+                </View>
+              </View>
+            ):(
+              <View/>
+            )}
             <View style={styles.inputContainer}>
               <Text style={styles.normalBoldText}>Description</Text>
               <TextInput style={[styles.textInput,{height:'100px'}]}
