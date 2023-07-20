@@ -4,10 +4,11 @@ import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
 
 
-export default function ChangePasswordModal({ closeModal, route }) {
+export default function ChangePasswordModal({ closeModal, info }) {
 
   const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: '', confirmPassword: ''})
   const [validationResults, setValidationResults] = useState([]);
+
 
   function register() {
     try{
