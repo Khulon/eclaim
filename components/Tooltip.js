@@ -10,7 +10,7 @@ import { View, Text, StyleSheet } from 'react-native';
  * @param {ReactNode} children - The content that triggers the tooltip on hover.
  * @param {boolean} bottom - Determines whether to display the tooltip below the content.
  */
-const Tooltip = ({ text, children, bottom }) => {
+const Tooltip = ({ text, children, customStyle }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [ isBottom, setIsBottom ] = useState(false)
   let timeoutId; // Variable to store the timeout ID
@@ -25,9 +25,9 @@ const Tooltip = ({ text, children, bottom }) => {
     },
     tooltipText: {
       position: 'absolute',
-      top: isBottom ? '120%' : '-50%',
-      left: isBottom ? '50%' :'250%',
-      transform: 'translateX(-50%)',
+      top: '-50%',
+      left: '250%',
+      transform: 'translateX(-30px)',
       backgroundColor: 'black',
       color: '#fff',
       padding: 10,
@@ -37,9 +37,6 @@ const Tooltip = ({ text, children, bottom }) => {
   });
 
   const handleMouseEnter = () => {
-    if (bottom == true) {
-      setIsBottom(true)
-    }
     timeoutId = setTimeout(() => {
       setIsHovered(true);
     }, 200); // Delay of 2 seconds (2000 milliseconds)
@@ -59,7 +56,7 @@ const Tooltip = ({ text, children, bottom }) => {
       >
         {children}
       </View>
-      {isHovered && <Text style={styles.tooltipText}>{text}</Text>}
+      {isHovered && <Text style={[styles.tooltipText, customStyle]} >{text}</Text>} 
     </View>
   );
 };
