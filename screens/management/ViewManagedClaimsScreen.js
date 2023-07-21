@@ -78,8 +78,6 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         }
         setApprovers(data.approvers);
         setProcessor(data.processor);
-        console.log(data.approvers)
-        console.log(data.processor)
       });
       setIsLoading(false)
     } catch (error) {
