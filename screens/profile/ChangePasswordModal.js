@@ -47,6 +47,8 @@ export default function ChangePasswordModal({ closeModal }) {
         window.localStorage.setItem('details', JSON.stringify(item))
         window.localStorage.setItem('token', data.token)
         window.location.reload(false)
+      } else if(data.error == "known") {
+        alert(data.message)
       } else {
         console.log(data.message)
         alert('Failed to update password!')
