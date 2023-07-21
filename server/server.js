@@ -362,7 +362,17 @@ const generateRandomID = () => {
   return id;
 };
 
+app.get('/getCompanies', async (req, res) => {
 
+  try {
+    var request = new sql.Request();
+    const companies = await request.query("SELECT prefix FROM Companies")
+    res.send(companies.recordset)
+  } catch(err) {
+    console.log(err)
+    res.send({message: err.message})
+  }
+})
 
 //User to add claim
 app.post('/addClaim', async (req, res) => {
@@ -373,7 +383,7 @@ app.post('/addClaim', async (req, res) => {
 
   let payPeriodFrom = req.body.payPeriodFrom;
   let payPeriodTo = req.body.payPeriodTo;
-
+  let company = req.body.company;
   let costCenter = req.body.costCenter;
   if (costCenter == "") {
     costCenter = null;
@@ -405,7 +415,7 @@ app.post('/addClaim', async (req, res) => {
       const query = "SET XACT_ABORT ON " 
       + "BEGIN TRANSACTION "
       +"INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, @formCreator, @expense_type, "
-        + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, GETDATE(), @nextApprover);"
+        + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, GETDATE(), @nextApprover, '"+company+"');"
         + "INSERT INTO MonthlyGeneral VALUES('"+newFormId+"', @fromDate, @toDate, @costCenter, @note);"
         + " COMMIT TRANSACTION";
       request.input('expense_type', sql.Text, expenseType)
@@ -464,7 +474,7 @@ app.post('/addClaim', async (req, res) => {
     const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + " INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, GETDATE(), @nextApprover);"
+    + " INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, GETDATE(), @nextApprover, '"+company+"');"
     + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, '"+newFormId+"'); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)

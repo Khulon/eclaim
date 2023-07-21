@@ -11,7 +11,7 @@ export default function MonthlyExpenseForm({route}) {
   const addClaim = route.params.props;
   const [claim, setClaim] = useState(
     {creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, 
-    payPeriodFrom: new Date(), payPeriodTo: new Date(), costCenter: null, note: null});
+    payPeriodFrom: new Date(), payPeriodTo: new Date(), costCenter: null, note: null, company: addClaim.company});
 
   function addMonthlyClaim (claim) {
     console.log(claim.payPeriodFrom, claim.payPeriodTo)
