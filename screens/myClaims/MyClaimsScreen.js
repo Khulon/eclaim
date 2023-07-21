@@ -1,20 +1,23 @@
-import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Modal } from 'react-native';
 import React, { useState, useEffect } from "react";
-import { Ionicons } from "react-native-vector-icons";
+import { Ionicons, Feather } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
 import { parseDatePeriod } from '../../functions/Parsers';
 import Tooltip from '../../components/Tooltip';
 import LoadingPage from '../../components/LoadingPage';
+import FilterModal from './FilterModal';
 
 export default function MyClaimsScreen({ navigation }) {        
   window.localStorage.setItem('stackScreen', 'MyClaims');
+  const [modalVisible, setModalVisible] = useState(false);
   const userDetails = JSON.parse(window.localStorage.getItem('details'))
   const [data, setData] = useState(null);
   const [fullData, setFullData] = useState(null);
   const [isLoading, setIsLoading] = useState(false); 
   const [selectedId, setSelectedId] = useState('');
   const [search, setSearch] = useState('')
+  const [ isFilterHover, setIsFilterHover ] = useState(false)
 
   useEffect(() => {
     setIsLoading(true)
@@ -132,6 +135,14 @@ export default function MyClaimsScreen({ navigation }) {
 
   return (
     <View style={styles.page}>
+      {modalVisible && (
+        <Modal transparent animationType="fade">
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <FilterModal closeModal={()=>setModalVisible(!modalVisible)}/>
+            </View>
+          </View>
+        </Modal>)}
       <LoadingPage isLoading={isLoading}/>
       <View style={styles.pageDefault}>
         <View style={{height:'5%'}}/>
@@ -139,17 +150,24 @@ export default function MyClaimsScreen({ navigation }) {
           <View style={{width:'84%', flexGrow:1, flexDirection:'row', alignItems:'center'}}>
             <Text style={{fontFamily:"inherit", fontSize: "38px", fontWeight:"700"}}>My Claims</Text>
           </View>
-          <View style={styles.inputContainer}>
-            <TextInput style={styles.textInput}
-              placeholder="Search" 
-              value={search} 
-              onChangeText={(search) => handleSearch(search)} 
-              autoCapitalize="none" 
-              autoCorrect={false} 
-            />
-            <View style={{height:'35px', width:'35px', position:'absolute', alignItems:'center', justifyContent:'center'}}>
-              <Text style={{paddingRight:'10px'}}><Ionicons name="search-outline" color="#444" size='large'/></Text>
+          <View style={{width:'85%', height:'35px', flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingBottom:'30px'}}>
+            <View style={{height:'35px', flexGrow:1, flexDirection:'row-reverse', paddingRight:'10px'}}>
+              <TextInput style={styles.textInput}
+                placeholder="Search" 
+                value={search} 
+                onChangeText={(search) => handleSearch(search)} 
+                autoCapitalize="none" 
+                autoCorrect={false} 
+              />
+              <View style={{height:'35px', width:'35px', position:'absolute', alignItems:'center', justifyContent:'center'}}>
+                <Text style={{paddingRight:'10px'}}><Ionicons name="search-outline" color="#444" size='large'/></Text>
+              </View>
             </View>
+            <TouchableOpacity onPress={()=> setModalVisible(!modalVisible)} style={{width:'8%', height:'35px', backgroundColor:'#E3E3E3', borderRadius:'20px', padding:'10px', minWidth:'100px', justifyContent:'center', alignItems:'center', flexDirection:'row'}}>
+              <Feather name="filter" color="#5F5F5F" size="16px"/>
+              <Text style={{color:'#5F5F5F', fontWeight:600, fontSize:'14px'}}> Filter</Text>
+            </TouchableOpacity>
+            
           </View>
         </View>
 
@@ -173,6 +191,21 @@ export default function MyClaimsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 15,
+    height:'70%',
+    minHeight:'400px',
+    width:'25%',
+    minWidth:'320px'
+  },
   page: {
     height: "100%",
     width: "100%",
@@ -209,7 +242,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: "35px",
-    width:'100%',
+    flexGrow:1,
     color: "#6A6A6A",
     backgroundColor: "#D9D9D9",
     borderWidth: "1px",
