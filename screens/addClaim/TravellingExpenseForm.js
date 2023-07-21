@@ -8,7 +8,7 @@ import "../../components/custom-datepicker.css";
 
 export default function TravellingExpenseForm({ route }) {      
   const addClaim = route.params.props;
-  const [claim, setClaim] = useState({creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType,
+  const [claim, setClaim] = useState({creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, company: addClaim.company,
     country: null, exchangeRate:null, dateFrom:  new Date(), dateTo:  new Date()});
 
   function addTravellingClaim (claim) {
