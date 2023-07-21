@@ -45,9 +45,11 @@ export default function EditClaimScreen({ navigation, route}) {
       fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         if(data.message == "Token expired!") {
           throw new Error("Token expired!")
         }
+        
         setFullData(data);
         setData(data)
         claim.current.total_amount = 0
@@ -190,8 +192,8 @@ export default function EditClaimScreen({ navigation, route}) {
             <Tooltip text={'Transport Expense'}>
               <Ionicons  name="car-outline" color="#444" size="25px"/>
             </Tooltip>
-          ):type=='Entertainment and Gifts'?(
-            <Tooltip text={'Entertainment and Gifts'}>
+          ):type=='Entertainment'?(
+            <Tooltip text={'Entertainment Expense'}>
               <Ionicons  name="gift-outline" color="#444" size="25px"/>
             </Tooltip>
           ):type=='Mobile'?(

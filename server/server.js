@@ -623,9 +623,11 @@ async function expenseAuthentication (req, res, next) {
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
 
+    console.log("Claimees:      " + claimees.recordset[0].claimee)
+
     for (var i = 0; i < claimees.recordset.length; i++) {
       if(claimees.recordset[i].claimee == decoded.email) {
-        next()
+        return next()
       }
     }
     //check all claimees
@@ -639,25 +641,29 @@ async function expenseAuthentication (req, res, next) {
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
       if(firstApprover.recordset[0].approver_name == decoded.email) {
-        next()
+        return next()
       }
     } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
         //everyone
       const managers = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status IN ('Pending Next Approval', 'Approved', 'Processed') AND person = '"+decoded.email+"'")
+      console.log("count: " + managers.recordset[0].count)
       if(managers.recordset[0].count == 1) {
-          next()
+          return next()
+      }
+      if(processor == decoded.email) {
+        return next()
       }
     } else if (status.recordset[0].status == "Pending Next Approval") {
       const next_Approver = await request.query("SELECT next_recipient FROM Claims WHERE id = '"+id+"'")
       nextApprover = next_Approver.recordset[0].next_recipient
       if(nextApprover == decoded.email) {
-        next()
+        return next()
       }
     } else if (status.recordset[0].status == "Rejected" || status.recordset[0].status == "Rejected by approver" || status.recordset[0].status == "Rejected by processor") {
       let currentStatus = status.recordset[0].status
       const everyone = await request.query("select count(*) as count from (select DISTINCT person from History where date < (select top 1 date from History where id = '"+id+"' AND status = '"+currentStatus+"')) T WHERE person = '"+decoded.email+"'")
       if(everyone.recordset[0].count == 1) {
-        next()
+        return next()
       }
     }
     
@@ -678,11 +684,12 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
   var request = new sql.Request();
 
   try {
-
+    console.log(id, user)
     //Check who is form creator
     const query = "SELECT form_creator FROM Claims WHERE id = '"+id+"'";
     const form_creator = await request.query(query)
 
+    
     //Form creator is not user
     if (form_creator.recordset[0].form_creator != user) {
       const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' AND claimee = '"+user+"'";
@@ -693,11 +700,13 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
     } else {
       const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"'";
       const result = await request.query(queryString);
+      console.log(result.recordset)
       res.send(result.recordset);
-  }
+    }
+    
   
   } catch(err) {
-    console.log(err)
+    console.log(err.message)
     res.send({message: err.message});
   }
 
@@ -1833,4 +1842,19 @@ app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res
 })
 
 
+app.post('/changePassword', async (req, res) => {
+  let password = req.body.password;
+  let user = req.body.user;
+  console.log(req.body)
+  console.log(password, user)
 
+  try {
+    var request = new sql.Request();
+    await request.query("UPDATE Accounts SET password = '"+password+"' WHERE email = '"+user+"'")
+    res.send({message: "Success!"})
+  } catch(err) {
+    console.log(err)
+    res.send({message: err.message})
+  }
+
+})

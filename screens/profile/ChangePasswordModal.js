@@ -1,39 +1,57 @@
 import { StyleSheet, Text, View, TextInput, ScrollView} from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef} from 'react';
 import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
 
 
-export default function ChangePasswordModal({ closeModal, info }) {
+export default function ChangePasswordModal({ closeModal }) {
 
-  const [loginDetails, setLoginDetails] = useState({companyEmail: '', password: '', confirmPassword: ''})
   const [validationResults, setValidationResults] = useState([]);
+  const password = useRef()
+  const confirmPassword = useRef()
 
 
-  function register() {
+  function changePassword() {
     try{
-      console.log(loginDetails.password)
-      console.log(loginDetails.confirmPassword)
-      if(loginDetails.password != loginDetails.confirmPassword) {
+      console.log(password.current)
+      console.log(confirmPassword.current)
+      if(password.current != confirmPassword.current) {
         alert("Passwords do not match!");
         throw new Error("Passwords do not match!");
-      } 
+      }
       if (!validationResults.every(result => result.color == 'green')) {
         alert("Password must pass all conditions in red!")
         throw new Error("Password must pass all conditions in red!");
       }
-      createUser(loginDetails);
+      handleChangePassword(password.current)
     } catch (error) {
       console.log(error);
     }
   }
 
-  function handleChangePassword(){
-
+  async function handleChangePassword(password) {
+    const header = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
+    const user = window.localStorage.getItem('session')
+    await fetch('http://10.0.1.28:5000/changePassword', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify({user: user, password: password})
+    }).then((response) => response.json())
+    .then((data) => {
+      if(data.message == 'Success!') {
+        alert("Password changed successfully!")
+        window.location.reload(false)
+      } else {
+        console.log(data.message)
+        alert('Failed to update password!')
+      }
+    })
+    
   }
 
   const validatePassword = (input) => {
-    setLoginDetails({...loginDetails, password: input})
+    
+    password.current = input;
     const results = [];
 
     // Check password length
@@ -100,9 +118,14 @@ export default function ChangePasswordModal({ closeModal, info }) {
         color: "green"
       });
     }
-
     setValidationResults(results);
   };
+
+  function test (input) {
+    console.log(input)
+    confirmPassword.current = input;
+    console.log(confirmPassword.current)
+  }
   
   return (
     <View style={styles.page}>
@@ -126,10 +149,9 @@ export default function ChangePasswordModal({ closeModal, info }) {
                     <Text style={styles.normalBoldText}>New Password</Text>
                     <TextInput style={styles.textInput}
                         placeholder="......." 
-                        value={loginDetails.password} 
-                        onChangeText={validatePassword}
                         autoCapitalize="none" 
-                        autoCorrect={false} 
+                        onChangeText = {(value) => validatePassword(value)}
+                        autoCorrect={false}
                         secureTextEntry={true}
                     />
                 </View>
@@ -137,11 +159,11 @@ export default function ChangePasswordModal({ closeModal, info }) {
                     <Text style={styles.normalBoldText}>Confirm New Password</Text>
                     <TextInput style={styles.textInput}
                         placeholder="......." 
-                        value={loginDetails.confirmPassword} 
-                        onChangeText={(confirmPassword) => setLoginDetails({...loginDetails, confirmPassword: confirmPassword})} 
-                        autoCapitalize="none" 
+                        autoCapitalize="none"
+                        onChangeText = {(value) => test(value)}
                         autoCorrect={false} 
                         secureTextEntry={true}
+
                     />
                 </View>
                 <View style={{height:'130px', justifyContent:'center', width:'90%', maxWidth:'450px'}}>
@@ -158,7 +180,7 @@ export default function ChangePasswordModal({ closeModal, info }) {
         </ScrollView>
             
         <View style={{ width: '100%', height:'60px', justifyContent:'center', alignItems: 'center'}}>
-          <DefaultButton description='Confirm' onPress={() => handleChangePassword()} customStyle={{width: "90%", maxWidth: "400px"}}/>
+          <DefaultButton description='Confirm' onPress={() => changePassword()} customStyle={{width: "90%", maxWidth: "400px"}}/>
         </View>
       </View>
     </View>

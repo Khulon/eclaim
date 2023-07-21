@@ -52,7 +52,7 @@ export default function ProfileScreen({ navigation }) {
         <Modal transparent animationType="fade">
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <ChangePasswordModal closeModal={()=>setModalVisible(!modalVisible)} info={userDetails.password}/>
+              <ChangePasswordModal closeModal={()=>setModalVisible(!modalVisible)}/>
             </View>
           </View>
         </Modal>)}
