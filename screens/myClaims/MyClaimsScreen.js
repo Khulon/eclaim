@@ -80,7 +80,7 @@ export default function MyClaimsScreen({ navigation }) {
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"45px", alignItems: "center", justifyContent: "center"}}>
         {form_type == 'Travelling' ? (
-          <Tooltip text={'Travel claim'}>
+          <Tooltip text={'Travel claim'}> 
             <Ionicons  name="airplane-outline" color="#444" size="25px"/>
           </Tooltip>
         ):(
