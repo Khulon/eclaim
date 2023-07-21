@@ -17,7 +17,7 @@ export default function MyClaimsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false); 
   const [selectedId, setSelectedId] = useState('');
   const [search, setSearch] = useState('')
-  const [ isFilterHover, setIsFilterHover ] = useState(false)
+  const [filterDate, setFilterDate] = useState({startDate:null, endDate:null})
 
   useEffect(() => {
     setIsLoading(true)
@@ -70,13 +70,34 @@ export default function MyClaimsScreen({ navigation }) {
     //console.log(filteredData)
   }
 
-  const contains = ({form_creator, id}, query) => {
+  const contains = ({form_creator, id, form_type, pay_period_from, pay_period_to, period_from, period_to}, query) => {
     id = id.toLowerCase()
     form_creator = form_creator.toLowerCase()
+    //console.log(filterDate.startDate, filterDate.endDate)
+    if (filterDate.startDate != null && filterDate.endDate != null) {
+      if (form_type == "Travelling") {
+        console.log(period_from)
+        console.log(filterDate.startDate)
+        if (period_from<filterDate.startDate || period_to>filterDate.endDate) {
+          return false
+        }
+      }
+      if (form_type == "Monthly" && (pay_period_from<filterDate.startDate || pay_period_to>filterDate.endDate)) {
+        return false
+      }
+    }
     if (form_creator.includes(query) || id.includes(query)) {
       return true
     }
     return false
+  }
+
+  function applyFilter (startDate, endDate) {
+    setFilterDate((filterDate) => ({
+      ...filterDate,
+      startDate: startDate,
+      endDate: endDate,
+    }));
   }
   
   const Item = ({date, creator_Name, total, claimees, status, claimId, form_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
@@ -139,7 +160,7 @@ export default function MyClaimsScreen({ navigation }) {
         <Modal transparent animationType="fade">
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <FilterModal closeModal={()=>setModalVisible(!modalVisible)}/>
+              <FilterModal closeModal={()=>setModalVisible(!modalVisible)} applyFilter={(startDate, endDate)=>applyFilter(startDate, endDate)}/>
             </View>
           </View>
         </Modal>)}

@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import DefaultButton from '../../components/DefaultButton';
 
 
-export default function FilterModal({ closeModal }) {
+export default function FilterModal({ closeModal, applyFilter }) {
 
     const [startDate, setStartDate ] = useState(new Date())
     const [endDate, setEndDate ] = useState(new Date())
@@ -40,7 +40,7 @@ export default function FilterModal({ closeModal }) {
                 </ScrollView>
                     
                 <View style={{ width: '100%', height:'60px', justifyContent:'center', alignItems: 'center'}}>
-                <DefaultButton description='Feature not working yet' onPress={() => applyFilter()} customStyle={{width: "90%", maxWidth: "400px"}}/>
+                <DefaultButton description='Feature not working yet' onPress={() => applyFilter(startDate, endDate)} customStyle={{width: "90%", maxWidth: "400px"}}/>
                 </View>
             </View>
         </View>
