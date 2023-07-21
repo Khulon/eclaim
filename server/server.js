@@ -40,8 +40,8 @@ app.listen(port, () => {
 })
 
 
-function generateAccessToken(username) {
-  return jwt.sign(username, tokenSecret, { expiresIn: '3600s' });
+function generateAccessToken(details) {
+  return jwt.sign(details, tokenSecret, { expiresIn: '3600s' });
 }
 
 
@@ -623,8 +623,6 @@ async function expenseAuthentication (req, res, next) {
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
 
-    console.log("Claimees:      " + claimees.recordset[0].claimee)
-
     for (var i = 0; i < claimees.recordset.length; i++) {
       if(claimees.recordset[i].claimee == decoded.email) {
         return next()
@@ -646,7 +644,6 @@ async function expenseAuthentication (req, res, next) {
     } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
         //everyone
       const managers = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status IN ('Pending Next Approval', 'Approved', 'Processed') AND person = '"+decoded.email+"'")
-      console.log("count: " + managers.recordset[0].count)
       if(managers.recordset[0].count == 1) {
           return next()
       }
@@ -700,7 +697,6 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
     } else {
       const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"'";
       const result = await request.query(queryString);
-      console.log(result.recordset)
       res.send(result.recordset);
     }
     
@@ -1843,18 +1839,23 @@ app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res
 
 
 app.post('/changePassword', async (req, res) => {
-  let password = req.body.password;
+  let newPassword = req.body.newPassword;
   let user = req.body.user;
-  console.log(req.body)
-  console.log(password, user)
+  let oldPassword = req.body.oldPassword;
 
   try {
     var request = new sql.Request();
-    await request.query("UPDATE Accounts SET password = '"+password+"' WHERE email = '"+user+"'")
-    res.send({message: "Success!"})
+    const check = await request.query("SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+user+"' AND password = '"+oldPassword+"'")
+    if(check.recordset[0].count == 0) {
+      return res.json({error: "known", message: "You are not allowed to change this password!"})
+    } else if(check.recordset[0].count = 1) {
+      await request.query("UPDATE Accounts SET password = '"+newPassword+"' WHERE email = '"+user+"'")
+      const token = generateAccessToken({ email: user, password: newPassword });
+      res.send({message: "Success!", token: token})
+    }
   } catch(err) {
     console.log(err)
-    res.send({message: err.message})
+    res.send({error: "unknown", message: err.message})
   }
 
 })

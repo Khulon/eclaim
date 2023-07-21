@@ -32,15 +32,23 @@ export default function ChangePasswordModal({ closeModal }) {
   async function handleChangePassword(password) {
     const header = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
     const user = window.localStorage.getItem('session')
+    const oldPassword = JSON.parse(window.localStorage.getItem('details')).password
+    
     await fetch('http://10.0.1.28:5000/changePassword', {
       method: 'POST',
       headers: header,
-      body: JSON.stringify({user: user, password: password})
+      body: JSON.stringify({user: user, oldPassword: oldPassword, newPassword: password})
     }).then((response) => response.json())
     .then((data) => {
       if(data.message == 'Success!') {
         alert("Password changed successfully!")
+        const item = JSON.parse(window.localStorage.getItem('details'))
+        item.password = password
+        window.localStorage.setItem('details', JSON.stringify(item))
+        window.localStorage.setItem('token', data.token)
         window.location.reload(false)
+      } else if(data.error == "known") {
+        alert(data.message)
       } else {
         console.log(data.message)
         alert('Failed to update password!')
