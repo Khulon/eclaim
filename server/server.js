@@ -726,6 +726,9 @@ app.post('/addTravellingExpense', async (req, res) => {
   let claimee = req.body.claimee;
   let amount = req.body.amount;
   let type = req.body.type;
+  let place = req.body.place;
+  let customer = req.body.customer_name;
+  let company = req.body.company;
   let otherType = req.body.otherType;
   let receipt = req.body.receipt;
 
@@ -774,9 +777,22 @@ app.post('/addTravellingExpense', async (req, res) => {
      + "@withGst, @withoutGst, @amount, @description, @receipt, 'Yes', GETDATE(), GETDATE())");
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
-    request.input('place', sql.VarChar, null);
-    request.input('customer', sql.VarChar, null);
-    request.input('company', sql.VarChar, null);
+    
+    if(place == "" || place == null) {
+      request.input('place', sql.VarChar, null);
+    } else {
+      request.input('place', sql.VarChar, place);
+    }
+    if(customer == "" || customer == null) {
+      request.input('customer', sql.VarChar, null);
+    } else {
+      request.input('customer', sql.VarChar, customer);
+    }
+    if(company == "" || company == null) {
+      request.input('company', sql.VarChar, null);
+    } else {
+      request.input('company', sql.VarChar, company);
+    }
     request.input('withGst', sql.Numeric(18,2), null);
     request.input('withoutGst', sql.Numeric(18,2), null);
     request.input('amount', sql.Numeric(18,2), amount);
@@ -941,6 +957,9 @@ app.post('/editTravellingExpense', async (req, res) => {
   let claimee = req.body.claimee;
   let item_number = req.body.item_number;
   let amount = req.body.amount;
+  let place = req.body.place;
+  let customer = req.body.customer_name;
+  let company = req.body.company;
   let type = req.body.type;
   let otherType = req.body.otherType;
   let date = req.body.date;
@@ -954,6 +973,12 @@ app.post('/editTravellingExpense', async (req, res) => {
 
     if(type == null) {
       return res.json({error: "known", message: "Please enter a valid expense type!"})
+    }
+
+    if(type != "Entertainment and Gifts") {
+      place = null
+      customer = null
+      company = null
     }
 
     if(type == "Others") {
@@ -984,7 +1009,7 @@ app.post('/editTravellingExpense', async (req, res) => {
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = @description, total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = @description, total_amount = @amount, receipt = @receipt, place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
@@ -999,6 +1024,9 @@ app.post('/editTravellingExpense', async (req, res) => {
     } else {
       request.input('receipt', sql.VarChar, receipt);
     }
+    request.input('place', sql.VarChar, place);
+    request.input('customer', sql.VarChar, customer);
+    request.input('company', sql.VarChar, company);
     request.input('item_number', sql.Int, item_number);
     
     await request.query(query)
@@ -1055,6 +1083,12 @@ app.post('/editMonthlyExpense', async (req, res) => {
 
     if(type == null) {
       return res.send({error: "known", message: "Please select an expense type!"})
+    }
+
+    if(type != "Entertainment and Gifts") {
+      place = null
+      customer = null
+      company = null
     }
 
     if(type == "Others") {

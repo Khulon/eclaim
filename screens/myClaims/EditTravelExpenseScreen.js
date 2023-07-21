@@ -21,7 +21,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
     amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt,
-    place: null, customer_name: null, company: null, });
+    place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name });
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -204,8 +204,8 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
                   <Text style={styles.normalBoldText}>Customer Name</Text>
                   <TextInput style={styles.textInput}
                     placeholder="Name(s)" 
-                    value={expense.customer} 
-                    onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
+                    value={expense.customer_name} 
+                    onChangeText={(customer) => setNewExpense({...expense, customer_name: customer})}
                     autoCapitalize="none" 
                     autoCorrect={false} 
                     editable={isEditing}
