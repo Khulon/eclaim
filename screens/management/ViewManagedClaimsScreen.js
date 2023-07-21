@@ -68,7 +68,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         setTable(newTable)
         console.log(newTable)
       });
-      
+
       fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}`)
       .then((response) => response.json())
       .then((data) => {
@@ -239,7 +239,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             <Tooltip text={'Transport Expense'}>
               <Ionicons  name="car-outline" color="#444" size="25px"/>
             </Tooltip>
-          ):type=='Entertainment'?(
+          ):type=='Entertainment and Gifts'?(
             <Tooltip text={'Entertainment Expense'}>
               <Ionicons  name="gift-outline" color="#444" size="25px"/>
             </Tooltip>
