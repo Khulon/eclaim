@@ -73,8 +73,9 @@ app.post('/register', async (req, res) => {
     let email = req.body.companyEmail;
     let password = req.body.password;
     var request = new sql.Request();
+    const check = await request.query("SELECT COUNT(*) AS count FROM Employees WHERE email = '"+email+"'")
     const count = await request.query("SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"'")
-    if (count.recordset[0].count == 0) {
+    if (check.recordset[0].count == 0) {
       return res.json({error: "known", message: "Email does not exist! Contact admin to add you as a user."})
     } else if (count.recordset[0].count == 1) {
       return res.json({error: "known", message: "Account already exists!"})
