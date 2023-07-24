@@ -1,14 +1,24 @@
-import { StyleSheet, Text, View, TextInput, ScrollView} from 'react-native';
-import React, { useState, useRef} from 'react';
-import BackButton from '../../components/BackButton';
+import { StyleSheet, Text, View, ScrollView} from 'react-native';
+import React, { useState, useEffect} from 'react';
+import BackButton from './BackButton';
 import DatePicker from "react-datepicker";
-import DefaultButton from '../../components/DefaultButton';
+import DefaultButton from './DefaultButton';
 
-
-export default function FilterModal({ closeModal, applyFilter }) {
+export default function FilterModal({ closeModal, applyFilter, filterDate }) {
 
     const [startDate, setStartDate ] = useState(new Date())
     const [endDate, setEndDate ] = useState(new Date())
+
+    useEffect(() => {
+      if (filterDate.startDate == null || filterDate.endDate == null) {
+        setStartDate(new Date().setHours(0,0,0,0))
+        setEndDate(new Date().setHours(23,59,59))
+      }
+      else {
+        setStartDate(filterDate.startDate)
+        setEndDate(filterDate.endDate)
+      }
+    }, [])
 
     return (
         <View style={styles.page}>
@@ -40,7 +50,7 @@ export default function FilterModal({ closeModal, applyFilter }) {
                 </ScrollView>
                     
                 <View style={{ width: '100%', height:'60px', justifyContent:'center', alignItems: 'center'}}>
-                <DefaultButton description='Feature not working yet' onPress={() => applyFilter(startDate, endDate)} customStyle={{width: "90%", maxWidth: "400px"}}/>
+                <DefaultButton description='Apply' onPress={() => applyFilter(startDate, endDate)} customStyle={{width: "90%", maxWidth: "400px"}}/>
                 </View>
             </View>
         </View>

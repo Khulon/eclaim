@@ -52,7 +52,7 @@ export default function pdf({route, navigation}) {
                 </TouchableOpacity>
                 <View style={{width:'230px', justifyContent:'center', alignItems:'center'}}>
                     <Text style={{fontWeight:700, fontSize:'25px'}}>{presets[options].receiptsPerPage} per page</Text>
-                    <Text style={{fontWeight:400, fontSize:'20px'}}>1.Print/ ctrl-P, </Text>
+                    <Text style={{fontWeight:400, fontSize:'20px'}}>1.Press Print Icon</Text>
                     <Text style={{fontWeight:400, fontSize:'20px'}}>2.({presets[options].layout})</Text>
                     <Text style={{fontWeight:400, fontSize:'20px'}}>3.Background Graphics</Text>
                     <TouchableOpacity style={{alignItems:'center'}} onPress={()=> setHide(true)}>

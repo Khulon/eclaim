@@ -6,7 +6,7 @@ import BottomNavigator from '../../components/BottomNavigation';
 import { parseDatePeriod } from '../../functions/Parsers';
 import Tooltip from '../../components/Tooltip';
 import LoadingPage from '../../components/LoadingPage';
-import FilterModal from './FilterModal';
+import FilterModal from '../../components/FilterModal';
 
 export default function MyClaimsScreen({ navigation }) {        
   window.localStorage.setItem('stackScreen', 'MyClaims');
@@ -73,16 +73,18 @@ export default function MyClaimsScreen({ navigation }) {
   const contains = ({form_creator, id, form_type, pay_period_from, pay_period_to, period_from, period_to}, query) => {
     id = id.toLowerCase()
     form_creator = form_creator.toLowerCase()
-    //console.log(filterDate.startDate, filterDate.endDate)
+
     if (filterDate.startDate != null && filterDate.endDate != null) {
+      const startDate = filterDate.startDate.toISOString()
+      const endDate = filterDate.endDate.toISOString()
+      
       if (form_type == "Travelling") {
-        console.log(period_from)
-        console.log(filterDate.startDate)
-        if (period_from<filterDate.startDate || period_to>filterDate.endDate) {
+        
+        if (period_from <= startDate || period_to > endDate) {
           return false
         }
       }
-      if (form_type == "Monthly" && (pay_period_from<filterDate.startDate || pay_period_to>filterDate.endDate)) {
+      if (form_type == "Monthly" && (pay_period_from <= startDate || pay_period_to > endDate)) {
         return false
       }
     }
@@ -98,7 +100,12 @@ export default function MyClaimsScreen({ navigation }) {
       startDate: startDate,
       endDate: endDate,
     }));
+    setModalVisible(!modalVisible)
   }
+
+  useEffect(() => {
+    handleSearch(search)
+  }, [filterDate]);
   
   const Item = ({date, creator_Name, total, claimees, status, claimId, form_type, backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
@@ -160,11 +167,12 @@ export default function MyClaimsScreen({ navigation }) {
         <Modal transparent animationType="fade">
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <FilterModal closeModal={()=>setModalVisible(!modalVisible)} applyFilter={(startDate, endDate)=>applyFilter(startDate, endDate)}/>
+              <FilterModal closeModal={()=>setModalVisible(!modalVisible)} applyFilter={(startDate, endDate)=>applyFilter(startDate, endDate)} filterDate={filterDate}/>
             </View>
           </View>
         </Modal>)}
       <LoadingPage isLoading={isLoading}/>
+      
       <View style={styles.pageDefault}>
         <View style={{height:'5%'}}/>
         <View style={styles.topCard}>
@@ -245,7 +253,7 @@ const styles = StyleSheet.create({
   },
   bottomNavigation: {
     width:'100%',
-    height: '70px'
+    height: '80px'
   },
   topCard: {
     height: "130px",
