@@ -46,11 +46,12 @@ export default function AdminEditUserScreen({ navigation, route }) {
           console.log(data);
           if(data.message == "User Deleted!") {
             alert("User deleted successfully!")
+            window.location.reload(false);
           } else {
             alert("User deletion failed!")
           }
         });
-      window.location.reload(false);
+      
   }
 
   function updateUser(userDetails) {
