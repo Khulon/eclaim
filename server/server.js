@@ -40,8 +40,8 @@ app.listen(port, () => {
 })
 
 
-function generateAccessToken(username) {
-  return jwt.sign(username, tokenSecret, { expiresIn: '3600s' });
+function generateAccessToken(details) {
+  return jwt.sign(details, tokenSecret, { expiresIn: '3600s' });
 }
 
 
@@ -362,7 +362,17 @@ const generateRandomID = () => {
   return id;
 };
 
+app.get('/getCompanies', async (req, res) => {
 
+  try {
+    var request = new sql.Request();
+    const companies = await request.query("SELECT prefix FROM Companies")
+    res.send(companies.recordset)
+  } catch(err) {
+    console.log(err)
+    res.send({message: err.message})
+  }
+})
 
 //User to add claim
 app.post('/addClaim', async (req, res) => {
@@ -373,7 +383,7 @@ app.post('/addClaim', async (req, res) => {
 
   let payPeriodFrom = req.body.payPeriodFrom;
   let payPeriodTo = req.body.payPeriodTo;
-
+  let company = req.body.company;
   let costCenter = req.body.costCenter;
   if (costCenter == "") {
     costCenter = null;
@@ -405,7 +415,7 @@ app.post('/addClaim', async (req, res) => {
       const query = "SET XACT_ABORT ON " 
       + "BEGIN TRANSACTION "
       +"INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, @formCreator, @expense_type, "
-        + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, GETDATE(), @nextApprover);"
+        + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, GETDATE(), @nextApprover, '"+company+"');"
         + "INSERT INTO MonthlyGeneral VALUES('"+newFormId+"', @fromDate, @toDate, @costCenter, @note);"
         + " COMMIT TRANSACTION";
       request.input('expense_type', sql.Text, expenseType)
@@ -464,7 +474,7 @@ app.post('/addClaim', async (req, res) => {
     const checkApproval = await request.query("SELECT levels_of_approval FROM Departments WHERE department_name != '"+formCreator+"' AND department_name IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
-    + " INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, GETDATE(), @nextApprover);"
+    + " INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, GETDATE(), @nextApprover, '"+company+"');"
     + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, '"+newFormId+"'); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
@@ -623,8 +633,6 @@ async function expenseAuthentication (req, res, next) {
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
 
-    console.log("Claimees:      " + claimees.recordset[0].claimee)
-
     for (var i = 0; i < claimees.recordset.length; i++) {
       if(claimees.recordset[i].claimee == decoded.email) {
         return next()
@@ -646,7 +654,6 @@ async function expenseAuthentication (req, res, next) {
     } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
         //everyone
       const managers = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status IN ('Pending Next Approval', 'Approved', 'Processed') AND person = '"+decoded.email+"'")
-      console.log("count: " + managers.recordset[0].count)
       if(managers.recordset[0].count == 1) {
           return next()
       }
@@ -700,7 +707,6 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
     } else {
       const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"'";
       const result = await request.query(queryString);
-      console.log(result.recordset)
       res.send(result.recordset);
     }
     
@@ -720,6 +726,9 @@ app.post('/addTravellingExpense', async (req, res) => {
   let claimee = req.body.claimee;
   let amount = req.body.amount;
   let type = req.body.type;
+  let place = req.body.place;
+  let customer = req.body.customer_name;
+  let company = req.body.company;
   let otherType = req.body.otherType;
   let receipt = req.body.receipt;
 
@@ -768,9 +777,22 @@ app.post('/addTravellingExpense', async (req, res) => {
      + "@withGst, @withoutGst, @amount, @description, @receipt, 'Yes', GETDATE(), GETDATE())");
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
-    request.input('place', sql.VarChar, null);
-    request.input('customer', sql.VarChar, null);
-    request.input('company', sql.VarChar, null);
+    
+    if(place == "" || place == null) {
+      request.input('place', sql.VarChar, null);
+    } else {
+      request.input('place', sql.VarChar, place);
+    }
+    if(customer == "" || customer == null) {
+      request.input('customer', sql.VarChar, null);
+    } else {
+      request.input('customer', sql.VarChar, customer);
+    }
+    if(company == "" || company == null) {
+      request.input('company', sql.VarChar, null);
+    } else {
+      request.input('company', sql.VarChar, company);
+    }
     request.input('withGst', sql.Numeric(18,2), null);
     request.input('withoutGst', sql.Numeric(18,2), null);
     request.input('amount', sql.Numeric(18,2), amount);
@@ -935,6 +957,9 @@ app.post('/editTravellingExpense', async (req, res) => {
   let claimee = req.body.claimee;
   let item_number = req.body.item_number;
   let amount = req.body.amount;
+  let place = req.body.place;
+  let customer = req.body.customer_name;
+  let company = req.body.company;
   let type = req.body.type;
   let otherType = req.body.otherType;
   let date = req.body.date;
@@ -948,6 +973,12 @@ app.post('/editTravellingExpense', async (req, res) => {
 
     if(type == null) {
       return res.json({error: "known", message: "Please enter a valid expense type!"})
+    }
+
+    if(type != "Entertainment and Gifts") {
+      place = null
+      customer = null
+      company = null
     }
 
     if(type == "Others") {
@@ -978,7 +1009,7 @@ app.post('/editTravellingExpense', async (req, res) => {
     }
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = @description, total_amount = @amount, receipt = @receipt, last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = @description, total_amount = @amount, receipt = @receipt, place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
@@ -993,6 +1024,9 @@ app.post('/editTravellingExpense', async (req, res) => {
     } else {
       request.input('receipt', sql.VarChar, receipt);
     }
+    request.input('place', sql.VarChar, place);
+    request.input('customer', sql.VarChar, customer);
+    request.input('company', sql.VarChar, company);
     request.input('item_number', sql.Int, item_number);
     
     await request.query(query)
@@ -1049,6 +1083,12 @@ app.post('/editMonthlyExpense', async (req, res) => {
 
     if(type == null) {
       return res.send({error: "known", message: "Please select an expense type!"})
+    }
+
+    if(type != "Entertainment and Gifts") {
+      place = null
+      customer = null
+      company = null
     }
 
     if(type == "Others") {
@@ -1843,18 +1883,23 @@ app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res
 
 
 app.post('/changePassword', async (req, res) => {
-  let password = req.body.password;
+  let newPassword = req.body.newPassword;
   let user = req.body.user;
-  console.log(req.body)
-  console.log(password, user)
+  let oldPassword = req.body.oldPassword;
 
   try {
     var request = new sql.Request();
-    await request.query("UPDATE Accounts SET password = '"+password+"' WHERE email = '"+user+"'")
-    res.send({message: "Success!"})
+    const check = await request.query("SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+user+"' AND password = '"+oldPassword+"'")
+    if(check.recordset[0].count == 0) {
+      return res.json({error: "known", message: "You are not allowed to change this password!"})
+    } else if(check.recordset[0].count = 1) {
+      await request.query("UPDATE Accounts SET password = '"+newPassword+"' WHERE email = '"+user+"'")
+      const token = generateAccessToken({ email: user, password: newPassword });
+      res.send({message: "Success!", token: token})
+    }
   } catch(err) {
     console.log(err)
-    res.send({message: err.message})
+    res.send({error: "unknown", message: err.message})
   }
 
 })

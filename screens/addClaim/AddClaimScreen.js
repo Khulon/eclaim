@@ -1,5 +1,5 @@
 import { TextInput, StyleSheet, Text, View, ScrollView} from 'react-native';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SelectList} from 'react-native-dropdown-select-list'
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
@@ -8,9 +8,24 @@ import BackButton from '../../components/BackButton';
 export default function AddClaimScreen({ navigation }) {        
   const expenseTypes = [{key: '0', value: 'Travelling'},{key: '1', value: 'Monthly'}]
   const [isExistingClaim, setIsExistingClaim] = useState(null);
+  const [companies, setCompanies] = useState([])
   const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null, company: null});
 
-  function handleAddClaim() {
+  useEffect(() => {
+    //fetch companies
+    fetch('http://10.0.1.28:5000/getCompanies')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+      for(let i = 0; i < data.length; i++) {
+        data[i] = {value: data[i].prefix}
+      }
+      setCompanies(data)
+    })
+  }, [])
+
+
+  async function handleAddClaim() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     switch(isExistingClaim) {
       case 'Yes':
@@ -34,13 +49,16 @@ export default function AddClaimScreen({ navigation }) {
         break;
       case 'No':
         if (claim.expenseType != null) {
+          if (claim.company == null) {
+            alert("Please fill in the company which you are claiming from!")
+            break;
+          }
           (claim.expenseType == 'Travelling') ? (
             navigation.navigate("TravellingExpenseForm", {props: claim })
           ) : (
             navigation.navigate("MonthlyExpenseForm", {props: claim })
           )
-        }
-        else {
+        } else {
           alert("Please fill in the expense form type!")
         }
         break;
@@ -126,7 +144,7 @@ export default function AddClaimScreen({ navigation }) {
                     boxStyles={styles.boxStyles}
                     inputStyles={styles.inputStyles}  
                     setSelected={(val) => setClaim({...claim, company:val})} 
-                    data={[{key:'0', value:'No'},{key:'1', value:'Yes'},]} 
+                    data={companies} 
                     save="value"
                     showsVerticalScrollIndicator = {false}
                     search = {false}
