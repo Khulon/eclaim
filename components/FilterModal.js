@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, ScrollView} from 'react-native';
 import React, { useState, useEffect} from 'react';
-import BackButton from '../../components/BackButton';
+import BackButton from './BackButton';
 import DatePicker from "react-datepicker";
-import DefaultButton from '../../components/DefaultButton';
+import DefaultButton from './DefaultButton';
 
 export default function FilterModal({ closeModal, applyFilter, filterDate }) {
 

@@ -6,7 +6,7 @@ import BottomNavigator from '../../components/BottomNavigation';
 import { parseDatePeriod } from '../../functions/Parsers';
 import Tooltip from '../../components/Tooltip';
 import LoadingPage from '../../components/LoadingPage';
-import FilterModal from './FilterModal';
+import FilterModal from '../../components/FilterModal';
 
 export default function MyClaimsScreen({ navigation }) {        
   window.localStorage.setItem('stackScreen', 'MyClaims');
@@ -172,6 +172,7 @@ export default function MyClaimsScreen({ navigation }) {
           </View>
         </Modal>)}
       <LoadingPage isLoading={isLoading}/>
+      
       <View style={styles.pageDefault}>
         <View style={{height:'5%'}}/>
         <View style={styles.topCard}>
