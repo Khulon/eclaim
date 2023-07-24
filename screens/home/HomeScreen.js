@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
   bottomNavigation: {
     width:'100%',
-    height: '70px'
+    height: '80px'
   },
   text: {
     fontSize: "17px",

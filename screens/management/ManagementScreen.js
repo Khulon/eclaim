@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   bottomNavigation: {
     width:'100%',
-    height: '70px'
+    height: '80px'
   },
   topCard: {
     height: "130px",

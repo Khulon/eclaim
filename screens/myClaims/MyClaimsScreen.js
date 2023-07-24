@@ -76,12 +76,13 @@ export default function MyClaimsScreen({ navigation }) {
     //console.log(filterDate.startDate, filterDate.endDate)
     if (filterDate.startDate != null && filterDate.endDate != null) {
       if (form_type == "Travelling") {
-        console.log(period_from)
-        console.log(filterDate.startDate)
+        
         if (period_from<filterDate.startDate || period_to>filterDate.endDate) {
           return false
         }
       }
+      console.log(pay_period_from<filterDate.startDate)
+      console.log(pay_period_to>filterDate.endDate)
       if (form_type == "Monthly" && (pay_period_from<filterDate.startDate || pay_period_to>filterDate.endDate)) {
         return false
       }
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
   },
   bottomNavigation: {
     width:'100%',
-    height: '70px'
+    height: '80px'
   },
   topCard: {
     height: "130px",
