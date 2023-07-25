@@ -6,10 +6,10 @@ export default function excel(claim, fullData, approvers, processor) {
         
     try {
 
-        //console.log(fullData)
-        console.log(approvers)
-        console.log(processor)
-        //console.log(fullData.length)
+        if(claim.cost_centre == null) {
+            claim.cost_centre = ""
+        }
+
         for(let i = 0; i < fullData.length; i++){
             if(fullData[i].receipt != null){
                 fullData[i].receipt = "Yes"            
@@ -22,10 +22,10 @@ export default function excel(claim, fullData, approvers, processor) {
         
         if(claim.form_type == 'Travelling') {
             worksheet =  XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Country: '+ claim.country], ['Period From: ' + parseDate(claim.period_from)],
-            ['Period To: ' + parseDate(claim.period_to)], ['Exchange Rate: ' + claim.exchange_rate]]);
+            ['Period To: ' + parseDate(claim.period_to)], ['Company:' + claim.company], ['Exchange Rate: ' + claim.exchange_rate]]);
         } else {
             worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Period From: ' + parseDate(claim.pay_period_from)],
-            ['Period To: ' + parseDate(claim.pay_period_to)], ['Cost Centre: ' + claim.cost_centre]]);
+            ['Period To: ' + parseDate(claim.pay_period_to)], ['Company:' + claim.company], ['Cost Centre: ' + claim.cost_centre]]);
         }
         
 
