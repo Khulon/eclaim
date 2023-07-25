@@ -765,12 +765,13 @@ app.post('/addTravellingExpense', async (req, res) => {
 
     
     var request = new sql.Request();
+    /*
     const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
     if(checkType.recordset[0].count == 0) {
       const query = "INSERT INTO TravellingExpenseTypes VALUES(@type)"
       request.input('type', sql.VarChar, type)
       await request.query(query);
-    }
+    } */
     const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
@@ -883,12 +884,13 @@ app.post('/addMonthlyExpense', async (req, res) => {
     }
     
     var request = new sql.Request();
+    /*
     const checkType = await request.query("SELECT COUNT(*) AS count FROM MonthlyExpenseTypes WHERE type = '"+type+"'")
     if(checkType.recordset[0].count == 0) {
       const query = "INSERT INTO MonthlyExpenseTypes VALUES(@type)"
       request.input('type', sql.VarChar, type)
       await request.query(query);
-    }
+    } */
     const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
@@ -1002,12 +1004,13 @@ app.post('/editTravellingExpense', async (req, res) => {
     if(description == "") {
       description = null;
     }
+    /*
     const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
     if(checkType.recordset[0].count == 0) {
       const query = "INSERT INTO TravellingExpenseTypes VALUES(@type)"
       request.input('type', sql.VarChar, type)
       await request.query(query);
-    }
+    }*/
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
     + "description = @description, total_amount = @amount, receipt = @receipt, place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
@@ -1108,12 +1111,13 @@ app.post('/editMonthlyExpense', async (req, res) => {
     if(description == "") {
       description = null;
     }
+    /*
     const checkType = await request.query("SELECT COUNT(*) AS count FROM MonthlyExpenseTypes WHERE type = '"+type+"'")
     if(checkType.recordset[0].count == 0) {
       const query = "INSERT INTO MonthlyExpenseTypes VALUES(@type)"
       request.input('type', sql.VarChar, type)
       await request.query(query);
-    }
+    } */
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     
     const form_creator = await request.query("SELECT form_creator FROM Claims where id = '"+id+"'")
