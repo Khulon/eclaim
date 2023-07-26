@@ -5,6 +5,7 @@ const handlebars = require('handlebars')
 const cors = require('cors');
 const sql = require('mssql');
 const jwt = require('jsonwebtoken');
+const { parse } = require('path');
 const app = express();
 var tokenSecret = require('crypto').randomBytes(64).toString('hex')
 
@@ -363,17 +364,6 @@ const generateRandomID = () => {
   return id;
 };
 
-app.get('/getCompanies', async (req, res) => {
-
-  try {
-    var request = new sql.Request();
-    const companies = await request.query("SELECT prefix FROM Companies")
-    res.send(companies.recordset)
-  } catch(err) {
-    console.log(err)
-    res.send({message: err.message})
-  }
-})
 
 //User to add claim
 app.post('/addClaim', async (req, res) => {
@@ -629,7 +619,14 @@ async function expenseAuthentication (req, res, next) {
     var request = new sql.Request();
     const status = await request.query("SELECT status FROM Claims WHERE id = '"+id+"'")
     const claimees = await request.query("SELECT claimee from Claimees WHERE form_id = '"+id+"'")
-    const firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
+    const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+decoded.email+"'")
+    var firstApprover;
+    //not approver, find first approver of form creator
+    if(checkApprover.recordset[0].count == 0) {
+      firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
+    } else {
+      firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT form_creator FROM Claims WHERE id = '"+id+"')")
+    }
     var nextApprover;
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
@@ -700,13 +697,13 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
     
     //Form creator is not user
     if (form_creator.recordset[0].form_creator != user) {
-      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' AND claimee = '"+user+"'";
+      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' AND claimee = '"+user+"' ORDER BY item_number ASC";
       const result = await request.query(queryString);
       res.send(result.recordset);
 
     //display all expenses
     } else {
-      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"'";
+      const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' ORDER BY item_number ASC";
       const result = await request.query(queryString);
       res.send(result.recordset);
     }
@@ -765,13 +762,7 @@ app.post('/addTravellingExpense', async (req, res) => {
 
     
     var request = new sql.Request();
-    /*
-    const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
-    if(checkType.recordset[0].count == 0) {
-      const query = "INSERT INTO TravellingExpenseTypes VALUES(@type)"
-      request.input('type', sql.VarChar, type)
-      await request.query(query);
-    } */
+    
     const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
@@ -824,6 +815,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
   let type = req.body.type;
   let otherType = req.body.otherType;
   let receipt = req.body.receipt;
+  let gst_amount = req.body.gst_amount;
   let date = req.body.date;
   var description = req.body.description;
   let checked = 'No'
@@ -832,6 +824,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
 
     let with_GST = req.body.with_GST;
     let without_GST = req.body.without_GST;
+    var tax_base = 0;
 
     if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
       return res.send({error: "known", message: "Please fill in the amount!"})
@@ -845,11 +838,17 @@ app.post('/addMonthlyExpense', async (req, res) => {
         without_GST = 0;
         if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
+        } else {
+          if(!/^\d+(\.\d{2})?$/.test(parseFloat(gst_amount))) {
+            return res.send({error: "known", message: "Please enter GST amount!"})
+          }
+          tax_base = parseFloat(with_GST) - parseFloat(gst_amount);
         }
       }
     }
 
     let total = parseFloat(with_GST) + parseFloat(without_GST);
+    gst_amount = parseFloat(gst_amount);
 
     if(type == null) {
       return res.send({error: "known", message: "Please select an expense type!"})
@@ -884,14 +883,8 @@ app.post('/addMonthlyExpense', async (req, res) => {
     }
     
     var request = new sql.Request();
-    /*
-    const checkType = await request.query("SELECT COUNT(*) AS count FROM MonthlyExpenseTypes WHERE type = '"+type+"'")
-    if(checkType.recordset[0].count == 0) {
-      const query = "INSERT INTO MonthlyExpenseTypes VALUES(@type)"
-      request.input('type', sql.VarChar, type)
-      await request.query(query);
-    } */
-    const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"' AND claimee = '"+claimee+"'")
+    
+    const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"'")
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const form_creator = await request.query("SELECT form_creator FROM Claims WHERE id = '"+id+"'")
@@ -899,7 +892,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
       checked = 'Yes'
     }
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-    + ""+with_GST+", "+without_GST+", "+total+", @description, @receipt, @checked, GETDATE(), GETDATE() )");
+    + ""+tax_base+", "+gst_amount+", "+without_GST+", "+total+", @description, @receipt, @checked, GETDATE(), GETDATE() )");
     
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
@@ -1004,13 +997,7 @@ app.post('/editTravellingExpense', async (req, res) => {
     if(description == "") {
       description = null;
     }
-    /*
-    const checkType = await request.query("SELECT COUNT(*) AS count FROM TravellingExpenseTypes WHERE type = '"+type+"'")
-    if(checkType.recordset[0].count == 0) {
-      const query = "INSERT INTO TravellingExpenseTypes VALUES(@type)"
-      request.input('type', sql.VarChar, type)
-      await request.query(query);
-    }*/
+   
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
     + "description = @description, total_amount = @amount, receipt = @receipt, place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
@@ -1053,6 +1040,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
   let type = req.body.type;
   let place = req.body.place;
   let customer = req.body.customer;
+  let gst_amount = req.body.gst_amount;
   let company = req.body.company;
   let otherType = req.body.otherType;
   let date = req.body.date;
@@ -1064,6 +1052,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
   try{
     let with_GST = req.body.with_GST;
     let without_GST = req.body.without_GST;
+    let tax_base = 0;
 
     if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
       return res.send({error: "known", message: "Please fill in the amount!"})
@@ -1077,11 +1066,17 @@ app.post('/editMonthlyExpense', async (req, res) => {
         without_GST = 0;
         if(!/^\d+(\.\d{1,2}0?)$/.test(parseFloat(with_GST))) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
+        } else {
+          if(!/^\d+(\.\d{2})?$/.test(parseFloat(gst_amount))) {
+            return res.send({error: "known", message: "Please enter GST amount!"})
+          }
+          tax_base = parseFloat(with_GST) - parseFloat(gst_amount);
         }
       }
     }
 
     let total = parseFloat(with_GST) + parseFloat(without_GST);
+    gst_amount = parseFloat(gst_amount);
 
     var request = new sql.Request();
 
@@ -1111,13 +1106,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
     if(description == "") {
       description = null;
     }
-    /*
-    const checkType = await request.query("SELECT COUNT(*) AS count FROM MonthlyExpenseTypes WHERE type = '"+type+"'")
-    if(checkType.recordset[0].count == 0) {
-      const query = "INSERT INTO MonthlyExpenseTypes VALUES(@type)"
-      request.input('type', sql.VarChar, type)
-      await request.query(query);
-    } */
+    
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     
     const form_creator = await request.query("SELECT form_creator FROM Claims where id = '"+id+"'")
@@ -1129,7 +1118,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
 
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
     + "description = @description, total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
-    + " company_name = @company, amount_with_gst = @with_GST, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
+    + " company_name = @company, amount_with_gst = "+tax_base+", gst_amount = "+gst_amount+", amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
@@ -1146,7 +1135,6 @@ app.post('/editMonthlyExpense', async (req, res) => {
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
     request.input('company', sql.VarChar, company);
-    request.input('with_GST', sql.Numeric(18,2), with_GST);
     request.input('without_GST', sql.Numeric(18,2), without_GST);
 
     console.log(query)

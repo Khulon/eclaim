@@ -21,7 +21,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
-    with_GST: expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, 
+    with_GST: expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
     description: expenseDetails.description, receipt: expenseDetails.receipt});
 
   function updateExpense(expense) {
@@ -183,7 +183,7 @@ function deleteExpense(expense) {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount without GST</Text>
+                <Text style={styles.normalBoldText}>Amount (non GST-chargeable)</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. 20.34" 
                   value={expense.without_GST} 
@@ -194,7 +194,7 @@ function deleteExpense(expense) {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount with GST</Text>
+                <Text style={styles.normalBoldText}>Amount (GST-chargeable)</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. 23.00" 
                   value={expense.with_GST} 
@@ -203,7 +203,22 @@ function deleteExpense(expense) {
                   autoCorrect={false} 
                   editable={isEditing}
                 />
+                <Text style = {{fontSize: "12px", color: "#6A6A6A"}}>*Inclusive of GST amount</Text>
               </View>
+
+              {expense.with_GST != null && expense.with_GST != "" ? (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>GST Amount</Text>
+                    <TextInput style={styles.textInput}
+                      placeholder="eg. 0.50" 
+                      onChangeText={(gst_amount) => setNewExpense({...expense, gst_amount: gst_amount})}
+                      autoCapitalize="none" 
+                      autoCorrect={false} 
+                    />
+                </View>
+              ) : (
+                <View/>
+              )}
 
               {expense.type == 'Entertainment and Gifts' ? (
                 <View style={{width:'100%', alignItems:'center'}}>
