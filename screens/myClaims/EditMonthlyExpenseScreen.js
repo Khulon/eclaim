@@ -21,8 +21,9 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
-    with_GST: expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
+    with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
     description: expenseDetails.description, receipt: expenseDetails.receipt});
+
 
   function updateExpense(expense) {
     console.log(expense)
@@ -210,6 +211,7 @@ function deleteExpense(expense) {
                 <View style={styles.inputContainer}>
                   <Text style={styles.normalBoldText}>GST Amount</Text>
                     <TextInput style={styles.textInput}
+                      value={expense.gst_amount}
                       placeholder="eg. 0.50" 
                       onChangeText={(gst_amount) => setNewExpense({...expense, gst_amount: gst_amount})}
                       autoCapitalize="none" 

@@ -749,7 +749,7 @@ app.post('/addTravellingExpense', async (req, res) => {
       type = otherType;
     }
 
-    if(!/^\d+(\.\d{2})?$/.test(parseFloat(amount))) {
+    if(!/^\d+(\.\d{2})?$/.test(amount)) {
       return res.send({error: "known", message: "Please enter a valid amount!"})
     }
 
@@ -832,15 +832,15 @@ app.post('/addMonthlyExpense', async (req, res) => {
       if((with_GST == '' || with_GST == null || parseFloat(with_GST) == 0)) {
         with_GST = 0;
         gst_amount = 0;
-        if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
+        if(!/^\d+(\.\d{2})?$/.test(without_GST)) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         }
       } else if(without_GST == '' || without_GST == null) {
         without_GST = 0;
-        if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
+        if(!/^\d+(\.\d{2})?$/.test(with_GST)) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         } else {
-          if(!/^\d+(\.\d{2})?$/.test(parseFloat(gst_amount))) {
+          if(!/^\d+(\.\d{2})?$/.test(gst_amount)) {
             return res.send({error: "known", message: "Please enter GST amount!"})
           } else if(parseFloat(with_GST) == 0) {
             gst_amount = 0
@@ -852,6 +852,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
 
     let total = parseFloat(with_GST) + parseFloat(without_GST);
     gst_amount = parseFloat(gst_amount);
+    
 
     if(type == null) {
       return res.send({error: "known", message: "Please select an expense type!"})
@@ -993,7 +994,7 @@ app.post('/editTravellingExpense', async (req, res) => {
       type = otherType;
     }
 
-    if(!/^\d+(\.\d{2})?$/.test(parseFloat(amount))) {
+    if(!/^\d+(\.\d{2})?$/.test(amount)) {
       return res.send({error: "known", message: "Please enter a valid amount!"})
     }
 
@@ -1063,15 +1064,15 @@ app.post('/editMonthlyExpense', async (req, res) => {
       if((with_GST == '' || with_GST == null || parseFloat(with_GST) == 0)) {
         with_GST = 0;
         gst_amount = 0;
-        if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
+        if(!/^\d+(\.\d{2})?$/.test(without_GST)) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         }
       } else if(without_GST == '' || without_GST == null) {
         without_GST = 0;
-        if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
+        if(!/^\d+(\.\d{2})?$/.test(with_GST)) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         } else {
-          if(!/^\d+(\.\d{2})?$/.test(parseFloat(gst_amount))) {
+          if(!/^\d+(\.\d{2})?$/.test(gst_amount)) {
             return res.send({error: "known", message: "Please enter GST amount!"})
           } else if(parseFloat(with_GST) == 0) {
             gst_amount = 0
