@@ -143,7 +143,7 @@ function deleteExpense(expense) {
                     placeholder = {expense.type}
                     save="value"
                     showsVerticalScrollIndicator = {false}
-                    search = {false}
+                    search = {true}
                   />  
                 </View>
               ) : (

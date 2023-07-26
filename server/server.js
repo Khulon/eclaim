@@ -829,8 +829,9 @@ app.post('/addMonthlyExpense', async (req, res) => {
     if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
       return res.send({error: "known", message: "Please fill in the amount!"})
     } else {
-      if((with_GST == '' || with_GST == null)) {
+      if((with_GST == '' || with_GST == null || parseFloat(with_GST) == 0)) {
         with_GST = 0;
+        gst_amount = 0;
         if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         }
@@ -841,6 +842,8 @@ app.post('/addMonthlyExpense', async (req, res) => {
         } else {
           if(!/^\d+(\.\d{2})?$/.test(parseFloat(gst_amount))) {
             return res.send({error: "known", message: "Please enter GST amount!"})
+          } else if(parseFloat(with_GST) == 0) {
+            gst_amount = 0
           }
           tax_base = parseFloat(with_GST) - parseFloat(gst_amount);
         }
@@ -1057,18 +1060,21 @@ app.post('/editMonthlyExpense', async (req, res) => {
     if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
       return res.send({error: "known", message: "Please fill in the amount!"})
     } else {
-      if((with_GST == '' || with_GST == null)) {
+      if((with_GST == '' || with_GST == null || parseFloat(with_GST) == 0)) {
         with_GST = 0;
-        if(!/^\d+(\.\d{1,2}0?)$/.test(parseFloat(without_GST))) {
+        gst_amount = 0;
+        if(!/^\d+(\.\d{2})?$/.test(parseFloat(without_GST))) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         }
       } else if(without_GST == '' || without_GST == null) {
         without_GST = 0;
-        if(!/^\d+(\.\d{1,2}0?)$/.test(parseFloat(with_GST))) {
+        if(!/^\d+(\.\d{2})?$/.test(parseFloat(with_GST))) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
         } else {
           if(!/^\d+(\.\d{2})?$/.test(parseFloat(gst_amount))) {
             return res.send({error: "known", message: "Please enter GST amount!"})
+          } else if(parseFloat(with_GST) == 0) {
+            gst_amount = 0
           }
           tax_base = parseFloat(with_GST) - parseFloat(gst_amount);
         }

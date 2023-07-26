@@ -87,7 +87,7 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
                   data={expenseTypeDropdown} 
                   save="value"
                   showsVerticalScrollIndicator = {false}
-                  search = {false}
+                  search = {true}
                 />  
               </View>
               {expense.type == 'Others' ? (
