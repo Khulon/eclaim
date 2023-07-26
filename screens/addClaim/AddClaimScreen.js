@@ -10,19 +10,7 @@ export default function AddClaimScreen({ navigation }) {
   const [isExistingClaim, setIsExistingClaim] = useState(null);
   const [companies, setCompanies] = useState([])
   const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null, company: null});
-
-  useEffect(() => {
-    //fetch companies
-    fetch('http://10.0.1.28:5000/getCompanies')
-    .then(response => response.json())
-    .then(data => {
-      console.log(data)
-      for(let i = 0; i < data.length; i++) {
-        data[i] = {value: data[i].prefix}
-      }
-      setCompanies(data)
-    })
-  }, [])
+  const claimCompanies = [{key: '0', value: 'EKCA'},{key: '1', value: 'EKH'},{key: '2', value: 'Reefertec'}, {key: '3', value: 'SmartZ'}, {key: '4', value: 'PCL'}]
 
 
   async function handleAddClaim() {
@@ -144,7 +132,7 @@ export default function AddClaimScreen({ navigation }) {
                     boxStyles={styles.boxStyles}
                     inputStyles={styles.inputStyles}  
                     setSelected={(val) => setClaim({...claim, company:val})} 
-                    data={companies} 
+                    data={claimCompanies} 
                     save="value"
                     showsVerticalScrollIndicator = {false}
                     search = {false}
