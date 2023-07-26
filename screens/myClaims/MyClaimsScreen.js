@@ -5,6 +5,7 @@ import filter from "lodash.filter"
 import BottomNavigator from '../../components/BottomNavigation';
 import { parseDatePeriod } from '../../functions/Parsers';
 import Tooltip from '../../components/Tooltip';
+import LogoutButton from '../../components/LogoutButton';
 import LoadingPage from '../../components/LoadingPage';
 import FilterModal from '../../components/FilterModal';
 
@@ -176,8 +177,9 @@ export default function MyClaimsScreen({ navigation }) {
       <View style={styles.pageDefault}>
         <View style={{height:'5%'}}/>
         <View style={styles.topCard}>
-          <View style={{width:'84%', flexGrow:1, flexDirection:'row', alignItems:'center'}}>
+          <View style={{width:'84%', flexGrow:1, flexDirection:'row', alignItems:'center', justifyContent: 'space-between'}}>
             <Text style={{fontFamily:"inherit", fontSize: "38px", fontWeight:"700"}}>My Claims</Text>
+            <LogoutButton/>
           </View>
           <View style={{width:'85%', height:'35px', flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingBottom:'30px'}}>
             <View style={{height:'35px', flexGrow:1, flexDirection:'row-reverse', paddingRight:'10px'}}>
