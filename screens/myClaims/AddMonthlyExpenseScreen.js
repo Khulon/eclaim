@@ -16,7 +16,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
-    with_GST: null, without_GST: null, place: null, gst_amount: null, customer_name: null, company: null, date: new Date(), description: null, receipt: null, file_data:null, file_name:null});
+    with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: new Date(), description: null, receipt: null, file_data:null, file_name:null});
 
   async function handleAddExpense() {
     console.log(expense)
@@ -88,7 +88,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   data={expenseTypeDropdown} 
                   save="value"
                   showsVerticalScrollIndicator = {false}
-                  search = {true}
+                  search = {false}
                 />  
               </View>
               {expense.type == 'Others' ? (
@@ -109,7 +109,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                 <DatePicker className="custom-input" selected={expense.date} onChange={(date) => setExpense({...expense, date: date})} dateFormat="dd/MM/yyyy"/>
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount (non GST-chargeable)</Text>
+                <Text style={styles.normalBoldText}>Amount without GST</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. 20.34" 
                   value={expense.without_GST} 
@@ -120,7 +120,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount (GST-chargeable)</Text>
+                <Text style={styles.normalBoldText}>Amount with GST</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. 23.00" 
                   value={expense.with_GST} 
@@ -128,22 +128,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />
-                <Text style = {{fontSize: "12px", color: "#6A6A6A"}}>*Inclusive of GST amount</Text>
               </View>
-
-              {expense.with_GST != null && expense.with_GST != "" ? (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>GST Amount</Text>
-                    <TextInput style={styles.textInput}
-                      placeholder="eg. 0.50"
-                      onChangeText={(gst_amount) => setExpense({...expense, gst_amount: gst_amount})}
-                      autoCapitalize="none" 
-                      autoCorrect={false} 
-                    />
-                </View>
-              ) : (
-                <View/>
-              )}
 
               {expense.type == 'Entertainment and Gifts' ? (
                 <View style={{width:'100%', alignItems:'center'}}>
@@ -208,12 +193,15 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                 </TouchableOpacity>
               </View>
 
-
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Receipt</Text>
-                <FilePicker file_data={expense.file_data} file_name={expense.file_name} onChangeFile={(fileData, fileName) => setExpense({...expense, file_data: fileData, file_name: fileName })}/>
+                <FilePicker 
+                  file_data={expense.file_data} 
+                  file_name={expense.file_name} 
+                  onChangeFile={(fileData, fileName) => setExpense({...expense, file_data: fileData, file_name: fileName })}
+                  editable={true}
+                />
               </View>
-              
 
             </View>
           </ScrollView>

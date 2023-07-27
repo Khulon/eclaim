@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} from 'react-native';
 
 
-export default function FilePicker({file_data, file_name, onChangeFile}) {
+export default function FilePicker({file_data, file_name, onChangeFile, editable}) {
     const [fileName, setFileName] = useState(file_name)
     const [fileData, setFileData] = useState(file_data)
 
     async function pickAndUploadFile() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '*/*';
+        input.accept = '.pdf, image/jpeg, image/png';
         input.addEventListener('change', async (event) => {
           const file = event.target.files[0];
           if (file) {
@@ -48,11 +48,6 @@ export default function FilePicker({file_data, file_name, onChangeFile}) {
 
       return(
         <View>
-            {console.log(fileName)}
-                {console.log(fileData)}
-            <TouchableOpacity onPress={()=>pickAndUploadFile()}>
-                Upload
-            </TouchableOpacity>
             {(fileName != null && fileData != null) ? (
                 <View>
                     <TouchableOpacity onPress={()=>downloadFile(fileName, fileData)}>
@@ -66,6 +61,13 @@ export default function FilePicker({file_data, file_name, onChangeFile}) {
                     </Text>
                 </View>
             ) }
+            {editable ? (
+              <TouchableOpacity onPress={()=>pickAndUploadFile()}>
+                Upload
+              </TouchableOpacity>
+            ): (
+              <View/>
+            )}
         </View>
       )
 
