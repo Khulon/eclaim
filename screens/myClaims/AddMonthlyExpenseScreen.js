@@ -9,13 +9,14 @@ import DefaultButton from '../../components/DefaultButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../components/custom-datepicker.css";
+import FilePicker from '../../components/FilePicker';
 
 export default function AddMonthlyExpenseScreen({ navigation, route }) {        
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
-    with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: new Date(), description: null, receipt: null});
+    with_GST: null, without_GST: null, place: null, customer_name: null, company: null, date: new Date(), description: null, receipt: null, file_data:null, file_name:null});
 
   async function handleAddExpense() {
     console.log(expense)
@@ -191,6 +192,14 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   </View>
                 </TouchableOpacity>
               </View>
+
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.normalBoldText}>Receipt</Text>
+                <FilePicker file_data={expense.file_data} file_name={expense.file_name} onChangeFile={(fileData, fileName) => setExpense({...expense, file_data: fileData, file_name: fileName })}/>
+              </View>
+              
+
             </View>
           </ScrollView>
         </View>
