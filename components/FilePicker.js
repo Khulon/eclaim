@@ -47,11 +47,14 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
       }
 
       return(
-        <View>
+        <View style={{flexDirection:'row', alignItems:'center'}}>
+          <View style={{height:'45px', flexGrow:1, borderWidth:'1px',borderColor: "#DADADA",borderRadius: "12px",padding: "15px", justifyContent:'center'}}>
             {(fileName != null && fileData != null) ? (
                 <View>
                     <TouchableOpacity onPress={()=>downloadFile(fileName, fileData)}>
-                        {fileName}
+                      <Text style={{textDecorationLine: 'underline'}}>
+                        {fileName} 
+                      </Text>
                     </TouchableOpacity>
                 </View>
             ):(
@@ -61,14 +64,32 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
                     </Text>
                 </View>
             ) }
-            {editable ? (
+          </View>
+
+          {editable ? (
+            <View style={{borderWidth:'1px', width:'100px', height:'45px',borderColor: "#DADADA",borderRadius: "8px",padding: "15px", backgroundColor:"#E3E3E3", alignItems:'center', justifyContent:'center'}}>
               <TouchableOpacity onPress={()=>pickAndUploadFile()}>
-                Upload
+                <Text style={{fontWeight:600, fontSize:'15px'}}>
+                  Upload
+                </Text>
               </TouchableOpacity>
-            ): (
-              <View/>
-            )}
+            </View>
+          ): (
+            <View/>
+          )}
         </View>
       )
 
 }
+
+
+const styles = StyleSheet.create({
+  textInput: {
+    height: "45px",
+    color: "#6A6A6A",
+    borderWidth: "1px",
+    borderRadius: "12px",
+    padding: "15px",
+    borderColor: "#DADADA",
+  },
+})
