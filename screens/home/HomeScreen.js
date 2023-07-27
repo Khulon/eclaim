@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import React from "react";
 import BottomNavigator from '../../components/BottomNavigation';
 import LogoutButton from '../../components/LogoutButton';
+
 
 
 export default function HomeScreen({ navigation }) {

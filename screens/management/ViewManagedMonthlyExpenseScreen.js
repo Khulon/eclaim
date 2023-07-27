@@ -2,6 +2,7 @@ import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView}
 import React, { useState } from "react";
 import FullScreenImage from '../../components/FullScreenImage';
 import BackButton from '../../components/BackButton';
+import FilePicker from '../../components/FilePicker';
 
 export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {        
   const [isExpand, setIsExpand] = useState(false)
@@ -11,7 +12,7 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
     with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
-    description: expenseDetails.description, receipt: expenseDetails.receipt});
+    description: expenseDetails.description, receipt: expenseDetails.receipt, file_data:null, file_name: null});
 
   return (
     <View style={styles.page}>
@@ -37,30 +38,31 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                 </View>
               </View>
               <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Expense Type</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="eg. Overtime meal"
-                  value={expense.type}
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                  editable={false}
-                />
-              </View>
-              {expense.type == 'Others' ? (
                 <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>If others, state type</Text>
+                  <Text style={styles.normalBoldText}>Expense Type</Text>
                   <TextInput style={styles.textInput}
                     placeholder="eg. Overtime meal"
-                    onChangeText={(type) => setNewExpense({...expense, otherType: type})}
-                    autoCapitalize="none"
-                    autoCorrect={false}
+                    value={expense.type}
+                    autoCapitalize="none" 
+                    autoCorrect={false} 
                     editable={false}
                   />
                 </View>
-                ) : (
-                  <View/>
-              )}
+
+                {expense.type == 'Others' ? (
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.normalBoldText}>If others, state type</Text>
+                    <TextInput style={styles.textInput}
+                      placeholder="eg. Overtime meal"
+                      onChangeText={(type) => setNewExpense({...expense, otherType: type})}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={false}
+                    />
+                  </View>
+                  ) : (
+                    <View/>
+                )}
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Date</Text>
                 <TextInput style={styles.textInput}
@@ -109,64 +111,72 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                 <View/>
               )}
 
-              {expense.type == 'Entertainment and Gifts' ? (
-                <View style={{width:'100%', alignItems:'center'}}>
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.normalBoldText}>Place</Text>
-                    <TextInput style={styles.textInput}
-                      placeholder="Place" 
-                      value={expense.place} 
-                      onChangeText={(place) => setNewExpense({...expense, place: place})}
-                      autoCapitalize="none" 
-                      autoCorrect={false} 
-                      editable={false}
-                    />
+                {expense.type == 'Entertainment and Gifts' ? (
+                  <View style={{width:'100%', alignItems:'center'}}>
+                    <View style={styles.inputContainer}>
+                      <Text style={styles.normalBoldText}>Place</Text>
+                      <TextInput style={styles.textInput}
+                        placeholder="Place" 
+                        value={expense.place} 
+                        onChangeText={(place) => setNewExpense({...expense, place: place})}
+                        autoCapitalize="none" 
+                        autoCorrect={false} 
+                        editable={false}
+                      />
+                    </View>
+                    <View style={styles.inputContainer}>
+                      <Text style={styles.normalBoldText}>Customer Name</Text>
+                      <TextInput style={styles.textInput}
+                        placeholder="eg. Tom Liu, Jane Tan" 
+                        value={expense.customer} 
+                        onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
+                        autoCapitalize="none" 
+                        autoCorrect={false} 
+                        editable={false}
+                      />
+                    </View>
+                    <View style={styles.inputContainer}>
+                      <Text style={styles.normalBoldText}>Company</Text>
+                      <TextInput style={styles.textInput}
+                        placeholder="eg. Yang Ming" 
+                        value={expense.company} 
+                        onChangeText={(company) => setNewExpense({...expense, company: company})}
+                        autoCapitalize="none" 
+                        autoCorrect={false} 
+                        editable={false}
+                      />
+                    </View>
                   </View>
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.normalBoldText}>Customer Name</Text>
-                    <TextInput style={styles.textInput}
-                      placeholder="eg. Tom Liu, Jane Tan" 
-                      value={expense.customer} 
-                      onChangeText={(customer) => setNewExpense({...expense, customer: customer})}
-                      autoCapitalize="none" 
-                      autoCorrect={false} 
-                      editable={false}
-                    />
-                  </View>
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.normalBoldText}>Company</Text>
-                    <TextInput style={styles.textInput}
-                      placeholder="eg. Yang Ming" 
-                      value={expense.company} 
-                      onChangeText={(company) => setNewExpense({...expense, company: company})}
-                      autoCapitalize="none" 
-                      autoCorrect={false} 
-                      editable={false}
-                    />
-                  </View>
+                ):(
+                  <View/>
+                )}
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>Description</Text>
+                  <TextInput style={[styles.textInput,{height:'100px'}]}
+                    placeholder="Desciption of expense" 
+                    value={expense.description} 
+                    multiline={true}
+                    onChangeText={(description) => setNewExpense({...expense, description: description})}
+                    autoCapitalize="none" 
+                    autoCorrect={false} 
+                    editable={false}
+                  />
                 </View>
-              ):(
-                <View/>
-              )}
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Description</Text>
-                <TextInput style={[styles.textInput,{height:'100px'}]}
-                  placeholder="Desciption of expense" 
-                  value={expense.description} 
-                  multiline={true}
-                  onChangeText={(description) => setNewExpense({...expense, description: description})}
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                  editable={false}
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Receipt</Text>
-                <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
-                  <Image style={styles.receiptImage}
-                      source={expense.receipt}
-                    />
-                </TouchableOpacity>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>Receipt</Text>
+                  <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
+                    <Image style={styles.receiptImage}
+                        source={expense.receipt}
+                      />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.normalBoldText}>Receipt</Text>
+                  <FilePicker 
+                    file_data={expense.file_data} 
+                    file_name={expense.file_name} 
+                    editable={false}
+                  />
               </View>
             </View>
           </ScrollView>

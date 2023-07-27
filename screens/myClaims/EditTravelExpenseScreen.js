@@ -10,6 +10,7 @@ import DefaultButton from '../../components/DefaultButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../components/custom-datepicker.css";
+import FilePicker from '../../components/FilePicker';
 
 export default function EditTravelExpenseScreen({ navigation, route }) {        
   const [isExpand, setIsExpand] = useState(false)
@@ -21,7 +22,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
     amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt,
-    place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name });
+    place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name, file_data:null, file_name:null});
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -260,6 +261,17 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
                 </TouchableOpacity>
               </View>
             )}
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.normalBoldText}>Receipt</Text>
+              <FilePicker 
+                file_data={expense.file_data} 
+                file_name={expense.file_name} 
+                onChangeFile={(fileData, fileName) => setNewExpense({...expense, file_data: fileData, file_name: fileName })}
+                editable={isEditing}
+              />
+            </View>
+
           </View>
         </ScrollView>
       </View>

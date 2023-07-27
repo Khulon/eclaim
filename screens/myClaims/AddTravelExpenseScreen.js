@@ -9,13 +9,14 @@ import DefaultButton from '../../components/DefaultButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../components/custom-datepicker.css";
+import FilePicker from '../../components/FilePicker';
 
 export default function AddTravelExpenseScreen({ navigation, route }) {        
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.travellingExpenseTypes;
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
-    amount: null, date: new Date(), description: null, receipt: null, place: null, customer_name: null, company: null});
+    amount: null, date: new Date(), description: null, receipt: null, place: null, customer_name: null, company: null, file_data:null, file_name:null});
 
   async function handleAddExpense() {
     console.log(expense)
@@ -178,6 +179,17 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
                   </View>
                 </TouchableOpacity>
               </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.normalBoldText}>Receipt</Text>
+                <FilePicker 
+                  file_data={expense.file_data} 
+                  file_name={expense.file_name} 
+                  onChangeFile={(fileData, fileName) => setExpense({...expense, file_data: fileData, file_name: fileName })}
+                  editable={true}
+                />
+              </View>
+
             </View>
           </ScrollView>
         </View>
