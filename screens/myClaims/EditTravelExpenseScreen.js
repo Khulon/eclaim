@@ -137,7 +137,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
                 placeholder = {expense.type}
                 save="value"
                 showsVerticalScrollIndicator = {false}
-                search = {false}
+                search = {true}
               />  
             </View>
           ) : (

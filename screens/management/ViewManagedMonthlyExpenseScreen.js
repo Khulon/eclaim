@@ -10,7 +10,7 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
-    with_GST: expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, 
+    with_GST: expenseDetails.total_amount, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
     description: expenseDetails.description, receipt: expenseDetails.receipt});
 
   return (

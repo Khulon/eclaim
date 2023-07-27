@@ -60,8 +60,9 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
               date_of_expense: parseDate(data[i].date_of_expense), total_amount: data[i].total_amount, receipt: data[i].receipt})
 
           } else {
-            newTable.push({claimee: data[i].claimee, item_number: data[i].item_number, date_of_expense: parseDate(data[i].date_of_expense), 
-              description: data[i].description, expense_type: data[i].expense_type, total_amount: data[i].total_amount, receipt: data[i].receipt,
+            newTable.push({item_number: data[i].item_number, claimant: data[i].claimee, date_of_expense: parseDate(data[i].date_of_expense), 
+              description: data[i].description, expense_type: data[i].expense_type, tax_base: data[i].amount_with_gst, gst_amount: data[i].gst_amount, 
+              amount_without_gst: data[i].amount_without_gst, total_amount: data[i].total_amount, receipt: data[i].receipt,
             place: data[i].place, customers: data[i].customer_name, company: data[i].company_name})
           }
         }
