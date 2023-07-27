@@ -9,7 +9,7 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
     async function pickAndUploadFile() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '*/*';
+        input.accept = '.pdf, image/jpeg, image/png';
         input.addEventListener('change', async (event) => {
           const file = event.target.files[0];
           if (file) {
