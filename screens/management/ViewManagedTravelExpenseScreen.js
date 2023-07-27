@@ -2,6 +2,7 @@ import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView 
 import React, { useState } from "react";
 import FullScreenImage from '../../components/FullScreenImage';
 import BackButton from '../../components/BackButton';
+import FilePicker from '../../components/FilePicker';
 
 export default function ViewManagedTravelExpenseScreen({ navigation, route }) {        
   const [isExpand, setIsExpand] = useState(false)
@@ -10,7 +11,7 @@ export default function ViewManagedTravelExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
     amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt,
-    place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,});
+    place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, file_data:null, file_name:null});
 
   return (
     <View style={styles.page}>
@@ -140,6 +141,14 @@ export default function ViewManagedTravelExpenseScreen({ navigation, route }) {
                       source={expense.receipt}
                     />
                 </TouchableOpacity>
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.normalBoldText}>Receipt</Text>
+                <FilePicker 
+                  file_data={expense.file_data} 
+                  file_name={expense.file_name} 
+                  editable={false}
+                />
               </View>
             </View>
           </ScrollView>

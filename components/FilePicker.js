@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} fro
 
 
 export default function FilePicker({file_data, file_name, onChangeFile, editable}) {
-    const [isEditable, setIsEditable] = useState(editable != null ? editable : true)
     const [fileName, setFileName] = useState(file_name)
     const [fileData, setFileData] = useState(file_data)
 
@@ -62,7 +61,7 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
                     </Text>
                 </View>
             ) }
-            {isEditable ? (
+            {editable ? (
               <TouchableOpacity onPress={()=>pickAndUploadFile()}>
                 Upload
               </TouchableOpacity>
