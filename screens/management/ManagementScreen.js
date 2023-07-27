@@ -120,18 +120,21 @@ export default function ManagementScreen({ navigation }) {
             </Tooltip>
           )}
       </View>
-      <View style={{height:"100%", width:"50%", minWidth:"180px", justifyContent:"center"}}>
+      <View style={{height:"100%", flexGrow:1, minWidth:"180px", justifyContent:"center"}}>
         <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Creator: {creator_Name}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Claimees: {claimees}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Total: {total}</Text>
       </View>
-      <View style={{flexGrow:1, height:'80%', flexDirection:'row-reverse' }}>
-        <View style={{width:"20%"}}></View>
-        <View style={{justifyContent:'space-between', alignItems:'flex-end'}}>
-          <Text style={{fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
-          <Text style={{fontWeight:'600', color:"#444444", fontSize: "16px"}} >ID: {claimId}</Text>
+      <View style={{width:'100%', height:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse' }}>
+        <View style={{width:"10%", height:'80%'}}/>
+        <View style={{width:'150px', height:'80%', flexDirection:'row', backgroundColor:backgroundColor,}}>
+          <View style={{ alignItems:'flex-end', justifyContent:'space-between', height:'100%', width:'100%'}}>
+            <Text style={{fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
+            <Text style={{fontWeight:'600', color:"#444444", fontSize: "16px"}} >ID: {claimId}</Text>
+          </View>
         </View>
+        <View style={{width:"4%", height:'80%', backgroundColor:backgroundColor, opacity:0.5}}/>
       </View>
     </TouchableOpacity>
   );
@@ -306,7 +309,6 @@ const styles = StyleSheet.create({
   userCard: {
     backgroundColor: 'white',
     height:"100px",
-    padding: "10px",
     borderBottomWidth: "0.5px",
     borderTopWidth: "0.5px",
     borderColor: "#DADADA",
