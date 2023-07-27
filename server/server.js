@@ -73,6 +73,9 @@ app.post('/register', async (req, res) => {
   try {
     let email = req.body.companyEmail;
     let password = req.body.password;
+    if(password == "") {
+
+    }
     var request = new sql.Request();
     const check = await request.query("SELECT COUNT(*) AS count FROM Employees WHERE email = '"+email+"'")
     const count = await request.query("SELECT COUNT(*) AS count FROM Accounts WHERE email = '"+email+"'")
@@ -365,6 +368,61 @@ const generateRandomID = () => {
 };
 
 
+app.get('/getCostCentres', async (req, res) => {
+  try {
+    var request = new sql.Request();
+    const result = await request.query("SELECT * FROM CostCentres")
+    res.send(result.recordset)
+  } catch(err) {
+    console.log(err)
+    res.send({message: err.message});
+  }
+})
+
+
+app.get('/getClaimants/:id/:token', async (req, res) => {
+  
+  const { id, token } = req.params;
+
+  try {
+    const decoded = jwt.verify(token, tokenSecret)
+    var request = new sql.Request();
+    const findFormCreator = await request.query("SELECT form_creator FROM Claims WHERE id = '"+id+"'")
+    const formCreator = findFormCreator.recordset[0].form_creator
+    //find supervisor of form creator
+    const checkSupervisor = await request.query("SELECT S.supervisor FROM Claims C JOIN BelongsToDepartments B ON C.form_creator = B.email JOIN Supervisors S ON S.department = B.department WHERE C.id = '"+id+"'")
+    const supervisor = checkSupervisor.recordset[0].supervisor
+    const getClaimants = await request.query("SELECT DISTINCT email FROM BelongsToDepartments WHERE department IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
+    //supervisor created the form
+    if(supervisor == formCreator) {
+      console.log("Supervisor created form!")
+      const password = await request.query("SELECT password FROM Accounts WHERE email = '"+supervisor+"'")
+      //authenticated
+      if(supervisor == decoded.email && decoded.password == password.recordset[0].password) {
+        return res.send(getClaimants.recordset)
+      }
+    //someone else in the department created it(normal/approver)
+    } else {
+      const password = await request.query("SELECT password FROM Accounts WHERE email = '"+decoded.email+"'")
+      if(decoded.email == formCreator && decoded.password == password.recordset[0].password) {
+        res.send([{email: decoded.email}])
+      } else {
+        res.sendStatus(403)
+      }
+    }
+
+  } catch(err) {
+    if(err.name == 'TokenExpiredError') {
+      return res.send({error: 'true', message: "Token expired!"})
+    } else {
+      console.log(err)
+      return res.send({error: 'true', message: err.message})
+    }
+  }
+})
+
+
+
 //User to add claim
 app.post('/addClaim', async (req, res) => {
   let formCreator = req.body.creator;
@@ -410,7 +468,7 @@ app.post('/addClaim', async (req, res) => {
         + "INSERT INTO MonthlyGeneral VALUES('"+newFormId+"', @fromDate, @toDate, @costCenter, @note);"
         + " COMMIT TRANSACTION";
       request.input('expense_type', sql.Text, expenseType)
-      request.input('total_amount', sql.Numeric(18,2), 0);
+      request.input('total_amount', sql.Money, 0);
       request.input('formCreator', sql.VarChar, formCreator);
       request.input('levels', sql.Int, checkApproval.recordset[0].levels_of_approval);
       request.input('claimees', sql.Int, 1);
@@ -469,7 +527,7 @@ app.post('/addClaim', async (req, res) => {
     + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, '"+newFormId+"'); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
-    request.input('total_amount', sql.Numeric(18,2), 0);
+    request.input('total_amount', sql.Money, 0);
     request.input('levels', sql.Int, checkApproval.recordset[0].levels_of_approval);
     request.input('claimees', sql.Int, 1);
     request.input('sd', sql.DateTime, null);
@@ -529,8 +587,14 @@ app.post('/joinClaim', async (req, res) => {
     if(claimCreator.recordset[0].form_creator == formCreator) {
       return res.json({error: "known", message: "You cannot join your own claim!"})
     }
-    await request.query("INSERT INTO Claimees VALUES('"+formId+"', '"+formCreator+"' )");
 
+    //handles case where claimant joins before and joins again
+    const check = await request.query("SELECT COUNT(*) AS count FROM Claimees WHERE claimee = '"+formCreator+"' AND form_id = '"+formId+"'")
+    if(check.recordset[0].count == 0) {
+      await request.query("INSERT INTO Claimees VALUES('"+formId+"', '"+formCreator+"')");
+    } else if (check.recordset[0].count == 1) {
+      return res.json({error: "known", message: "You have already joined this claim!"})
+    }
     res.send({message: "Joined claim successfully!", user: formCreator})
 
   } catch(err) {
@@ -767,7 +831,7 @@ app.post('/addTravellingExpense', async (req, res) => {
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-     + "@withGst, @withoutGst, @amount, @description, @receipt, 'Yes', GETDATE(), GETDATE())");
+     + "@withGst, @gst, @withoutGst, @amount, @description, @receipt, 'Yes', GETDATE(), GETDATE())");
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     
@@ -786,9 +850,10 @@ app.post('/addTravellingExpense', async (req, res) => {
     } else {
       request.input('company', sql.VarChar, company);
     }
-    request.input('withGst', sql.Numeric(18,2), null);
-    request.input('withoutGst', sql.Numeric(18,2), null);
-    request.input('amount', sql.Numeric(18,2), amount);
+    request.input('withGst', sql.Money, null);
+    request.input('gst', sql.Money, null);
+    request.input('withoutGst', sql.Money, null);
+    request.input('amount', sql.Money, amount);
     request.input('description', sql.Text, description);
     request.input('receipt', sql.VarChar, receipt);
 
@@ -810,6 +875,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
   let id = req.body.id;
   let claimee = req.body.claimee;
   let place = req.body.place;
+  let adder = req.body.adder;
   let customer_name = req.body.customer_name;
   let company = req.body.company;
   let type = req.body.type;
@@ -892,8 +958,15 @@ app.post('/addMonthlyExpense', async (req, res) => {
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const form_creator = await request.query("SELECT form_creator FROM Claims WHERE id = '"+id+"'")
-    if(form_creator.recordset[0].form_creator == claimee) {
+    if(adder == form_creator.recordset[0].form_creator) {
       checked = 'Yes'
+    } 
+    
+    if(claimee != form_creator.recordset[0].form_creator) {
+      const check = await request.query("SELECT COUNT(*) AS count FROM Claimees WHERE claimee = '"+claimee+"' AND form_id = '"+id+"'")
+      if(check.recordset[0].count == 0) {
+        await request.query("INSERT INTO Claimees VALUES('"+id+"', '"+claimee+"')")
+      }
     }
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
     + ""+tax_base+", "+gst_amount+", "+without_GST+", "+total+", @description, @receipt, @checked, GETDATE(), GETDATE() )");
@@ -1013,7 +1086,7 @@ app.post('/editTravellingExpense', async (req, res) => {
       } else {
       request.input('description', sql.VarChar, description)
     }
-    request.input('amount', sql.Numeric(18,2), amount);
+    request.input('amount', sql.Money, amount);
     if(receipt == null) {
       request.input('receipt', sql.VarChar, null);
     } else {
@@ -1142,7 +1215,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
     request.input('company', sql.VarChar, company);
-    request.input('without_GST', sql.Numeric(18,2), without_GST);
+    request.input('without_GST', sql.Money, without_GST);
 
     console.log(query)
     

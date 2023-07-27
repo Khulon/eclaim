@@ -1,6 +1,7 @@
 import { TextInput, StyleSheet, Text, View, ScrollView} from 'react-native';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DefaultButton from '../../components/DefaultButton';
+import { SelectList} from 'react-native-dropdown-select-list'
 import BackButton from '../../components/BackButton';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,6 +13,24 @@ export default function MonthlyExpenseForm({route}) {
   const [claim, setClaim] = useState(
     {creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, 
     payPeriodFrom: new Date(), payPeriodTo: new Date(), costCenter: null, note: null, company: addClaim.company});
+  const [cost_centre, setCostCentre] = useState(null);
+
+  useEffect(() => {
+    try {
+      fetch('http://10.0.1.28:5000/getCostCentres')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        for(let i = 0; i < data.length; i++) {
+          data[i] = {value: data[i].name}
+        }
+        setCostCentre(data)
+      })
+    } catch (e) {
+      console.log(e);
+      alert("Failed to fetch cost centres!")
+    }
+  }, []);
 
   function addMonthlyClaim (claim) {
     console.log(claim.payPeriodFrom, claim.payPeriodTo)
@@ -69,12 +88,18 @@ export default function MonthlyExpenseForm({route}) {
               </View>
               <View style={[styles.inputContainer]}>
                 <Text style={styles.normalBoldText}>Cost Center</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="eg. SG Depot" 
-                  onChangeText={(val) => setClaim({...claim, costCenter: val})} 
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                />
+                <SelectList
+                  dropdownStyles={styles.dropdownStyles}
+                  dropdownItemStyles={styles.dropdownItemStyles}
+                  dropdownTextStyles={styles.dropdownTextStyles}
+                  boxStyles={styles.boxStyles}
+                  inputStyles={styles.inputStyles}  
+                  setSelected={(val) => setClaim({...claim, costCenter: val})} 
+                  data={cost_centre} 
+                  save="value"
+                  showsVerticalScrollIndicator = {false}
+                  search = {true}
+              />  
               </View>
             </View>
           </ScrollView>

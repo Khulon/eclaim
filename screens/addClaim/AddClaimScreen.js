@@ -8,7 +8,6 @@ import BackButton from '../../components/BackButton';
 export default function AddClaimScreen({ navigation }) {        
   const expenseTypes = [{key: '0', value: 'Travelling'},{key: '1', value: 'Monthly'}]
   const [isExistingClaim, setIsExistingClaim] = useState(null);
-  const [companies, setCompanies] = useState([])
   const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null, company: null});
   const claimCompanies = [{key: '0', value: 'EKCA'},{key: '1', value: 'EKH'},{key: '2', value: 'Reefertec'}, {key: '3', value: 'SmartZ'}, {key: '4', value: 'PCL'}]
 

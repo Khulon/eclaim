@@ -11,7 +11,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../components/custom-datepicker.css";
 
-export default function AddMonthlyExpenseScreen({ navigation, route }) {        
+export default function EditMonthlyExpenseScreen({ navigation, route }) {        
   const [isExpand, setIsExpand] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleteButtonHover, setIsDeleteButtonHover] = useState(false);

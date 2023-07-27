@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import React from "react";
 import BottomNavigator from '../../components/BottomNavigation';
+import LogoutButton from '../../components/LogoutButton';
 
 
 export default function HomeScreen({ navigation }) {
@@ -11,6 +12,9 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.page}>
       <View style={styles.pageHome}>
+        <View style={{width: "80%", height: 80, alignItems: 'flex-end', justifyContent: 'flex-end'}}>
+          <LogoutButton />
+          </View>
       <View style={{alignItems: 'center', justifyContent: 'center', flexGrow:1}}>
         <Image 
           style={{width: 120, height: 120}}

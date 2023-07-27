@@ -1,5 +1,5 @@
 import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
@@ -13,9 +13,33 @@ import "../../components/custom-datepicker.css";
 export default function AddMonthlyExpenseScreen({ navigation, route }) {        
   const user = window.localStorage.getItem('session');
   const claim  = route.params.props;
+  const [claimants, setClaimants] = useState(null);
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
-  const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
+  const [expense, setExpense] = useState({id: claim.current.id, claimee: user, adder: user, type: null, otherType: null,
     with_GST: null, without_GST: null, place: null, gst_amount: null, customer_name: null, company: null, date: new Date(), description: null, receipt: null});
+
+    
+    useEffect(() => {
+      const id = claim.current.id
+      const token = window.localStorage.getItem('token')
+      fetch(`http://10.0.1.28:5000/getClaimants/${id}/${token}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        console.log(data.length)
+        for(let i = 0; i < data.length; i++) {
+          console.log(data[i])
+          data[i] = {value: data[i].email}
+        }
+        console.log(data)
+        setClaimants(data)
+        if(data.error == 'true') {
+          console.log(data.message)
+          alert("Failed to get claimants!")
+        }
+      })
+    }, []); 
+  
 
   async function handleAddExpense() {
     console.log(expense)
@@ -75,6 +99,23 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
               </View>
             </View>
             <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
+            <View style={[styles.inputContainer,{zIndex:6}]}>
+                <Text style={styles.normalBoldText}>Claiming For</Text>
+                <SelectList
+                  dropdownStyles={styles.dropdownStyles}
+                  dropdownItemStyles={styles.dropdownItemStyles}
+                  dropdownTextStyles={styles.dropdownTextStyles}
+                  boxStyles={styles.boxStyles}
+                  inputStyles={styles.inputStyles}
+                  setSelected={(claimant) => setExpense({...expense, claimee: claimant})}
+                  data={claimants}
+                  placeholder= {expense.claimee}
+                  save="value"
+                  showsVerticalScrollIndicator = {false}
+                  search = {true}
+                />  
+              </View>
+              
               <View style={[styles.inputContainer,{zIndex:5}]}>
                 <Text style={styles.normalBoldText}>Expense Type</Text>
                 <SelectList
@@ -82,14 +123,14 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   dropdownItemStyles={styles.dropdownItemStyles}
                   dropdownTextStyles={styles.dropdownTextStyles}
                   boxStyles={styles.boxStyles}
-                  inputStyles={styles.inputStyles} 
+                  inputStyles={styles.inputStyles}
                   setSelected={(type) => setExpense({...expense, type: type})}
                   data={expenseTypeDropdown} 
                   save="value"
                   showsVerticalScrollIndicator = {false}
                   search = {true}
                 />  
-              </View>
+              </View> 
               {expense.type == 'Others' ? (
                 <View style={styles.inputContainer}>
                   <Text style={styles.normalBoldText}>If others, state type</Text>
@@ -144,7 +185,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                 <View/>
               )}
 
-              {expense.type == 'Entertainment and Gifts' ? (
+              {expense.type == 'Entertainment and Gifts' || expense.type == 'Entertainment - ICO' || expense.type == 'Entertainment - Customers' ? (
                 <View style={{width:'100%', alignItems:'center'}}>
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Place</Text>
