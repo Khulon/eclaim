@@ -11,8 +11,8 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
-    with_GST: expenseDetails.total_amount, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
-    description: expenseDetails.description, receipt: expenseDetails.receipt, file_data:null, file_name:null});
+    with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
+    description: expenseDetails.description, receipt: expenseDetails.receipt, file_data:null, file_name: null});
 
   return (
     <View style={styles.page}>
@@ -48,6 +48,7 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                     editable={false}
                   />
                 </View>
+
                 {expense.type == 'Others' ? (
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>If others, state type</Text>
@@ -62,39 +63,53 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                   ) : (
                     <View/>
                 )}
+              <View style={styles.inputContainer}>
+                <Text style={styles.normalBoldText}>Date</Text>
+                <TextInput style={styles.textInput}
+                  placeholder="dd/mm/yyyy"
+                  value={expense.date}
+                  onChangeText={(date) => setNewExpense({...expense, date: date})}
+                  autoCapitalize="none"
+                  autoCorrect={false} 
+                  editable={false}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.normalBoldText}>Amount (non GST-chargeable)</Text>
+                <TextInput style={styles.textInput}
+                  placeholder="eg. 20.34" 
+                  value={expense.without_GST} 
+                  onChangeText={(amount) => setNewExpense({...expense, without_GST: amount})}
+                  autoCapitalize="none" 
+                  autoCorrect={false} 
+                  editable={false}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.normalBoldText}>Amount (GST-chargeable)</Text>
+                <TextInput style={styles.textInput}
+                  placeholder="eg. 25.00" 
+                  value={expense.with_GST} 
+                  onChangeText={(amount) => setNewExpense({...expense, with_GST: amount})}
+                  autoCapitalize="none" 
+                  autoCorrect={false} 
+                  editable={false}
+                />
+              </View>
+
+              {expense.with_GST != null && expense.with_GST != "" ? (
                 <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>Date</Text>
-                  <TextInput style={styles.textInput}
-                    placeholder="dd/mm/yyyy"
-                    value={expense.date}
-                    onChangeText={(date) => setNewExpense({...expense, date: date})}
-                    autoCapitalize="none"
-                    autoCorrect={false} 
-                    editable={false}
-                  />
+                  <Text style={styles.normalBoldText}>GST Amount</Text>
+                    <TextInput style={styles.textInput}
+                      value = {expense.gst_amount}
+                      onChangeText={(gst_amount) => setNewExpense({...expense, gst_amount: gst_amount})}
+                      autoCapitalize="none" 
+                      autoCorrect={false} 
+                    />
                 </View>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>Amount without GST</Text>
-                  <TextInput style={styles.textInput}
-                    placeholder="eg. 20.34" 
-                    value={expense.without_GST} 
-                    onChangeText={(amount) => setNewExpense({...expense, without_GST: amount})}
-                    autoCapitalize="none" 
-                    autoCorrect={false} 
-                    editable={false}
-                  />
-                </View>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>Amount with GST</Text>
-                  <TextInput style={styles.textInput}
-                    placeholder="eg. 25.00" 
-                    value={expense.with_GST} 
-                    onChangeText={(amount) => setNewExpense({...expense, with_GST: amount})}
-                    autoCapitalize="none" 
-                    autoCorrect={false} 
-                    editable={false}
-                  />
-                </View>
+              ) : (
+                <View/>
+              )}
 
                 {expense.type == 'Entertainment and Gifts' ? (
                   <View style={{width:'100%', alignItems:'center'}}>

@@ -14,8 +14,10 @@ export default function RegistrationScreen({ navigation }) {
 
   function register() {
     try{
-      console.log(loginDetails.password)
-      console.log(loginDetails.confirmPassword)
+      if(loginDetails.password == '' || loginDetails.confirmPassword == '') {
+        alert("Password cannot be empty!")
+        throw new Error("Password cannot be empty!");
+      }
       if(loginDetails.password != loginDetails.confirmPassword) {
         alert("Passwords do not match!");
         throw new Error("Passwords do not match!");
