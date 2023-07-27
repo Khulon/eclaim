@@ -196,7 +196,10 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
 
               <View style={styles.inputContainer}>
                 <Text style={styles.normalBoldText}>Receipt</Text>
-                <FilePicker file_data={expense.file_data} file_name={expense.file_name} onChangeFile={(fileData, fileName) => setExpense({...expense, file_data: fileData, file_name: fileName })}/>
+                <FilePicker 
+                  file_data={expense.file_data} 
+                  file_name={expense.file_name} 
+                  onChangeFile={(fileData, fileName) => setExpense({...expense, file_data: fileData, file_name: fileName })}/>
               </View>
               
 

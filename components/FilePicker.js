@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} from 'react-native';
 
 
-export default function FilePicker({file_data, file_name, onChangeFile}) {
+export default function FilePicker({file_data, file_name, onChangeFile, editable}) {
+    const [isEditable, setIsEditable] = useState(editable != null ? editable : true)
     const [fileName, setFileName] = useState(file_name)
     const [fileData, setFileData] = useState(file_data)
 
@@ -48,11 +49,6 @@ export default function FilePicker({file_data, file_name, onChangeFile}) {
 
       return(
         <View>
-            {console.log(fileName)}
-                {console.log(fileData)}
-            <TouchableOpacity onPress={()=>pickAndUploadFile()}>
-                Upload
-            </TouchableOpacity>
             {(fileName != null && fileData != null) ? (
                 <View>
                     <TouchableOpacity onPress={()=>downloadFile(fileName, fileData)}>
@@ -66,6 +62,13 @@ export default function FilePicker({file_data, file_name, onChangeFile}) {
                     </Text>
                 </View>
             ) }
+            {isEditable ? (
+              <TouchableOpacity onPress={()=>pickAndUploadFile()}>
+                Upload
+              </TouchableOpacity>
+            ): (
+              <View/>
+            )}
         </View>
       )
 
