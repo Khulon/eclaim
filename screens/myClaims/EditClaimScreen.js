@@ -184,7 +184,7 @@ export default function EditClaimScreen({ navigation, route}) {
       })
   }
 
-  const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
+  const Item = ({receipt, checked, date, item_number, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
     <TouchableOpacity onPress={onPress} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={[styles.userCard,{backgroundColor},{transform}]}>
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
         <Text>
@@ -221,7 +221,7 @@ export default function EditClaimScreen({ navigation, route}) {
       </View>
 
       <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
-        <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
+        <Text style={{fontSize: "16px", fontWeight:"700"}}>{item_number}. {date}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Name: {name}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Type: {type}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Cost: ${amount}</Text>
