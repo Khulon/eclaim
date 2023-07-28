@@ -25,6 +25,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.71.8",
     "react-native-asset": "^2.1.1",
+    "react-native-document-picker": "^9.0.1",
     "react-native-dropdown-select-list": "^2.0.4",
     "react-native-fs": "^2.20.0",
     "react-native-multiple-select": "^0.5.12",

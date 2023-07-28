@@ -48,6 +48,8 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
 
       return(
         <View style={{flexDirection:'row', alignItems:'center'}}>
+          {console.log(fileData)}
+          {console.log(fileName)}
           <View style={{height:'45px', flexGrow:1, borderWidth:'1px',borderColor: "#DADADA",borderRadius: "12px",padding: "15px", justifyContent:'center'}}>
             {(fileName != null && fileData != null) ? (
                 <View>

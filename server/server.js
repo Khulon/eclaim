@@ -11,7 +11,7 @@ var tokenSecret = require('crypto').randomBytes(64).toString('hex')
 
 
 app.use(cors());
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({limit: '100mb'}));
 
 
 var config = {
@@ -769,6 +769,7 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
     } else {
       const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' ORDER BY item_number ASC";
       const result = await request.query(queryString);
+      console.log(result.recordset)
       res.send(result.recordset);
     }
     
@@ -792,7 +793,8 @@ app.post('/addTravellingExpense', async (req, res) => {
   let customer = req.body.customer_name;
   let company = req.body.company;
   let otherType = req.body.otherType;
-  let receipt = req.body.receipt;
+  let file_data = req.body.file_data;
+  let file_name = req.body.file_name;
 
   try {
 
@@ -831,7 +833,7 @@ app.post('/addTravellingExpense', async (req, res) => {
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-     + "@withGst, @gst, @withoutGst, @amount, @description, @receipt, 'Yes', GETDATE(), GETDATE())");
+     + "@withGst, @gst, @withoutGst, @amount, @description, @receipt, '"+file_name+"', 'Yes', GETDATE(), GETDATE())");
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     
@@ -855,7 +857,7 @@ app.post('/addTravellingExpense', async (req, res) => {
     request.input('withoutGst', sql.Money, null);
     request.input('amount', sql.Money, amount);
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarChar, receipt);
+    request.input('receipt', sql.VarBinary, Buffer.from(file_data));
 
     await request.query(query);
 
@@ -868,8 +870,6 @@ app.post('/addTravellingExpense', async (req, res) => {
 });
 
 
-
-
 //Add monthly expense
 app.post('/addMonthlyExpense', async (req, res) => {
   let id = req.body.id;
@@ -880,10 +880,11 @@ app.post('/addMonthlyExpense', async (req, res) => {
   let company = req.body.company;
   let type = req.body.type;
   let otherType = req.body.otherType;
-  let receipt = req.body.receipt;
   let gst_amount = req.body.gst_amount;
   let date = req.body.date;
   var description = req.body.description;
+  let file_name = req.body.file_name;
+  let file_data = req.body.file_data;
   let checked = 'No'
 
   try {
@@ -969,7 +970,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
       }
     }
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-    + ""+tax_base+", "+gst_amount+", "+without_GST+", "+total+", @description, @receipt, @checked, GETDATE(), GETDATE() )");
+    + ""+tax_base+", "+gst_amount+", "+without_GST+", "+total+", @description, @receipt, '"+file_name+"', @checked, GETDATE(), GETDATE() )");
     
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
@@ -977,7 +978,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
     request.input('customer', sql.VarChar, customer_name);
     request.input('company', sql.VarChar, company);
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarChar, receipt);
+    request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     request.input('checked', sql.VarChar, checked)
 
     await request.query(query);
@@ -1036,7 +1037,8 @@ app.post('/editTravellingExpense', async (req, res) => {
   let type = req.body.type;
   let otherType = req.body.otherType;
   let date = req.body.date;
-  let receipt = req.body.receipt;
+  let file_data = req.body.file_data;
+  let file_name = req.body.file_name;
   let description = req.body.description;
      
   
@@ -1077,7 +1079,7 @@ app.post('/editTravellingExpense', async (req, res) => {
    
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = @description, total_amount = @amount, receipt = @receipt, place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = @description, total_amount = @amount, receipt = @receipt, file_name = '"+file_name+"', place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
@@ -1087,10 +1089,10 @@ app.post('/editTravellingExpense', async (req, res) => {
       request.input('description', sql.VarChar, description)
     }
     request.input('amount', sql.Money, amount);
-    if(receipt == null) {
-      request.input('receipt', sql.VarChar, null);
+    if(file_data == null) {
+      request.input('receipt', sql.VarBinary, null);
     } else {
-      request.input('receipt', sql.VarChar, receipt);
+      request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     }
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
@@ -1121,8 +1123,9 @@ app.post('/editMonthlyExpense', async (req, res) => {
   let company = req.body.company;
   let otherType = req.body.otherType;
   let date = req.body.date;
-  let receipt = req.body.receipt;
   let description = req.body.description;
+  let file_data = req.body.file_data;
+  let file_name = req.body.file_name;
   let checked = 'No';
     
   
@@ -1197,7 +1200,7 @@ app.post('/editMonthlyExpense', async (req, res) => {
   
 
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = @description, total_amount = "+total+", receipt = @receipt, last_modified = GETDATE(), place = @place, customer_name = @customer,"
+    + "description = @description, total_amount = "+total+", receipt = @receipt, file_name = '"+file_name+"', last_modified = GETDATE(), place = @place, customer_name = @customer,"
     + " company_name = @company, amount_with_gst = "+tax_base+", gst_amount = "+gst_amount+", amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
@@ -1207,10 +1210,10 @@ app.post('/editMonthlyExpense', async (req, res) => {
       } else {
       request.input('description', sql.VarChar, description)
     }
-    if(receipt == null) {
-      request.input('receipt', sql.VarChar, null);
+    if(file_data == null) {
+      request.input('receipt', sql.VarBinary, null);
     } else {
-      request.input('receipt', sql.VarChar, receipt);
+      request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     }
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
