@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Ionicons } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
-import * as ImagePicker from 'expo-image-picker';
 import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
 import DatePicker from "react-datepicker";
@@ -16,10 +15,9 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const claim  = route.params.props;
   const expenseTypeDropdown = route.params.travellingExpenseTypes;
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
-    amount: null, date: new Date(), description: null, receipt: null, place: null, customer_name: null, company: null, file_data:null, file_name:null});
+    amount: null, date: new Date(), description: null, place: null, customer_name: null, company: null, file_data:null, file_name:null});
 
   async function handleAddExpense() {
-    console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     await fetch('http://10.0.1.28:5000/addTravellingExpense', {
       method: 'POST',
@@ -38,19 +36,6 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
           alert("Failed to add expense!")
         }
       })    
-  }
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!result.canceled) {
-      setExpense({...expense, receipt: result.uri});
-    }
   }
 
   return (
@@ -166,18 +151,6 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />
-              </View>
-        
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Receipt</Text>
-                <TouchableOpacity onPress={()=> pickImage()}>
-                  <Image style={styles.recieptImage}
-                    source={expense.receipt}
-                  />
-                  <View style={[styles.imageInput]}>
-                    <Ionicons name="images-outline" color="#444444" size='25px'/>
-                  </View>
-                </TouchableOpacity>
               </View>
 
               <View style={styles.inputContainer}>

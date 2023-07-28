@@ -42,6 +42,7 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
       }
 
       return(
+
         <View style={styles.spaceGiven}>
           <View style={styles.container}>
             {(fileName != null && fileData != null) ? (

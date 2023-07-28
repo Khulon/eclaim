@@ -1,10 +1,8 @@
 import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons, Feather } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
-import * as ImagePicker from 'expo-image-picker';
-import FullScreenImage from '../../components/FullScreenImage';
 import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
 import DatePicker from "react-datepicker";
@@ -19,22 +17,16 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
   const expenseDetails = route.params.expense
   const date = new Date(expenseDetails.date_of_expense)
   const expenseTypeDropdown = route.params.travellingExpenseTypes
+
+  const uint8Array = new Uint8Array(expenseDetails.receipt.data);
+  // Convert the Uint8Array to a UTF-8 string using TextDecoder
+  const utf8String = new TextDecoder().decode(uint8Array);
+
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-    amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt,
-    place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name, file_data:null, file_name:null});
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    
-    setNewExpense({...expense, receipt: null})
-  }
+    amount: expenseDetails.total_amount, description: expenseDetails.description,
+    place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name,
+     file_data: utf8String, file_name: expenseDetails.file_name});
 
   function updateExpense(expense) {
     const header = {'Content-Type': 'application/json' };
@@ -79,7 +71,8 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
     if (isEditing) {
       setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
       item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-      amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt});
+      amount: expenseDetails.total_amount, description: expenseDetails.description, place: expenseDetails.place, 
+      customer_name: expenseDetails.customer_name, company: expenseDetails.company_name, file_data: utf8String, file_name: expenseDetails.file_name});
       setIsEditing(false)
     } else {
       setIsEditing(true)
@@ -88,9 +81,8 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
 
   return (
     <View style={styles.page}>
-      <FullScreenImage image={expense.receipt} myFunction={()=>{isExpand ? setIsExpand(false) : setIsExpand(true)}} show={isExpand}/>
+      
         <View style={styles.pageDefault}>
-
           <View style={styles.topCard}>
             <View style={styles.backButtonBar}>
               <BackButton onPress={() => navigation.goBack()}/>
@@ -239,28 +231,6 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
                 editable={isEditing}
               />
             </View>
-            {isEditing ? (
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Receipt</Text>
-                <TouchableOpacity onPress={()=> pickImage()}>
-                  <Image style={styles.receiptImage}
-                    source={expense.receipt}
-                  />
-                  <View style={[styles.imageInput]}>
-                    <Ionicons name="images-outline" color="#444444" size='25px'/>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Receipt</Text>
-                <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
-                  <Image style={styles.receiptImage}
-                      source={expense.receipt}
-                    />
-                </TouchableOpacity>
-              </View>
-            )}
 
             <View style={styles.inputContainer}>
               <Text style={styles.normalBoldText}>Receipt</Text>
