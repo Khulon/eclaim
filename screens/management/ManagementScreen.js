@@ -128,9 +128,9 @@ export default function ManagementScreen({ navigation }) {
       </View>
       <View style={{width:'100%', height:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse' }}>
         <View style={{width:"10%", height:'80%'}}/>
-        <View style={{width:'150px', height:'80%', flexDirection:'row', backgroundColor:backgroundColor,}}>
+        <View style={{width:'110px', height:'80%', flexDirection:'row', backgroundColor:backgroundColor,}}>
           <View style={{ alignItems:'flex-end', justifyContent:'space-between', height:'100%', width:'100%'}}>
-            <Text style={{fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
+            <Text style={{textAlign:'right', fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
             <Text style={{fontWeight:'600', color:"#444444", fontSize: "16px"}} >ID: {claimId}</Text>
           </View>
         </View>
