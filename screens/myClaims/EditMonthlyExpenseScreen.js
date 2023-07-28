@@ -285,7 +285,7 @@ function deleteExpense(expense) {
                 <FilePicker 
                   file_data={expense.file_data} 
                   file_name={expense.file_name} 
-                  onChangeFile={(fileData, fileName) => setNewExpense({...expense, file_data: fileData, file_name: fileName })}
+                  onChangeFile={(fileData, fileName) => setNewExpense({...expense, file_data: fileData, file_name: fileName})}
                   editable={isEditing}
                 />
               </View>
