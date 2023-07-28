@@ -268,7 +268,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         </Text>
       </View>
 
-      <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
+      <View style={{height:"100%", width:"90%", minWidth:"200px", justifyContent:"center"}}>
         <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Name: {name}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Type: {type}</Text>

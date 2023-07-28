@@ -114,7 +114,7 @@ export default function AdminHomeScreen({ navigation }) {
       <View style={{height:"100%", width:"10%", minWidth:"30px", alignItems: "center", justifyContent: "center"}}>
         <Text><Ionicons  name="person-outline" color="#444" size="large"/></Text>
       </View>
-      <View style={{height:"100%", width:"50%", minWidth:"200px", justifyContent:"center"}}>
+      <View style={{height:"100%", width:"100%", minWidth:"200px", justifyContent:"center"}}>
         <Text style={{fontSize: "13px", fontWeight:"700"}}>{name}</Text>
         <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Email: {email}</Text>
         <Text style={{color:"#444444", fontSize: "11px", marginLeft:"25px"}}>Approver: {approver}</Text>
