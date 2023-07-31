@@ -6,6 +6,8 @@ export default function excel(claim, fullData, approvers, processor) {
         
     try {
 
+        console.log(fullData.length)
+
         if(claim.cost_centre == null) {
             claim.cost_centre = ""
         }
@@ -25,7 +27,7 @@ export default function excel(claim, fullData, approvers, processor) {
             ['Period To: ' + parseDate(claim.period_to)], ['Company:' + claim.company], ['Exchange Rate: ' + claim.exchange_rate]]);
         } else {
             worksheet = XLSX.utils.aoa_to_sheet([['Claim ID: ' + claim.id], ['Form Creator: ' + claim.form_creator], ['Period From: ' + parseDate(claim.pay_period_from)],
-            ['Period To: ' + parseDate(claim.pay_period_to)], ['Company:' + claim.company], ['Cost Centre: ' + claim.cost_centre]]);
+            ['Period To: ' + parseDate(claim.pay_period_to)], ['Company: ' + claim.company], ['Cost Centre: ' + claim.cost_centre]]);
         }
         
 
@@ -37,12 +39,13 @@ export default function excel(claim, fullData, approvers, processor) {
         const columnWidths = columns.map(column => ({
         width: column.length + 2
         }));
+
         for(let i = 0; i < fullData.length; i++) {
             for(let j = 0; j < columns.length; j++) {
                 const cellAddress = XLSX.utils.encode_cell({ c: j, r: i + 7 });
                 const value = worksheet[cellAddress].v;
                 console.log(value)
-                if(value != null && value.toString().length + 2 > columnWidths[j].width) {
+                if (value != null && value.toString().length + 2 > columnWidths[j].width) {
                     columnWidths[j].width = value.length + 2;
                 }
             }
