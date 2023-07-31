@@ -227,7 +227,7 @@ export default function EditClaimScreen({ navigation, route}) {
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Cost: ${amount}</Text>
       </View>
       
-      <View style={{width:'100%', height:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse' }}>
+      <View style={{width:'105%', height:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse' }}>
         <View style={{width:"10%", height:'80%'}}/>
         <View style={{width:'110px', height:'80%', flexDirection:'row-reverse', backgroundColor:backgroundColor,}}>
         {checked == 'No' ? (

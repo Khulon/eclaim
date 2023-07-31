@@ -268,35 +268,37 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         </Text>
       </View>
 
-      <View style={{height:"100%", width:"90%", minWidth:"200px", justifyContent:"center"}}>
+      <View style={{height:"105%", width:"90%", minWidth:"200px", justifyContent:"center"}}>
         <Text style={{fontSize: "16px", fontWeight:"700"}}>{date}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Name: {name}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Type: {type}</Text>
         <Text style={{color:"#444444", fontSize: "14px", marginLeft:"25px"}}>Cost: ${amount}</Text>
       </View>
       
-      <View style={{flexGrow:1, height:'100%', flexDirection:'row-reverse'}}>
-        <View style={{width:'15%', height:'100%'}}></View>
-
-        {checked == 'No' ? (
-          <View style={{width:'30px', flexDirection:'row-reverse'}}>
-            <Tooltip text={'Unchecked'}>
-              <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="25px"></Ionicons></Text>
-            </Tooltip>
+      <View style={{width:'100%', height:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse' }}>
+        <View style={{width:"10%", height:'80%'}}/>
+          <View style={{width:'110px', height:'80%', flexDirection:'row-reverse', backgroundColor:backgroundColor,}}>
+            {checked == 'No' ? (
+              <View style={{width:'30px', flexDirection:'row-reverse'}}>
+                <Tooltip text={'Unchecked'}>
+                  <Text><Ionicons name="alert-circle-outline" color="#E04F4F" size="25px"></Ionicons></Text>
+                </Tooltip>
+              </View>
+            ):(
+              <View></View>
+            )}
+              
+            {receipt != null ? (
+              <View>
+                <Tooltip text={'Reciept'}>
+                  <Text><Ionicons name="document-attach-outline" color="#444" size="25px"></Ionicons></Text>
+                </Tooltip>
+              </View>
+            ):(
+              <View></View>
+            )}
           </View>
-        ):(
-          <View></View>
-        )}
-          
-        {receipt != null ? (
-          <View>
-            <Tooltip text={'Reciept'}>
-              <Text><Ionicons name="document-attach-outline" color="#444" size="25px"></Ionicons></Text>
-            </Tooltip>
-          </View>
-        ):(
-          <View></View>
-        )}
+        <View style={{width:"4%", height:'80%', backgroundColor:backgroundColor, opacity:0.5}}/>
       </View>
     </TouchableOpacity>
   );
