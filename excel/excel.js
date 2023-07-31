@@ -7,6 +7,7 @@ export default function excel(claim, fullData, approvers, processor) {
     try {
 
         console.log(fullData.length)
+        console.log(fullData)
 
         if(claim.cost_centre == null) {
             claim.cost_centre = ""
@@ -42,7 +43,7 @@ export default function excel(claim, fullData, approvers, processor) {
 
         for(let i = 0; i < fullData.length; i++) {
             for(let j = 0; j < columns.length; j++) {
-                const cellAddress = XLSX.utils.encode_cell({ c: j, r: i + 7 });
+                const cellAddress = XLSX.utils.encode_cell({ c: j, r: i + 8 });
                 const value = worksheet[cellAddress].v;
                 console.log(value)
                 if (value != null && value.toString().length + 2 > columnWidths[j].width) {
