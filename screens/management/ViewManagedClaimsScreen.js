@@ -1,6 +1,6 @@
 import { TextInput, StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState, useEffect } from "react";
-import { Ionicons, FontAwesome } from "react-native-vector-icons";
+import { Ionicons, FontAwesome, Feather } from "react-native-vector-icons";
 import filter from "lodash.filter"
 import ConfirmationButton, {inputConfirmationButton} from '../../components/ConfirmationButton';
 import { useIsFocused } from "@react-navigation/native";
@@ -379,9 +379,9 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                     <View style={styles.downloadButton}>
                       <Tooltip text={'Receipts'} bottom={true}>
                         {isDownloadPdfButtonHover?(
-                          <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="27px"/></Text>
+                          <Text><Feather name="download" color="#E04F4F" size="27px"/></Text>
                         ):(
-                          <Text><FontAwesome name="file-pdf-o" color="#E04F4F" size="25px"/></Text>
+                          <Text><Feather name="download" color="#E04F4F" size="25px"/></Text>
                         )}
                       </Tooltip>
                     </View>
