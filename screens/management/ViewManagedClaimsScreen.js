@@ -10,7 +10,8 @@ import Tooltip from '../../components/Tooltip';
 import LoadingPage from '../../components/LoadingPage';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
-import JSZip, { file } from 'jszip';
+import JSZip from 'jszip';
+import FileSaver from 'file-saver';
 
 export default function ViewManagedClaimsScreen({ navigation, route}) {
   const isFocused = useIsFocused();
@@ -232,21 +233,19 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   function handleDownloadPdfClaim (data) {
     
     const zip = new JSZip();
-    
-    for(var i = 0; i < data.length; i++) {
-      zip.file(data[i].file_name, data[i].receipt.data);
-    }
 
-    zip.generateAsync({type: "base64"}).then(function (zipContent) {
-        const dataURI = `data:application/zip;base64,${zipContent}`;
-        const link = document.createElement('a');
-        link.href = dataURI;
-        link.download = claim.id;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
-        
+    for(var i = 0; i < data.length; i++) {
+      const uint8Array = new Uint8Array(data[i].receipt.data);
+      // Convert the Uint8Array to a UTF-8 string using TextDecoder
+      const utf8String = new TextDecoder().decode(uint8Array);
+      zip.file(data[i].file_name, utf8String, {base64: true});
+    }
+    
+    zip.generateAsync({type: 'blob'}).then(function(content) {
+      console.log(content)
+      FileSaver.saveAs(content, 'Claim ' + claim.id + '.zip');
+    })
+    
   }
 
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
