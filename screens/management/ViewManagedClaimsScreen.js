@@ -10,6 +10,7 @@ import Tooltip from '../../components/Tooltip';
 import LoadingPage from '../../components/LoadingPage';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
+import JSZip, { file } from 'jszip';
 
 export default function ViewManagedClaimsScreen({ navigation, route}) {
   const isFocused = useIsFocused();
@@ -228,8 +229,24 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       })
   }
 
-  function handleDownloadPdfClaim () {
-    navigation.navigate('pdf',{data: data})
+  function handleDownloadPdfClaim (data) {
+    
+    const zip = new JSZip();
+    
+    for(var i = 0; i < data.length; i++) {
+      zip.file(data[i].file_name, data[i].receipt.data);
+    }
+
+    zip.generateAsync({type: "base64"}).then(function (zipContent) {
+        const dataURI = `data:application/zip;base64,${zipContent}`;
+        const link = document.createElement('a');
+        link.href = dataURI;
+        link.download = claim.id;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+        
   }
 
   const Item = ({receipt, checked, date, name, type, amount , backgroundColor, transform, onPress, onMouseEnter, onMouseLeave}) => (
@@ -290,7 +307,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
               
             {receipt != null ? (
               <View>
-                <Tooltip text={'Reciept'}>
+                <Tooltip text={'Receipt'}>
                   <Text><Ionicons name="document-attach-outline" color="#444" size="25px"></Ionicons></Text>
                 </Tooltip>
               </View>
@@ -359,7 +376,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
                 </View>
                 <View style={{width:'40px', alignItems:'center'}}>
                   <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsDownloadPdfButtonHover(true)} onMouseLeave={() => setIsDownloadPdfButtonHover(false)} 
-                    onPress={() => handleDownloadPdfClaim(claim)}>
+                    onPress={() => handleDownloadPdfClaim(fullData)}>
                     <View style={styles.downloadButton}>
                       <Tooltip text={'Receipts'} bottom={true}>
                         {isDownloadPdfButtonHover?(
