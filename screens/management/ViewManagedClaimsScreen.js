@@ -297,6 +297,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
             ):(
               <View></View>
             )}
+
           </View>
         <View style={{width:"4%", height:'80%', backgroundColor:backgroundColor, opacity:0.5}}/>
       </View>

@@ -241,7 +241,7 @@ export default function EditClaimScreen({ navigation, route}) {
         )}
         {receipt != null ? (
           <View>
-            <Tooltip text={'Reciept'}>
+            <Tooltip text={'Receipt'}>
               <Ionicons name="document-attach-outline" color="#444" size="23px"></Ionicons>
             </Tooltip>
           </View>

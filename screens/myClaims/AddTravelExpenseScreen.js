@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center'
   },
-  recieptImage: {
+  receiptImage: {
     width:'100%',
     height: "400px",
     borderRadius:'12px',

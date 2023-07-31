@@ -683,14 +683,18 @@ async function expenseAuthentication (req, res, next) {
     var request = new sql.Request();
     const status = await request.query("SELECT status FROM Claims WHERE id = '"+id+"'")
     const claimees = await request.query("SELECT claimee from Claimees WHERE form_id = '"+id+"'")
-    const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+decoded.email+"'")
+    const checkFormCreator = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = (SELECT form_creator FROM Claims WHERE id = '"+id+"')")
     var firstApprover;
-    //not approver, find first approver of form creator
-    if(checkApprover.recordset[0].count == 0) {
-      firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
-    } else {
+
+    //form creator is an approver
+    if(checkFormCreator.recordset[0].count == 1) {
       firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT form_creator FROM Claims WHERE id = '"+id+"')")
+    } else {
+      //form creator is not an approver, find first approver of form creator
+      firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT department FROM BelongsToDepartments WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     }
+    
+
     var nextApprover;
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
@@ -711,6 +715,7 @@ async function expenseAuthentication (req, res, next) {
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
       if(firstApprover.recordset[0].approver_name == decoded.email) {
+        console.log("first approver")	
         return next()
       }
     } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
