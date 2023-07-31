@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal} from 'react-native';
-
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 export default function FilePicker({file_data, file_name, onChangeFile, editable}) {
     const [fileName, setFileName] = useState(file_name)
@@ -27,7 +26,6 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
             }
           }
         });
-      
         input.click();
       }
     
@@ -46,25 +44,25 @@ export default function FilePicker({file_data, file_name, onChangeFile, editable
         <View style={styles.spaceGiven}>
           <View style={styles.container}>
             {(fileName != null && fileData != null) ? (
-                <View>
-                    <TouchableOpacity onPress={()=>downloadFile(fileName, fileData)}>
-                      <Text style={{textDecorationLine: 'underline',color: "#6A6A6A"}}>
-                        {fileName} 
-                      </Text>
-                    </TouchableOpacity>
-                </View>
+              <View>
+                <TouchableOpacity onPress={()=>downloadFile(fileName, fileData)}>
+                  <Text style={{textDecorationLine: 'underline',color: "#6A6A6A"}}>
+                    {fileName} 
+                  </Text>
+                </TouchableOpacity>
+              </View>
             ):(
-                <View>
-                    <Text>
-                        No File Selected
-                    </Text>
-                </View>
+              <View>
+                  <Text>
+                      No File Selected
+                  </Text>
+              </View>
             ) }
           </View>
 
           {editable ? (
-            <View style={styles.uploadButton}>
-              <TouchableOpacity onPress={()=>pickAndUploadFile()}>
+            <View>
+              <TouchableOpacity style={styles.uploadButton} onPress={()=>pickAndUploadFile()}>
                 <Text style={{fontWeight:600, fontSize:'15px'}}>
                   Upload
                 </Text>
