@@ -290,7 +290,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
           
         {receipt != null ? (
           <View>
-            <Tooltip text={'Reciept'}>
+            <Tooltip text={'Receipt'}>
               <Text><Ionicons name="document-attach-outline" color="#444" size="25px"></Ionicons></Text>
             </Tooltip>
           </View>
