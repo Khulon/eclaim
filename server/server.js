@@ -683,7 +683,7 @@ async function expenseAuthentication (req, res, next) {
     var request = new sql.Request();
     const status = await request.query("SELECT status FROM Claims WHERE id = '"+id+"'")
     const claimees = await request.query("SELECT claimee from Claimees WHERE form_id = '"+id+"'")
-    const checkFormCreator = await request.query("SELECT COUNT(*) AS count FROM Claims WHERE id = '"+id+"' AND form_creator = '"+decoded.email+"'")
+    const checkFormCreator = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = (SELECT form_creator FROM Claims WHERE id = '"+id+"')")
     var firstApprover;
 
     //form creator is an approver
