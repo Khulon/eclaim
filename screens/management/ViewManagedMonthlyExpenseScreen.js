@@ -8,11 +8,14 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
   const [isExpand, setIsExpand] = useState(false)
   const expenseDetails = route.params.expense
   const date = new Date(expenseDetails.date_of_expense).toLocaleDateString("en-UK");
+  const uint8Array = new Uint8Array(expenseDetails.receipt.data);
+  // Convert the Uint8Array to a UTF-8 string using TextDecoder
+  const utf8String = new TextDecoder().decode(uint8Array);
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
     with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
-    description: expenseDetails.description, receipt: expenseDetails.receipt, file_data:null, file_name: null});
+    description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
 
   return (
     <View style={styles.page}>
@@ -161,14 +164,6 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                     autoCorrect={false} 
                     editable={false}
                   />
-                </View>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>Receipt</Text>
-                  <TouchableOpacity onPress={()=>isExpand ? setIsExpand(false) : setIsExpand(true)}>
-                    <Image style={styles.receiptImage}
-                        source={expense.receipt}
-                      />
-                  </TouchableOpacity>
                 </View>
                 <View style={styles.inputContainer}>
                   <Text style={styles.normalBoldText}>Receipt</Text>
