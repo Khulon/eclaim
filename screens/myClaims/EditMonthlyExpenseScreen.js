@@ -24,7 +24,7 @@ export default function EditMonthlyExpenseScreen({ navigation, route }) {
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
     with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
-    description: expenseDetails.description, file_data: utf8String, file_name:expenseDetails.file_name});
+    description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
 
   function updateExpense(expense) {
     console.log(expense)
