@@ -862,7 +862,11 @@ app.post('/addTravellingExpense', async (req, res) => {
     request.input('withoutGst', sql.Money, null);
     request.input('amount', sql.Money, amount);
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    if(file_data == null) {
+      request.input('receipt', sql.VarBinary, null);
+    } else {
+      request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    }
 
     await request.query(query);
 
@@ -983,7 +987,11 @@ app.post('/addMonthlyExpense', async (req, res) => {
     request.input('customer', sql.VarChar, customer_name);
     request.input('company', sql.VarChar, company);
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    if(file_data == null) {
+      request.input('receipt', sql.VarBinary, null);
+    } else {
+      request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    }
     request.input('checked', sql.VarChar, checked)
 
     await request.query(query);
