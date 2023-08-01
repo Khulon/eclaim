@@ -186,15 +186,16 @@ function deleteExpense(expense) {
                   editable = {isEditing}
                 />
                 <View style={styles.container}>
-                <View style={styles.checkboxContainer}>
-                  <CheckBox
-                    value={expense.isSelected}
-                    onValueChange={(value) => setNewExpense({...expense, isSelected: value})}
-                    style={styles.checkbox}
-                  />
-                  <Text style={styles.label}>GST-chargeable</Text>
+                  <View style={styles.checkboxContainer}>
+                    <CheckBox
+                      disabled={!isEditing}
+                      value={expense.isSelected}
+                      onValueChange={(value) => setNewExpense({...expense, isSelected: value})}
+                      style={styles.checkbox}
+                    />
+                    <Text style={styles.label}>GST-chargeable</Text>
+                  </View>
                 </View>
-              </View>
               </View>
 
               {expense.type == 'Entertainment and Gifts' ? (
