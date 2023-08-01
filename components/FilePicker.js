@@ -42,14 +42,6 @@ export default function FilePicker({ file_data, file_name, onChangeFile, editabl
     document.body.removeChild(link);
   }
 
-  function openFileViewer() {
-    setViewerOpen(true);
-  }
-
-  function closeFileViewer() {
-    setViewerOpen(false);
-  }
-
   function getFileExtension(fileName) {
     return fileName.split('.').pop().toLowerCase();
   }
@@ -59,7 +51,7 @@ export default function FilePicker({ file_data, file_name, onChangeFile, editabl
       <View style={styles.container}>
         {fileData ? (
           <View>
-            <TouchableOpacity onPress={openFileViewer}>
+            <TouchableOpacity onPress={() => setViewerOpen(true)}>
               <Text style={{ textDecorationLine: 'underline', color: '#6A6A6A' }}>
                 {fileName}
               </Text>
@@ -93,16 +85,16 @@ export default function FilePicker({ file_data, file_name, onChangeFile, editabl
       {viewerOpen && fileData && (
         <Modal animationType="fade" transparent={false} visible={viewerOpen} showsVerticalScrollIndicator={false}>
           <View style={{position:'absolute',zIndex:99, padding:'50px' }}>
-              <CloseButton onPress={closeFileViewer}/>
+              <CloseButton onPress={() => setViewerOpen(false)}/>
             </View>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <View style={{ width:'100%', height:'100%', resizeMode:'contain', justifyContent:'center'}}>
 
                 <FileViewer
-                fileType={getFileExtension(fileName)} // Update this based on the file type you want to support
-                filePath={`data:application/pdf;base64,${fileData}`} // Update this based on the file type you want to support
-                style={{flex:1, borderWidth:'1px'}}
-              />
+                  fileType={getFileExtension(fileName)} // Update this based on the file type you want to support
+                  filePath={`data:application/octet-stream;base64,${fileData}`} // Update this based on the file type you want to support
+                  style={{flex:1, borderWidth:'1px'}}
+                />
               </View>
 
           </View>
