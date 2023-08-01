@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import React, { useState } from "react";
-import { Ionicons } from "react-native-vector-icons";
+import { Ionicons, Feather } from "react-native-vector-icons";
 
 /**
- * BackButton Component
+ * CloseButton Component
  *
  * A reusable component that represents a back button with an optional text label.
  *
  * @param {function} onPress - The callback function to be called when the button is pressed.
- * @param {boolean} hideText - Determines whether to hide the text label of the button. ("Go Back")
+ * @param {boolean} hideText - Determines whether to hide the text label of the button. ("Close")
  */
 
 export default function BackButton({onPress, hideText}) {
@@ -17,7 +17,7 @@ export default function BackButton({onPress, hideText}) {
     const styles = StyleSheet.create({
         backButton: {
             fontFamily: "Arial",
-            backgroundColor: "#D9D9D9",
+            backgroundColor: "#E78686",
             border: "none",
         
             alignItems: 'center',
@@ -34,14 +34,14 @@ export default function BackButton({onPress, hideText}) {
     return (
         <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsBackButtonHover(true)} onMouseLeave={() => setIsBackButtonHover(false)} onPress={onPress}>
           <View style={styles.backButton}>
-            <Text><Ionicons name="chevron-back-outline" color="#444"/></Text>
+            <Text><Feather name="x" color="white" size={isBackButtonHover ? "27px" : '25px'}/></Text>
           </View>
 
           {hideText ? (
             <View/>
           ) : (
             <View style={{paddingHorizontal:'20px'}}>
-                <Text style={{fontSize: "20px",fontWeight: "500",color: "#6A6A6A",fontFamily: "inherit"}}>Go Back</Text>
+                <Text style={{fontSize: "20px",fontWeight: "500",color: "#6A6A6A",fontFamily: "inherit"}}>Close</Text>
             </View>
           )}
         </TouchableOpacity>
