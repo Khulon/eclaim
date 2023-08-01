@@ -29,7 +29,7 @@ export default function EditMonthlyExpenseScreen({ navigation, route }) {
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, isSelected: expenseDetails.amount_without_gst == null ? true: false,
-    amount: expenseDetails.total_amount, description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
+    amount: expenseDetails.total_amount.toFixed(2), description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
 
   function updateExpense(expense) {
     console.log(expense)
@@ -77,7 +77,7 @@ function deleteExpense(expense) {
       setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
         item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
         place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, isSelected: expenseDetails.amount_without_gst == null ? true: false,
-        amount: expenseDetails.total_amount, description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
+        amount: expenseDetails.total_amount.toFixed(2), description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
       setIsEditing(false)
     } else {
       setIsEditing(true)
