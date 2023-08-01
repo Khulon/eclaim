@@ -346,7 +346,7 @@ export default function EditClaimScreen({ navigation, route}) {
             <Text style={{paddingTop:'5px', paddingRight:'10px', fontSize:'18px', fontWeight:500}}>ID: {claim.current.id}</Text>
           </View>
           <Text style={{paddingTop:"15px"}}>Total:</Text>
-          <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${claim.current.total_amount}</Text>
+          <Text style={{paddingBottom: "10px", fontFamily:"inherit", fontSize: "20px", fontWeight:"700"}}>${parseFloat(claim.current.total_amount).toFixed(2)}</Text>
       
           {claim.current.form_creator == userDetails.email ? (
             claim.current.status == "In Progress" || claim.current.status == 'Rejected' ? (
