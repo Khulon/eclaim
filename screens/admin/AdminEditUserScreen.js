@@ -153,7 +153,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
         </View>
 
         <View style={styles.content}>
-          <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}>
+          <ScrollView showsVerticalScrollIndicator={false} style={{height:"0px"}}  >
             <View style={{width:"100%", alignItems:"center"}}>
               <View style={styles.headerBar}>
                 <View style={{paddingHorizontal: '7px'}}>
@@ -204,8 +204,9 @@ export default function AdminEditUserScreen({ navigation, route }) {
                   searchInputPlaceholderText="Search Items..."
                   onChangeInput={ (text)=> console.log(text)}
                   styleInputGroup={{borderBottomWidth:1, borderColor:'#DADADA'}}
-                  styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA' , borderRadius:12}}
+                  styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA', borderRadius:12}}
                   styleRowList={{padding:5, backgroundColor:'white'}}
+                  styleListContainer={{height: 256}}
                   styleDropdownMenuSubsection={{borderWidth:1, borderRadius:12, height:45, borderColor:'#DADADA', paddingLeft:20}}
                   styleTextDropdown={{color:'#6A6A6A'}}
                   searchInputStyle={{height:'45px'}}
@@ -280,6 +281,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
                     styleInputGroup={{borderBottomWidth:1, borderColor:'#DADADA'}}
                     styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA' , borderRadius:12}}
                     styleRowList={{padding:5, backgroundColor:'white'}}
+                    styleListContainer={{height: 256}}
                     styleDropdownMenuSubsection={{borderWidth:1, borderRadius:12, height:45, borderColor:'#DADADA', paddingLeft:20}}
                     styleTextDropdown={{color:'#6A6A6A'}}
                     searchInputStyle={{height:'45px'}}

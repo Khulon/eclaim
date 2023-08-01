@@ -104,6 +104,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
                   styleInputGroup={{borderBottomWidth:1, borderColor:'#DADADA'}}
                   styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA' , borderRadius:12}}
                   styleRowList={{padding:5, backgroundColor:'white'}}
+                  styleListContainer={{height: 256}}
                   styleDropdownMenuSubsection={{borderWidth:1, borderRadius:12, height:45, borderColor:'#DADADA', paddingLeft:20}}
                   styleTextDropdown={{color:'#6A6A6A'}}
                   searchInputStyle={{height:'45px'}}
@@ -173,6 +174,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
                     styleInputGroup={{borderBottomWidth:1, borderColor:'#DADADA'}}
                     styleSelectorContainer={{borderWidth:1, borderColor:'#DADADA' , borderRadius:12}}
                     styleRowList={{padding:5, backgroundColor:'white'}}
+                    styleListContainer={{height: 256}}
                     styleDropdownMenuSubsection={{borderWidth:1, borderRadius:12, height:45, borderColor:'#DADADA', paddingLeft:20}}
                     styleTextDropdown={{color:'#6A6A6A'}}
                     searchInputStyle={{height:'45px'}}
