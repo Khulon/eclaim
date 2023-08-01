@@ -13,7 +13,7 @@ export default function ViewManagedTravelExpenseScreen({ navigation, route }) {
   const utf8String = new TextDecoder().decode(uint8Array);
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-    amount: expenseDetails.total_amount, description: expenseDetails.description, receipt: expenseDetails.receipt,
+    amount: expenseDetails.total_amount.toFixed(2), description: expenseDetails.description, receipt: expenseDetails.receipt,
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, file_data: utf8String, file_name: expenseDetails.file_name});
 
   return (

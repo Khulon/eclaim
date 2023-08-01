@@ -8,12 +8,20 @@ import "../../components/custom-datepicker.css";
 
 export default function AdminSettingsScreen({ navigation}) {        
   const [isEditing, setIsEditing] = useState(false)
-  const [settings, setSettings] = useState({gst: 7});
+  const [settings, setSettings] = useState(null);
 
+  useEffect(() => {
+    fetch('http://10.0.1.28:5000/getGST')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+      setSettings(data.gst)
+    })
+  }, [isEditing])
 
   function handleToggleEdit () {
     if (isEditing) {
-      setSettings({gst:7});
+      setSettings(null)
       setIsEditing(false)
     } else {
       setIsEditing(true)
@@ -21,8 +29,24 @@ export default function AdminSettingsScreen({ navigation}) {
   }
 
   function updateSettings() {
-    alert("Expense updated!")
-    navigation.goBack();
+    fetch('http://10.0.1.28:5000/updateGST', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({gst: settings})
+    }).then(response => response.json())
+    .then(data => {
+      console.log(data)
+      if(data.message == "Success!") {
+        alert("Expense updated!")
+        navigation.goBack();
+      } else {
+        console.log(data.message)
+        alert("Error updating GST rate!")
+      }
+    })
+    
   }
 
   return (
@@ -52,9 +76,9 @@ export default function AdminSettingsScreen({ navigation}) {
             <View style={styles.inputContainer}>
               <Text style={styles.normalBoldText}>GST rate</Text>
               <TextInput style={styles.textInput}
-                placeholder="eg. 20.34"
-                value={settings.gst}
-                onChangeText={(amount) => setSettings({...settings, gst:amount})}
+                placeholder="eg. 8"
+                value={settings}
+                onChangeText={(amount) => setSettings(amount)}
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={isEditing}
