@@ -30,7 +30,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
 
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-    amount: expenseDetails.total_amount, description: expenseDetails.description,
+    amount: expenseDetails.total_amount.toFixed(2), description: expenseDetails.description,
     place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name,
      file_data: utf8String, file_name: expenseDetails.file_name});
 
@@ -77,7 +77,7 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
     if (isEditing) {
       setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
       item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date,
-      amount: expenseDetails.total_amount, description: expenseDetails.description, place: expenseDetails.place, 
+      amount: expenseDetails.total_amount.toFixed(2), description: expenseDetails.description, place: expenseDetails.place, 
       customer_name: expenseDetails.customer_name, company: expenseDetails.company_name, file_data: utf8String, file_name: expenseDetails.file_name});
       setIsEditing(false)
     } else {

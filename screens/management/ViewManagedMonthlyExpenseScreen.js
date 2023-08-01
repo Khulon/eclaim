@@ -88,7 +88,7 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                 <View style={styles.inputContainer}>
                   <Text style={styles.normalBoldText}>Amount (GST-inclusive)</Text>
                   <TextInput style={styles.textInput}
-                    value={expense.total} 
+                    value={expense.total.toFixed(2)} 
                     autoCapitalize="none" 
                     autoCorrect={false} 
                     editable={false}
@@ -98,7 +98,7 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                 <View style={styles.inputContainer}>
                   <Text style={styles.normalBoldText}>GST Amount</Text>
                     <TextInput style={styles.textInput}
-                      value = {expense.gst_amount}
+                      value = {expense.gst_amount.toFixed(2)}
                       autoCapitalize="none" 
                       autoCorrect={false} 
                     />
@@ -108,7 +108,7 @@ export default function ViewManagedMonthlyExpenseScreen({ navigation, route }) {
                 <View style={styles.inputContainer}>
                   <Text style={styles.normalBoldText}>Amount (non GST-chargeable)</Text>
                   <TextInput style={styles.textInput}
-                    value={expense.total} 
+                    value={expense.total.toFixed(2)} 
                     autoCapitalize="none" 
                     autoCorrect={false} 
                     editable={false}

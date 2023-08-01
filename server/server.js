@@ -5,7 +5,6 @@ const handlebars = require('handlebars')
 const cors = require('cors');
 const sql = require('mssql');
 const jwt = require('jsonwebtoken');
-const { parse } = require('path');
 const app = express();
 var tokenSecret = require('crypto').randomBytes(64).toString('hex')
 
@@ -891,8 +890,11 @@ app.post('/addMonthlyExpense', async (req, res) => {
   let isSelected = req.body.isSelected;
 
   try {
+    var request = new sql.Request();
     var tax_base = null;
     var gst_amount = null;
+    const rate = await request.query("SELECT rate FROM GST")
+    const gst = rate.recordset[0].rate;
 
     if(amount == '' || amount == null) {
       return res.send({error: "known", message: "Please fill in the amount!"})
@@ -901,8 +903,8 @@ app.post('/addMonthlyExpense', async (req, res) => {
           return res.send({error: "known", message: "Please enter a valid amount!"})
       } else {
         if(isSelected == true) {
-          tax_base = parseFloat(amount * 0.92).toFixed(2);
-          gst_amount = parseFloat(amount * 0.08).toFixed(2);
+          tax_base = parseFloat(amount * (1 - gst/100)).toFixed(2);
+          gst_amount = parseFloat(amount * gst / 100).toFixed(2);
         }
       }
     } 
@@ -938,8 +940,6 @@ app.post('/addMonthlyExpense', async (req, res) => {
     if(company == "") {
       company = null;
     }
-    
-    var request = new sql.Request();
     
     const count = await request.query("SELECT COALESCE(MAX(item_number), 0) AS count FROM Expenses WHERE id = '"+id+"'")
     let item_number = count.recordset[0].count + 1;
@@ -1143,8 +1143,11 @@ app.post('/editMonthlyExpense', async (req, res) => {
     
   
   try{
+    var request = new sql.Request();
     var tax_base = null;
     var gst_amount = null;
+    const rate = await request.query("SELECT rate FROM GST");
+    const gst = rate.recordset[0].rate
 
     if(amount == '' || amount == null) {
       return res.send({error: "known", message: "Please fill in the amount!"})
@@ -1153,13 +1156,13 @@ app.post('/editMonthlyExpense', async (req, res) => {
           return res.send({error: "known", message: "Please enter a valid amount!"})
       } else {
         if(isSelected == true) {
-          tax_base = parseFloat(amount * 0.92).toFixed(2);
-          gst_amount = parseFloat(amount * 0.08).toFixed(2);
+          tax_base = parseFloat(amount * (1 - gst/100)).toFixed(2);
+          gst_amount = parseFloat(amount * (gst/100)).toFixed(2);
         }
       }
     } 
 
-    var request = new sql.Request();
+    
 
     if(type == null) {
       return res.send({error: "known", message: "Please select an expense type!"})
@@ -1986,4 +1989,31 @@ app.post('/changePassword', async (req, res) => {
     res.send({error: "unknown", message: err.message})
   }
 
+})
+
+
+app.get('/getGST', async (req, res) => {
+  try {
+    var request = new sql.Request();
+    const result = await request.query("SELECT rate FROM GST")
+    res.send({gst: result.recordset[0].rate})
+
+  } catch(err) {
+    console.log(err)
+    res.send({message: err.message})
+  }
+
+})
+
+app.post('/updateGST', async (req, res) => {
+  try {
+    let rate = req.body.gst;
+    var request = new sql.Request();
+    await request.query("UPDATE GST set rate = "+rate+"")
+    res.send({message: "Success!"})
+
+  } catch(err) {
+    console.log(err)
+    res.send({message: err.message})
+  }
 })
