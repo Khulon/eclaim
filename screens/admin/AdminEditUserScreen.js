@@ -6,7 +6,6 @@ import MultiSelect from 'react-native-multiple-select';
 import DefaultButton from '../../components/DefaultButton';
 import BackButton from '../../components/BackButton';
 import { Ionicons } from "react-native-vector-icons";
-import { update } from 'lodash';
 
 export default function AdminEditUserScreen({ navigation, route }) {        
   const [isLockButtonHover, setIsLockButtonHover] = useState(false);
