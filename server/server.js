@@ -825,7 +825,7 @@ app.post('/addTravellingExpense', async (req, res) => {
     let item_number = count.recordset[0].count + 1;
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-     + "@withGst, @gst, @withoutGst, @amount, @description, @receipt, '"+file_name+"', 'Yes', GETDATE(), GETDATE())");
+     + "@withGst, @gst, @withoutGst, @amount, @description, @receipt, @file_name, 'Yes', GETDATE(), GETDATE())");
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     
@@ -855,6 +855,12 @@ app.post('/addTravellingExpense', async (req, res) => {
       request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     }
 
+    if(file_name == null) {
+      request.input('file_name', sql.VarChar, null);
+    } else {
+      request.input('file_name', sql.VarChar, file_name);
+    }
+
     await request.query(query);
 
     res.send({message: "Success!"});
@@ -876,46 +882,30 @@ app.post('/addMonthlyExpense', async (req, res) => {
   let company = req.body.company;
   let type = req.body.type;
   let otherType = req.body.otherType;
-  let gst_amount = req.body.gst_amount;
   let date = req.body.date;
   var description = req.body.description;
   let file_name = req.body.file_name;
   let file_data = req.body.file_data;
   let checked = 'No'
+  let amount = req.body.amount;
+  let isSelected = req.body.isSelected;
 
   try {
+    var tax_base = null;
+    var gst_amount = null;
 
-    let with_GST = req.body.with_GST;
-    let without_GST = req.body.without_GST;
-    var tax_base = 0;
-
-    if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
+    if(amount == '' || amount == null) {
       return res.send({error: "known", message: "Please fill in the amount!"})
     } else {
-      if((with_GST == '' || with_GST == null || parseFloat(with_GST) == 0)) {
-        with_GST = 0;
-        gst_amount = 0;
-        if(!/^\d+(\.\d{2})?$/.test(without_GST)) {
+      if(!/^\d+(\.\d{2})?$/.test(amount)) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
-        }
-      } else if(without_GST == '' || without_GST == null) {
-        without_GST = 0;
-        if(!/^\d+(\.\d{2})?$/.test(with_GST)) {
-          return res.send({error: "known", message: "Please enter a valid amount!"})
-        } else {
-          if(!/^\d+(\.\d{2})?$/.test(gst_amount)) {
-            return res.send({error: "known", message: "Please enter GST amount!"})
-          } else if(parseFloat(with_GST) == 0) {
-            gst_amount = 0
-          }
-          tax_base = parseFloat(with_GST) - parseFloat(gst_amount);
+      } else {
+        if(isSelected == true) {
+          tax_base = parseFloat(amount * 0.92).toFixed(2);
+          gst_amount = parseFloat(amount * 0.08).toFixed(2);
         }
       }
-    }
-
-    let total = parseFloat(with_GST) + parseFloat(without_GST);
-    gst_amount = parseFloat(gst_amount);
-    
+    } 
 
     if(type == null) {
       return res.send({error: "known", message: "Please select an expense type!"})
@@ -966,24 +956,37 @@ app.post('/addMonthlyExpense', async (req, res) => {
       }
     }
     const query = ("INSERT INTO Expenses VALUES('"+id+"', '"+claimee+"', @count, '"+type+"', @date, @place, @customer, @company, "
-    + ""+tax_base+", "+gst_amount+", "+without_GST+", "+total+", @description, @receipt, '"+file_name+"', @checked, GETDATE(), GETDATE() )");
+    + "@tax_base, @gst_amount, @without_gst, "+parseFloat(amount)+", @description, @receipt, @file_name, @checked, GETDATE(), GETDATE() )");
     
     request.input('count', sql.Int, item_number);
     request.input('date', sql.Date, expense_date.recordset[0].date)
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer_name);
     request.input('company', sql.VarChar, company);
+    request.input('tax_base', sql.Money, tax_base);
+    request.input('gst_amount', sql.Money, gst_amount);
+    if(isSelected == true) {
+      request.input('without_gst', sql.Money, null);
+    } else {
+      request.input('without_gst', sql.Money, parseFloat(amount));
+    }
     request.input('description', sql.Text, description);
     if(file_data == null) {
       request.input('receipt', sql.VarBinary, null);
     } else {
       request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     }
+
+    if(file_name == null) {
+      request.input('file_name', sql.VarChar, null);
+    } else {
+      request.input('file_name', sql.VarChar, file_name);
+    }
     request.input('checked', sql.VarChar, checked)
 
     await request.query(query);
 
-    res.send({message: "Success!", total: total});
+    res.send({message: "Success!"});
   } catch(err) {
     console.log(err)
     res.send({error: "unknown", message: err.message});
@@ -1079,7 +1082,7 @@ app.post('/editTravellingExpense', async (req, res) => {
    
     const expense_date = await request.query("SELECT PARSE('"+date+"' as date USING 'AR-LB') AS date")
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = @description, total_amount = @amount, receipt = @receipt, file_name = '"+file_name+"', place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
+    + "description = @description, total_amount = @amount, receipt = @receipt, file_name = @file_name, place = @place, customer_name = @customer, company_name = @company, last_modified = GETDATE() WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = @item_number";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
@@ -1088,12 +1091,21 @@ app.post('/editTravellingExpense', async (req, res) => {
       } else {
       request.input('description', sql.VarChar, description)
     }
+
     request.input('amount', sql.Money, amount);
+
     if(file_data == null) {
       request.input('receipt', sql.VarBinary, null);
     } else {
       request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     }
+
+    if(file_name == null) {
+      request.input('file_name', sql.VarChar, null);
+    } else {
+      request.input('file_name', sql.VarChar, file_name);
+    }
+
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
     request.input('company', sql.VarChar, company);
@@ -1119,7 +1131,6 @@ app.post('/editMonthlyExpense', async (req, res) => {
   let type = req.body.type;
   let place = req.body.place;
   let customer = req.body.customer;
-  let gst_amount = req.body.gst_amount;
   let company = req.body.company;
   let otherType = req.body.otherType;
   let date = req.body.date;
@@ -1127,39 +1138,26 @@ app.post('/editMonthlyExpense', async (req, res) => {
   let file_data = req.body.file_data;
   let file_name = req.body.file_name;
   let checked = 'No';
+  let isSelected = req.body.isSelected;
+  let amount = req.body.amount;
     
   
   try{
-    let with_GST = req.body.with_GST;
-    let without_GST = req.body.without_GST;
-    let tax_base = 0;
+    var tax_base = null;
+    var gst_amount = null;
 
-    if((with_GST == '' || with_GST == null) && (without_GST == '' || without_GST == null)) {
+    if(amount == '' || amount == null) {
       return res.send({error: "known", message: "Please fill in the amount!"})
     } else {
-      if((with_GST == '' || with_GST == null || parseFloat(with_GST) == 0)) {
-        with_GST = 0;
-        gst_amount = 0;
-        if(!/^\d+(\.\d{2})?$/.test(without_GST)) {
+      if(!/^\d+(\.\d{2})?$/.test(amount)) {
           return res.send({error: "known", message: "Please enter a valid amount!"})
-        }
-      } else if(without_GST == '' || without_GST == null) {
-        without_GST = 0;
-        if(!/^\d+(\.\d{2})?$/.test(with_GST)) {
-          return res.send({error: "known", message: "Please enter a valid amount!"})
-        } else {
-          if(!/^\d+(\.\d{2})?$/.test(gst_amount)) {
-            return res.send({error: "known", message: "Please enter GST amount!"})
-          } else if(parseFloat(with_GST) == 0) {
-            gst_amount = 0
-          }
-          tax_base = parseFloat(with_GST) - parseFloat(gst_amount);
+      } else {
+        if(isSelected == true) {
+          tax_base = parseFloat(amount * 0.92).toFixed(2);
+          gst_amount = parseFloat(amount * 0.08).toFixed(2);
         }
       }
-    }
-
-    let total = parseFloat(with_GST) + parseFloat(without_GST);
-    gst_amount = parseFloat(gst_amount);
+    } 
 
     var request = new sql.Request();
 
@@ -1200,8 +1198,8 @@ app.post('/editMonthlyExpense', async (req, res) => {
   
 
     const query = "UPDATE Expenses SET expense_type = '"+type+"', date_of_expense = @date, "
-    + "description = @description, total_amount = "+total+", receipt = @receipt, file_name = '"+file_name+"', last_modified = GETDATE(), place = @place, customer_name = @customer,"
-    + " company_name = @company, amount_with_gst = "+tax_base+", gst_amount = "+gst_amount+", amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
+    + "description = @description, total_amount = "+parseFloat(amount)+", receipt = @receipt, file_name = @file_name, last_modified = GETDATE(), place = @place, customer_name = @customer,"
+    + " company_name = @company, amount_with_gst = @tax_base, gst_amount = @gst_amount, amount_without_gst = @without_GST, checked = '"+checked+"' WHERE id = '"+id+"'"
     + " AND claimee = '"+claimee+"' AND item_number = "+item_number+"";
 
     request.input('date', sql.Date, expense_date.recordset[0].date);
@@ -1215,11 +1213,21 @@ app.post('/editMonthlyExpense', async (req, res) => {
     } else {
       request.input('receipt', sql.VarBinary, Buffer.from(file_data));
     }
+    if(file_name == null) {
+      request.input('file_name', sql.VarChar, null);
+    } else {
+      request.input('file_name', sql.VarChar, file_name);
+    }
     request.input('place', sql.VarChar, place);
     request.input('customer', sql.VarChar, customer);
     request.input('company', sql.VarChar, company);
-    request.input('without_GST', sql.Money, without_GST);
-
+    request.input('tax_base', sql.Money, tax_base);
+    request.input('gst_amount', sql.Money, gst_amount);
+    if(isSelected == true) {
+      request.input('without_gst', sql.Money, null);
+    } else {
+      request.input('without_gst', sql.Money, parseFloat(amount));
+    }
     console.log(query)
     
     await request.query(query)

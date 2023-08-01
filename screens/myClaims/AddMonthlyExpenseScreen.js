@@ -1,4 +1,4 @@
-import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { TextInput, StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, CheckBox} from 'react-native';
 import React, { useState, useEffect } from "react";
 import { SelectList } from 'react-native-dropdown-select-list'
 import ConfirmationButton from '../../components/ConfirmationButton';
@@ -14,8 +14,9 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   const claim  = route.params.props;
   const [claimants, setClaimants] = useState(null);
   const expenseTypeDropdown = route.params.monthlyExpenseTypes;
+  //const [isSelected, setSelection] = useState(false);
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, adder: user, type: null, otherType: null,
-    with_GST: null, without_GST: null, place: null, gst_amount: null, customer_name: null, company: null, date: new Date(),
+    amount: null, isSelected: false, place: null, customer_name: null, company: null, date: new Date(),
      description: null, file_data:null, file_name:null});
 
     
@@ -135,51 +136,33 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                 <Text style={styles.normalBoldText}>Date</Text>
                 <DatePicker className="custom-input" selected={expense.date} onChange={(date) => setExpense({...expense, date: date})} dateFormat="dd/MM/yyyy"/>
               </View>
+              
               <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount (non GST-chargeable)</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="eg. 20.34" 
-                  value={expense.without_GST} 
-                  onChangeText={(amount) => setExpense({...expense, without_GST: amount})}
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                />
-                 
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount (GST-chargeable)</Text>
+                <Text style={styles.normalBoldText}>Amount</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. 23.00" 
-                  value={expense.with_GST} 
-                  onChangeText={(amount) => setExpense({...expense, with_GST: amount})}
+                  onChangeText={(amount) => setExpense({...expense, amount: amount})}
                   autoCapitalize="none" 
                   autoCorrect={false} 
                 />
-                <Text style = {{fontSize: "12px", color: "#6A6A6A"}}>*Inclusive of GST amount</Text>
-              </View>
-
-              {expense.with_GST != null && expense.with_GST != "" ? (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.normalBoldText}>GST Amount</Text>
-                    <TextInput style={styles.textInput}
-                      placeholder="eg. 0.50"
-                      onChangeText={(gst_amount) => setExpense({...expense, gst_amount: gst_amount})}
-                      autoCapitalize="none" 
-                      autoCorrect={false} 
-                    />
+                <View style={styles.container}>
+                <View style={styles.checkboxContainer}>
+                  <CheckBox
+                    value={expense.isSelected}
+                    onValueChange={(value) => setExpense({...expense, isSelected: value})}
+                    style={styles.checkbox}
+                  />
+                  <Text style={styles.label}>GST-chargeable</Text>
                 </View>
-              ) : (
-                <View/>
-              )}
+              </View>
+              </View>
 
               {expense.type == 'Entertainment and Gifts' || expense.type == 'Entertainment - ICO' || expense.type == 'Entertainment - Customers' ? (
                 <View style={{width:'100%', alignItems:'center'}}>
                   <View style={styles.inputContainer}>
                     <Text style={styles.normalBoldText}>Place</Text>
                     <TextInput style={styles.textInput}
-                      placeholder="Place" 
-                      value={expense.place} 
+                      placeholder="Place"  
                       onChangeText={(place) => setExpense({...expense, place: place})}
                       autoCapitalize="none" 
                       autoCorrect={false} 
@@ -190,7 +173,6 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                     <Text style={styles.normalBoldText}>Customer Name</Text>
                     <TextInput style={styles.textInput}
                       placeholder="Name(s)" 
-                      value={expense.customer_name} 
                       onChangeText={(customer_name) => setExpense({...expense, customer_name: customer_name})}
                       autoCapitalize="none" 
                       autoCorrect={false} 
@@ -201,7 +183,6 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                     <Text style={styles.normalBoldText}>Company</Text>
                     <TextInput style={styles.textInput}
                       placeholder="eg. Yang Ming" 
-                      value={expense.company} 
                       onChangeText={(company) => setExpense({...expense, company: company})}
                       autoCapitalize="none" 
                       autoCorrect={false} 
@@ -216,7 +197,6 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                 <Text style={styles.normalBoldText}>Description</Text>
                 <TextInput style={[styles.textInput,{height:'100px'}]}
                   placeholder="Desciption of expense" 
-                  value={expense.description}
                   multiline={true}
                   onChangeText={(description) => setExpense({...expense, description: description})}
                   autoCapitalize="none" 
@@ -388,5 +368,15 @@ const styles = StyleSheet.create({
   },
   inputStyles: {
     color: "#6A6A6A",
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  checkbox: {
+    alignSelf: 'center',
+  },
+  label: {
+    margin: 8,
   },
 });

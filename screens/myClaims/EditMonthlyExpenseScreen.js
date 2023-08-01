@@ -1,4 +1,4 @@
-import { TextInput, StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { TextInput, StyleSheet, Text, View, TouchableOpacity, ScrollView, CheckBox } from 'react-native';
 import React, { useState } from "react";
 import { Feather } from "react-native-vector-icons";
 import { SelectList } from 'react-native-dropdown-select-list'
@@ -28,9 +28,8 @@ export default function EditMonthlyExpenseScreen({ navigation, route }) {
   
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
-    place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
-    with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
-    description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
+    place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, isSelected: expenseDetails.amount_without_gst == null ? true: false,
+    amount: expenseDetails.total_amount, description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
 
   function updateExpense(expense) {
     console.log(expense)
@@ -77,9 +76,8 @@ function deleteExpense(expense) {
     if (isEditing) {
       setNewExpense({id: expenseDetails.id, claimee: expenseDetails.email,
         item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
-        place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
-        with_GST: expenseDetails.amount_without_gst == 0 ? expenseDetails.total_amount : expenseDetails.amount_with_gst, without_GST: expenseDetails.amount_without_gst, gst_amount: expenseDetails.gst_amount,
-        description: expenseDetails.description, file_data: utf8String, file_name:expenseDetails.file_name});
+        place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, isSelected: expenseDetails.amount_without_gst == null ? true: false,
+        amount: expenseDetails.total_amount, description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
       setIsEditing(false)
     } else {
       setIsEditing(true)
@@ -176,27 +174,27 @@ function deleteExpense(expense) {
                   dateFormat="dd/MM/yyyy"
                 />
               </View>
+
               <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount without GST</Text>
-                <TextInput style={styles.textInput}
-                  placeholder="eg. 20.34" 
-                  value={expense.without_GST} 
-                  onChangeText={(amount) => setNewExpense({...expense, without_GST: amount})}
-                  autoCapitalize="none" 
-                  autoCorrect={false} 
-                  editable={isEditing}
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Text style={styles.normalBoldText}>Amount with GST</Text>
+                <Text style={styles.normalBoldText}>Amount</Text>
                 <TextInput style={styles.textInput}
                   placeholder="eg. 23.00" 
-                  value={expense.with_GST} 
-                  onChangeText={(amount) => setNewExpense({...expense, with_GST: amount})}
+                  value = {expense.amount}
+                  onChangeText={(amount) => setNewExpense({...expense, amount: amount})}
                   autoCapitalize="none" 
-                  autoCorrect={false} 
-                  editable={isEditing}
+                  autoCorrect={false}
+                  editable = {isEditing}
                 />
+                <View style={styles.container}>
+                <View style={styles.checkboxContainer}>
+                  <CheckBox
+                    value={expense.isSelected}
+                    onValueChange={(value) => setNewExpense({...expense, isSelected: value})}
+                    style={styles.checkbox}
+                  />
+                  <Text style={styles.label}>GST-chargeable</Text>
+                </View>
+              </View>
               </View>
 
               {expense.type == 'Entertainment and Gifts' ? (
@@ -424,5 +422,15 @@ const styles = StyleSheet.create({
   },
   inputStyles: {
     color: "#6A6A6A",
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  checkbox: {
+    alignSelf: 'center',
+  },
+  label: {
+    margin: 8,
   },
 });
