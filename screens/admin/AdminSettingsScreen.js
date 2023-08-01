@@ -50,7 +50,7 @@ export default function AdminSettingsScreen({ navigation}) {
           <View style={{padding:"15px",width:'100%', flex:"1", alignItems:'center', justifyContent:'center'}}>
           
             <View style={styles.inputContainer}>
-              <Text style={styles.normalBoldText}>Amount</Text>
+              <Text style={styles.normalBoldText}>GST rate</Text>
               <TextInput style={styles.textInput}
                 placeholder="eg. 20.34"
                 value={settings.gst}
