@@ -99,7 +99,6 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
                   data={claimants}
                   placeholder= {expense.claimee}
                   save="value"
-                  showsVerticalScrollIndicator = {false}
                   search = {true}
                 />  
               </View>

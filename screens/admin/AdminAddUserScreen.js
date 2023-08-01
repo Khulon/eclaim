@@ -146,7 +146,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
                 />  
               </View>
               <View style={[styles.inputContainer,{zIndex:3}]}>
-                <Text style={styles.normalBoldText}>Is a Approver?</Text>
+                <Text style={styles.normalBoldText}>Is an Approver?</Text>
                 <SelectList
                   dropdownStyles={styles.dropdownStyles}
                   dropdownItemStyles={styles.dropdownItemStyles}
