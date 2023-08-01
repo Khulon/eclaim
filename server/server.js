@@ -1330,14 +1330,20 @@ app.post('/submitClaim', async (req, res) => {
 
       const approver = await request.query("SELECT approver_name FROM Claims C JOIN BelongsToDepartments B ON C.form_creator = B.email JOIN Approvers A ON B.department = A.department  WHERE id = '"+id+"'")
       const approver_email = approver.recordset[0].approver_name;
-      console.log(total_amount)
+      const approverDetails = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+approver_email+"'"))
+      const approver_name = approverDetails.recordset[0].name
+      const approver_company = approverDetails.recordset[0].company_prefix
+      const creatorDetails = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+form_creator+"'"))
+      const creator_name = creatorDetails.recordset[0].name
+      const creator_company = creatorDetails.recordset[0].company_prefix
       
       //Send email to approver
       const filePath = './email/CreatorToApprover.html';
       const source = fs.readFileSync(filePath, 'utf-8').toString();
       const template = handlebars.compile(source);
       const approverReplacements = {
-        user: approver_email,
+        user: approver_name,
+        company: approver_company,
         header: 'Claim received',
         description: 'A new claim has been submitted and is awaiting your approval.',
         type: type,
@@ -1346,7 +1352,8 @@ app.post('/submitClaim', async (req, res) => {
         creator: form_creator
       };
       const confirmationReplacements = {
-        user: form_creator,
+        user: creator_name,
+        company: creator_company,
         header: 'Claim submitted',
         description: 'Your claim has been submitted and is awaiting approval.',
         type: type,
@@ -1481,8 +1488,8 @@ app.post('/approveClaim', async (req, res) => {
         updateStatus = "UPDATE Claims SET status = 'Approved', approval_date = GETDATE() WHERE id = '"+id+"'";
         description = 'A new claim has been approved and is awaiting your processing.'
         history = "INSERT INTO History VALUES('"+id+"', 'Approved', @datetime, '"+approver+"')"
-	toCreator = "Your claim has been approved and sent for processing"
-	header = "Claim Approved"
+        toCreator = "Your claim has been approved and sent for processing"
+        header = "Claim Approved"
         confirmationDescription = 'A claim that was approved by you has been sent for processing.'
         subject = 'New claim to process'
         confirmationSubject = 'Claim sent for processing - Confirmation Email'
@@ -1495,8 +1502,8 @@ app.post('/approveClaim', async (req, res) => {
         description = "A new claim is awaiting your approval!"
         history = "INSERT INTO History VALUES('"+id+"', 'Pending Next Approval', @datetime, '"+approver+"')"
         confirmationDescription = 'A claim that was approved by you has been sent to the next approver.'
-	toCreator = "Your claim has been sent to next approver"
-	header = "Claim Sent For Next Approval"
+        toCreator = "Your claim has been sent to next approver"
+        header = "Claim Sent For Next Approval"
         subject = "New claim to approve"
         confirmationSubject = 'Claim sent to next approver - Confirmation Email'
       }
@@ -1518,13 +1525,20 @@ app.post('/approveClaim', async (req, res) => {
     const dateTime = await request.query("SELECT approval_date FROM Claims WHERE id = '"+id+"'")
     request.input('datetime', sql.DateTime, dateTime.recordset[0].approval_date);
     await request.query(history)
+    const recipientDetails = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+recipient+"'"))
+    const recipient_name = recipientDetails.recordset[0].name
+    const approverDetails = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+approver+"'"))
+    const approver_name = approverDetails.recordset[0].name
+    const creatorDetails  = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+form_creator+"'"))
+    const creator_name = creatorDetails.recordset[0].name
     //trigger sending of email to next person
     
     const filePath ='./email/ApproverToFinance.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const nextPerson = {
-      user: recipient,
+      user: recipient_name,
+      company: recipientDetails.recordset[0].company_prefix,
       header: 'Claim received',
       description: description,
       type: type,
@@ -1534,7 +1548,8 @@ app.post('/approveClaim', async (req, res) => {
       approvedBy: approver
     };
     const confirmationReplacements = {
-      user: approver,
+      user: approver_name,
+      company: approverDetails.recordset[0].company_prefix,
       header: 'Claim approved',
       description: confirmationDescription,
       type: type,
@@ -1545,7 +1560,8 @@ app.post('/approveClaim', async (req, res) => {
     };
 
     const confirmationContent = {
-      user: form_creator,
+      user: creator_name,
+      company: creatorDetails.recordset[0].company_prefix,
       header: header,
       description: toCreator,
       type: type,
@@ -1638,11 +1654,17 @@ app.post('/processClaim', async (req, res) => {
         approverEmail += (approvers.recordset[i].person + ', ')
       }
     }
+    const creatorDetails  = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+form_creator+"'"))
+    const creator_name = creatorDetails.recordset[0].name
+    const processorDetails  = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+processor+"'"))
+    const processor_name = processorDetails.recordset[0].name
+
     const filePath = './email/FinanceToCreator.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const creatorReplacements = {
-      user: form_creator,
+      user: creator_name,
+      company: creatorDetails.recordset[0].company_prefix,
       header: 'Claim processed',
       description: 'Your claim has been processed!',
       type: type,
@@ -1653,7 +1675,8 @@ app.post('/processClaim', async (req, res) => {
       processedBy: processor
     };
     const confirmationReplacements = {
-      user: processor,
+      user: processor_name,
+      company: processorDetails.recordset[0].company_prefix,
       header: 'Claim processed',
       description: 'You have processed a claim.',
       type: type,
@@ -1765,13 +1788,19 @@ app.post('/approverRejectClaim', async (req, res) => {
         await request.query(history)
     }
   
+    const approverDetails  = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+approver+"'"))
+    const recipientDetails  = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+recipient+"'"))
+    const approver_name = approverDetails.recordset[0].name
+    const recipient_name = recipientDetails.recordset[0].name
+
     
     //trigger send email back to form creator
     const filePath = './email/Rejection.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
-      user: recipient,
+      user: recipient_name,
+      company: recipientDetails.recordset[0].company_prefix,
       header: 'Claim rejected',
       description: emailDescription,
       type: type,
@@ -1782,7 +1811,8 @@ app.post('/approverRejectClaim', async (req, res) => {
       message: description
     };
     const confirmationReplacements = {
-      user: approver,
+      user: approver_name,
+      company: approverDetails.recordset[0].company_prefix,
       header: 'Claim rejected',
       description: 'You have rejected a claim.',
       type: type,
@@ -1858,12 +1888,18 @@ app.post('/processorRejectClaim', async (req, res) => {
     request.input('datetime', sql.DateTime, currentTime.recordset[0].rejection_date);
     await request.query(history)
     //trigger send email back to approver
+
+    const approverDetails = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+approver+"'"))
+    const approver_name = approverDetails.recordset[0].name
+    const processorDetails = (await request.query("SELECT name, company_prefix FROM Employees WHERE email = '"+processor+"'"))
+    const processor_name = processorDetails.recordset[0].name
   
     const filePath = './email/Rejection.html';
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
-      user: approver,
+      user: approver_name,
+      company: approverDetails.recordset[0].company_prefix,
       header: 'Claim rejected',
       description: 'A claim that was approved by you has been rejected.',
       type: type,
@@ -1874,7 +1910,8 @@ app.post('/processorRejectClaim', async (req, res) => {
       message: description
     };
     const confirmationReplacements = {
-      user: processor,
+      user: processor_name,
+      company: processorDetails.recordset[0].company_prefix,
       header: 'Claim rejected',
       description: 'You have rejected a claim.',
       type: type,
