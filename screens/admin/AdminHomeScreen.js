@@ -16,6 +16,7 @@ export default function AdminHomeScreen({ navigation }) {
   const [search, setSearch] = useState('')
   const [userDepartments, setUserDepartments] = useState([]);
   const [approvingDepartments, setApprovingDepartments] = useState([]);
+  const [isSettingsHover, setIsSettingsButtonHover] = useState(false);
 
   useEffect(() => {
     setIsLoading(true)
@@ -150,6 +151,15 @@ export default function AdminHomeScreen({ navigation }) {
           <View style={{width:'100%', flexDirection:'row',paddingBottom:"15px"}}>
             <View style={{width:'23%', position:'absolute', alignItems:'center'}}>
               <LogoutButton/>
+            </View>
+            <View style={{width:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse'}}>
+              <View style={{width:'23%', justifyContent:'center', alignItems:'center'}}>
+                <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onMouseEnter={() => setIsSettingsButtonHover(true)} onMouseLeave={() => setIsSettingsButtonHover(false)} onPress = {() => navigation.navigate('AdminSettingsScreen')}>
+                  <View style={{alignItems: 'center', justifyContent: 'center',  cursor: "pointer", height:'30px', width:'30px', backgroundColor:'gray'}}>
+                    <Text><Ionicons name="log-out-outline" color="#444" size={isSettingsHover ? '20px' : '18px'}/></Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
             <View style={{width:'100%', alignItems:"center"}}>
               <Text>Admin Home</Text>
