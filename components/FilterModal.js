@@ -11,8 +11,9 @@ export default function FilterModal({ closeModal, applyFilter, filterDate }) {
 
     useEffect(() => {
       if (filterDate.startDate == null || filterDate.endDate == null) {
-        setStartDate(new Date().setHours(0,0,0,0))
-        setEndDate(new Date().setHours(23,59,59))
+        const today = new Date();
+        setStartDate(new Date(today.setHours(0, 0, 0, 0)));
+        setEndDate(new Date(today.setHours(23, 59, 59)));
       }
       else {
         setStartDate(filterDate.startDate)
@@ -23,7 +24,7 @@ export default function FilterModal({ closeModal, applyFilter, filterDate }) {
     return (
         <View style={styles.page}>
             <View style={styles.defaultPage}>
-
+                {console.log(startDate, endDate)}
                 <View style={styles.topBar}>
                 <BackButton onPress={closeModal} hideText={true}/>
                 </View>
