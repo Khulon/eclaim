@@ -687,7 +687,7 @@ async function expenseAuthentication (req, res, next) {
     var firstApprover;
 
     //form creator is an approver
-    if(checkFormCreator.recordset[0].count == 1) {
+    if(checkFormCreator.recordset[0].count >= 1) {
       firstApprover = await request.query("SELECT approver_name FROM Approvers WHERE department = (SELECT form_creator FROM Claims WHERE id = '"+id+"')")
     } else {
       //form creator is not an approver, find first approver of form creator
@@ -698,19 +698,17 @@ async function expenseAuthentication (req, res, next) {
     var nextApprover;
     const findProcessor = await request.query("SELECT processor_email FROM Processors where company = (SELECT company_prefix FROM Employees WHERE email = (SELECT form_creator FROM Claims WHERE id = '"+id+"'))")
     var processor = findProcessor.recordset[0].processor_email
+    const involved = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND person = '"+decoded.email+"'")
 
     for (var i = 0; i < claimees.recordset.length; i++) {
       if(claimees.recordset[i].claimee == decoded.email) {
         return next()
       }
     }
-    //check all claimees
-    for (var i = 0; i < claimees.recordset.length; i++) {
-      if(claimees.recordset[i].claimee == decoded.email) {
-        return next()
-      }
+
+    if(involved.recordset[0].count >= 1) {
+      return next()
     }
-    
 
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
@@ -718,12 +716,7 @@ async function expenseAuthentication (req, res, next) {
         console.log("first approver")	
         return next()
       }
-    } else if (status.recordset[0].status == 'Approved' || status.recordset[0].status == 'Processed') {
-        //everyone
-      const managers = await request.query("SELECT COUNT(*) AS count FROM History WHERE id = '"+id+"' AND status IN ('Pending Next Approval', 'Approved', 'Processed') AND person = '"+decoded.email+"'")
-      if(managers.recordset[0].count == 1) {
-          return next()
-      }
+    } else if (status.recordset[0].status == 'Approved') {
       if(processor == decoded.email) {
         return next()
       }
@@ -733,13 +726,7 @@ async function expenseAuthentication (req, res, next) {
       if(nextApprover == decoded.email) {
         return next()
       }
-    } else if (status.recordset[0].status == "Rejected" || status.recordset[0].status == "Rejected by approver" || status.recordset[0].status == "Rejected by processor") {
-      let currentStatus = status.recordset[0].status
-      const everyone = await request.query("select count(*) as count from (select DISTINCT person from History where date < (select top 1 date from History where id = '"+id+"' AND status = '"+currentStatus+"')) T WHERE person = '"+decoded.email+"'")
-      if(everyone.recordset[0].count == 1) {
-        return next()
-      }
-    }
+    } 
     
   } catch(err) {
     if(err.name == 'TokenExpiredError') {
@@ -862,7 +849,11 @@ app.post('/addTravellingExpense', async (req, res) => {
     request.input('withoutGst', sql.Money, null);
     request.input('amount', sql.Money, amount);
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    if(file_data == null) {
+      request.input('receipt', sql.VarBinary, null);
+    } else {
+      request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    }
 
     await request.query(query);
 
@@ -983,7 +974,11 @@ app.post('/addMonthlyExpense', async (req, res) => {
     request.input('customer', sql.VarChar, customer_name);
     request.input('company', sql.VarChar, company);
     request.input('description', sql.Text, description);
-    request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    if(file_data == null) {
+      request.input('receipt', sql.VarBinary, null);
+    } else {
+      request.input('receipt', sql.VarBinary, Buffer.from(file_data));
+    }
     request.input('checked', sql.VarChar, checked)
 
     await request.query(query);

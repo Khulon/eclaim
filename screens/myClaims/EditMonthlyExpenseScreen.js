@@ -17,9 +17,15 @@ export default function EditMonthlyExpenseScreen({ navigation, route }) {
   const expenseDetails = route.params.expense
   const date = new Date(expenseDetails.date_of_expense)
   const expenseTypeDropdown = route.params.monthlyExpenseTypes
-  const uint8Array = new Uint8Array(expenseDetails.receipt.data);
-  // Convert the Uint8Array to a UTF-8 string using TextDecoder
-  const utf8String = new TextDecoder().decode(uint8Array);
+  var uint8Array;
+  var utf8String;
+  if(expenseDetails.receipt == null) {
+    utf8String = null;
+  } else {
+    uint8Array = new Uint8Array(expenseDetails.receipt.data);
+    utf8String = new TextDecoder().decode(uint8Array);
+  }
+  
   const [expense, setNewExpense] = useState({id: expenseDetails.id, claimee: expenseDetails.email,
     item_number: expenseDetails.item_number, type: expenseDetails.expense_type, otherType: null, date: date, 
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name,
