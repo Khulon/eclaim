@@ -87,3 +87,9 @@ This is for Back-End Development where there are changes to server.js.
    - Click on the "Replace All" button to replace all occurrences.
 
    This will update all the headers in the front-end code to use `localhost` instead of `10.0.1.28`.
+
+   
+## System Architecture
+![System Architecture](/assets/System%20Architecture.png)
+
+### Frontend  
