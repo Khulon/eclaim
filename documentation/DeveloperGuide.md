@@ -4,9 +4,9 @@ This is the developer documentation for Engkong Eclaim Web Application! This gui
 
 ## Table of Contents
 - [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Ports](#ports)
+    - [Installation](#installation)
+    - [Usage](#usage)
+    - [Ports](#ports)
 - [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
