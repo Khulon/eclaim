@@ -437,8 +437,6 @@ app.post('/addClaim', async (req, res) => {
     costCenter = null;
   }
 
-  let note = req.body.note;
-
   var newFormId = '';
 
   while (newFormId == '') {
@@ -464,7 +462,7 @@ app.post('/addClaim', async (req, res) => {
       + "BEGIN TRANSACTION "
       +"INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, @formCreator, @expense_type, "
         + "@levels, @claimees, @status, @sd, @ad, @pd, @rd, GETDATE(), @nextApprover, '"+company+"');"
-        + "INSERT INTO MonthlyGeneral VALUES('"+newFormId+"', @fromDate, @toDate, @costCenter, @note);"
+        + "INSERT INTO MonthlyGeneral VALUES('"+newFormId+"', @fromDate, @toDate, @costCenter);"
         + " COMMIT TRANSACTION";
       request.input('expense_type', sql.Text, expenseType)
       request.input('total_amount', sql.Money, 0);
@@ -480,7 +478,6 @@ app.post('/addClaim', async (req, res) => {
       request.input('fromDate', sql.Date, fromDate.recordset[0].fromDate);
       request.input('toDate', sql.Date, toDate.recordset[0].toDate);
       request.input('costCenter', sql.VarChar, costCenter)
-      request.input('note', sql.Text, note);
 
       await request.query(query);
 
@@ -523,7 +520,7 @@ app.post('/addClaim', async (req, res) => {
     
     const query = "SET XACT_ABORT ON BEGIN TRANSACTION " 
     + " INSERT INTO Claims VALUES('"+newFormId+"', @total_amount, '"+formCreator+"', @expense_type, @levels, @claimees, 'In Progress', @sd, @ad, @pd, @rd, GETDATE(), @nextApprover, '"+company+"');"
-    + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, @note, '"+newFormId+"'); COMMIT TRANSACTION";
+    + "INSERT INTO TravellingGeneral VALUES('"+country+"', "+exchangeRate+", @period_from, @period_to, '"+newFormId+"'); COMMIT TRANSACTION";
         
     request.input('expense_type', sql.Text, expenseType)
     request.input('total_amount', sql.Money, 0);
@@ -536,7 +533,6 @@ app.post('/addClaim', async (req, res) => {
     request.input('nextApprover', sql.VarChar, null);
     request.input('period_from', sql.Date, fromDate.recordset[0].fromDate);
     request.input('period_to', sql.Date, toDate.recordset[0].toDate);
-    request.input('note', sql.Text, note);
 
     await request.query(query);
 
