@@ -5,8 +5,8 @@ This is the developer documentation for Engkong Eclaim Web Application! This gui
 ## Table of Contents
 - [Getting Started](#getting-started)
     - [Installation](#installation)
-    - [Usage](#usage)
     - [Ports](#ports)
+    - [Usage](#usage)
 - [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
@@ -35,6 +35,7 @@ Before you start using Eclaim Web App, make sure you have the following installe
 To install Eclaim Web App, follow these steps:
 
 1. **Clone the Repository**:
+*only do this step if you are not contributing to the repo. Otherwise, fork this repo then clone from your own fork. 
 
    ```bash
    git clone https://github.com/engkongit/eclaim.git
@@ -65,11 +66,12 @@ Before starting with the usage, there are important ports that needs to be adres
 
 4. <**localhost:5000**> This is the port typically used when hosting the back-end on the local computer
 
+
 ### Usage
 
 In this section, we'll cover how to use Eclaim Web App. Provide code examples and explanations for the 2 different use cases.
 
-#### Example 1: Run Both Front-End and Back-End Locally
+#### Example 2: Run Both Front-End and Back-End Locally
 
 This is for Back-End Development where there are changes to server.js.
 
@@ -79,14 +81,55 @@ This is for Back-End Development where there are changes to server.js.
    - Open Visual Studio Code (VSC).
    - Navigate to the `menu` typically located on the left.
    - Select `Search` from the menu then select the `Right Chevron Icon`, or use the shortcut `Ctrl + Shift + H` (Windows) or `Cmd + Shift + H` (Mac).
-
-   ![Find and Replace](path/to/screenshot.png)
-
    - In the "Find" field, type `10.0.1.28:5000`.
    - In the "Replace" field, type `localhost:5000`.
    - Click on the "Replace All" button to replace all occurrences.
 
+               ![Find and Replace](path/to/screenshot.png)
+
    This will update all the headers in the front-end code to use `localhost` instead of `10.0.1.28`.
+
+2. **Run Front-End**: 
+
+    ```bash
+    cd client
+    npm run dev
+
+3. **Run Back-End**: 
+
+    ```bash
+    cd server
+    expo web
+
+4. **Alternatively, Run Both Together**:
+
+    ```bash
+    cd client
+    npm run dev
+
+5. **Open Website**:
+
+    Open a web browser and navigate to the following link: [http://localhost:19006/](http://localhost:19006/).
+
+
+
+#### Example 2: Run Front-End Locally Only
+
+This is usually for Front-End Development where there are changes only to files in client. The client fetches data from the server hosted by EngKong (`10.0.1.28:5000`)
+
+1. **Headers in Front-End**:
+   Ensure that all the headers in the front-end are configured to `localhost` and not `10.0.1.28`.
+
+2. **Run Front-End**: 
+
+    ```bash
+    cd client
+    npm run dev
+
+3. **Open Website**:
+
+    Open a web browser and navigate to the following link: [http://localhost:19006/](http://localhost:19006/).
+
 
    
 ## System Architecture
