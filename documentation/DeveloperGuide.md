@@ -22,31 +22,31 @@ This eclaim application developed for Eng Kong is a cross-platform web applicati
 ## System Architecture
 ![System Architecture](assets/System%20Architecture.png)
 
-### Frontend  
+## Frontend  
 The frontend of our application is developed using __React Native__, providing a web app interface for our users. This client-side component is responsible for rendering the user interface and handling user interactions. It communicates with the Express.js backend through __HTTP requests__ to fetch and send data.
 
 
-### Backend  
+## Backend  
 Our backend is built on __Node.js with Express.js__ as the web application framework. It serves as the server-side component of our system. The Express.js backend exposes various __API endpoints__ that the frontend can interact with. The backend handles HTTP requests from the frontend, processes data, and __interacts with the Microsoft SQL Server__ database to get and update data. The backend is the __bridge__ between the frontend and the database, ensuring seamless communication and data management.
 
-### Database  
+## Database  
 We utilize __Microsoft SQL Server__ as our database to store and manage the application's data. The backend, built with Express.js, communicates with the database to perform __CRUD operations__ (Create, Read, Update, Delete) based on frontend requests. The diagram below shows how our database entities and their relationships are modelled. Please refer to the data dictionary for more information on the schema.
 
 _Entity-Relationship Diagram_
 ![Entity-Relationship Diagram](assets/er_diagram.png)
 
-### Communication Flow
+## Communication Flow
 The communication between the React Native frontend, Express.js backend, and SQL database follows a __standard HTTP request-response cycle__. When a user interacts with the frontend, it sends HTTP requests to the Express.js backend with relevant data. The backend processes the request and communicates with the database if necessary. After processing, the backend sends an HTTP response back to the frontend with the requested data or an appropriate acknowledgement. This data is then displayed on the frontend interface where the user is able to see and use.
 
-### Security  
-#### JWT authentication
+## Security  
+### JWT authentication
 We have implemented JSON Web Token (JWT) authentication on the backend Node.js server to secure the API endpoints and control access to sensitive resources. JWT authentication allows users to obtain a token upon successful login, and subsequent requests must include this token to gain access to protected routes. The token is signed with a secret key only known to the server to prevent tampering. Once the frontend client receives the token, it is stored in the window localStorage. For subsequent requests, the backend validates the token using the secret key and if it is valid, the user will be authorised to access the protected routes and its resources.
 
 
-#### Express.js middleware  
+### Express.js middleware  
 All API endpoints requiring authentication are protected using middleware that verifies the presence and validity of the JWT. If token is invalid, the user will be denied access. Do take note that the token will also expire and user will be logged out automatically once token has expired.
 
-#### Randomised Claim ID  
+### Randomised Claim ID  
 To make it harder for employees to join claims inappropriately, we used a random generator to generate random alphanumeric claim IDs when a new claim is being created.
 
 ## Getting Started
