@@ -60,11 +60,11 @@ Before starting with the usage, there are important ports that needs to be adres
 
 1. <**10.0.1.28:8080**> This is the port used on IIS(Internet Information Services) to host the front-end.
 
-2. <**10.0.1.28:5000**> This is the port used on IIS to host the back-end
+2. <**dw.engkong.com:5000**> This is the port used on IIS to host the back-end
 
 3. <**localhost:1906**> This is the port typically used when hosting the front-end on the local computer
 
-4. <**localhost:5000**> This is the port typically used when hosting the back-end on the local computer
+4. <**dw.engkong.com:5000**> This is the port typically used when hosting the back-end on the local computer
 
 
 ### Usage
@@ -81,11 +81,11 @@ This is for Back-End Development where there are changes to server.js.
    - Open Visual Studio Code (VSC).
    - Navigate to the `menu` typically located on the left.
    - Select `Search` from the menu then select the `Right Chevron Icon`, or use the shortcut `Ctrl + Shift + H` (Windows) or `Cmd + Shift + H` (Mac).
-   - In the "Find" field, type `10.0.1.28:5000`.
-   - In the "Replace" field, type `localhost:5000`.
-   - Click on the "Replace All" button to replace all occurrences.
 
-               ![Find and Replace](path/to/screenshot.png)
+
+   - In the "Find" field, type `dw.engkong.com:5000`.
+   - In the "Replace" field, type `dw.engkong.com:5000`.
+   - Click on the "Replace All" button to replace all occurrences.
 
    This will update all the headers in the front-end code to use `localhost` instead of `10.0.1.28`.
 
