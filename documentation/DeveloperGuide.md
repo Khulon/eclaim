@@ -1,6 +1,7 @@
-# Engkong Eclaim Web Application Developer Documentation
+# Developer Documentation
 
-This is the developer documentation for Engkong Eclaim Web Application! This guide aims to provide you with all the necessary information to understand, use, and contribute to this project effectively.
+## Overview
+This eclaim application developed for Eng Kong is a cross-platform web application that digitalises and streamlines the company's claim handling process. Currently, users are able to use the application on both web and mobile platforms, as long as they are connected to Eng Kong's VPN or their private network. This guide aims to provide you with all the necessary information to understand, use, and contribute to this application effectively.
 
 ## Table of Contents
 - [System Architecture](#system-architecture)
@@ -9,9 +10,12 @@ This is the developer documentation for Engkong Eclaim Web Application! This gui
     - [Ports](#ports)
     - [Usage](#usage)
 - [Contributing](#contributing)
-- [API Reference](#api-reference)
 - [Troubleshooting](#troubleshooting)
 - [Changelog](#changelog)
+- [Frontend](#frontend)
+- [Backend](#backend)
+- [Database](#database)
+- [Communication Flow](#communication-flow)
 
 ## System Architecture
 ![System Architecture](assets/System%20Architecture.png)
@@ -211,4 +215,18 @@ This section will go through the steps taken to contribute to the code on GitHub
 
 
 ### Frontend  
-asdasd
+The frontend of our application is developed using React Native, providing a web app interface for our users. This client-side component is responsible for rendering the user interface and handling user interactions. It communicates with the Express.js backend through HTTP requests to fetch and send data.
+
+
+### Backend  
+Our backend is built on Node.js with Express.js as the web application framework. It serves as the server-side component of our system. The Express.js backend exposes various API endpoints that the frontend can interact with. The backend handles HTTP requests from the frontend, processes data, and interacts with the Microsoft SQL Server database to get and update data. The backend is the bridge between the frontend and the database, ensuring seamless communication and data management.
+
+### Database  
+We utilize Microsoft SQL Server as our database to store and manage the application's data. The backend, built with Express.js, communicates with the database to perform CRUD operations (Create, Read, Update, Delete) based on frontend requests. The diagram below shows how our database entities and their relationships are modelled. Please refer to the data dictionary for more information on the schema.
+
+_Entity-Relationship Diagram_
+![Entity-Relationship Diagram](assets/er_diagram.png)
+
+### Communication Flow
+The communication between the React Native frontend, Express.js backend, and SQL database follows a standard HTTP request-response cycle. When a user interacts with the frontend, it sends HTTP requests to the Express.js backend with relevant data. The backend processes the request and communicates with the database if necessary. After processing, the backend sends an HTTP response back to the frontend with the requested data or an appropriate acknowledgement. This data is then displayed on the frontend interface where the user is able to see and use.
+
