@@ -71,6 +71,7 @@ Before starting with the usage, there are important ports that needs to be adres
 4. **`localhost:5000`** This is the port typically used when hosting the back-end on the local computer
 
 
+
 ## Usage
 
 In this section, we'll cover how to use Eclaim Web App. Provide code examples and explanations for the 2 different use cases.

@@ -11,7 +11,7 @@ export default function AdminSettingsScreen({ navigation}) {
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
-    fetch('http://10.0.1.28:5000/getGST')
+    fetch('http://dw.engkong.com:5000/getGST')
     .then(response => response.json())
     .then(data => {
       console.log(data)
@@ -29,7 +29,7 @@ export default function AdminSettingsScreen({ navigation}) {
   }
 
   function updateSettings() {
-    fetch('http://10.0.1.28:5000/updateGST', {
+    fetch('http://dw.engkong.com:5000/updateGST', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

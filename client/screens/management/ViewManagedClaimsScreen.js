@@ -46,7 +46,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       const user = claim.form_creator;
       const status = claim.status;
       const token  = window.localStorage.getItem('token');
-      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
+      await fetch(`http://dw.engkong.com:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -72,7 +72,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         console.log(newTable)
       });
 
-      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}`)
+      fetch(`http://dw.engkong.com:5000/getHistory/${id}/${status}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -147,7 +147,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   const user = window.localStorage.getItem('session')
 
   function approveClaim(claim) {
-    fetch('http://10.0.1.28:5000/approveClaim', {
+    fetch('http://dw.engkong.com:5000/approveClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -168,7 +168,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function processClaim(claim) {
-    fetch('http://10.0.1.28:5000/processClaim', {
+    fetch('http://dw.engkong.com:5000/processClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -189,7 +189,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function approverReject(claim, description) {
-    fetch('http://10.0.1.28:5000/approverRejectClaim', {
+    fetch('http://dw.engkong.com:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -210,7 +210,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function processorReject(claim, description) {
-    fetch('http://10.0.1.28:5000/processorRejectClaim', {
+    fetch('http://dw.engkong.com:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
