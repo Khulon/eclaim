@@ -3,6 +3,7 @@
 This is the developer documentation for Engkong Eclaim Web Application! This guide aims to provide you with all the necessary information to understand, use, and contribute to this project effectively.
 
 ## Table of Contents
+- [System Architecture](#system-architecture)
 - [Getting Started](#getting-started)
     - [Installation](#installation)
     - [Ports](#ports)
@@ -11,6 +12,9 @@ This is the developer documentation for Engkong Eclaim Web Application! This gui
 - [API Reference](#api-reference)
 - [Troubleshooting](#troubleshooting)
 - [Changelog](#changelog)
+
+## System Architecture
+![System Architecture](assets/System%20Architecture.png)
 
 ## Getting Started
 
@@ -23,12 +27,12 @@ Before you start using Eclaim Web App, make sure you have the following installe
 1. **Node.js and npm**: Install Node.js and npm (Node Package Manager) on your machine. You can download the latest version from the official Node.js website: [https://nodejs.org](https://nodejs.org)
 
 2. **React Native CLI**: Install the React Native command-line interface (CLI) globally on your system:
-    ```bash
-    npm install -g react-native-cli
+
+        npm install -g react-native-cli
 
 3. **Expo CLI**: Install the Expo command-line interface (CLI) globally on your system:
-    ```bash
-    npm install -g expo-cli
+
+        npm install -g expo-cli
 
 ## Installation
 
@@ -36,21 +40,18 @@ To install Eclaim Web App, follow these steps:
 
 1. **Fork the Repository**: Fork the repository from [https://github.com/engkongit/eclaim](https://github.com/engkongit/eclaim) then clone it to your local desktop
 
-   ```bash
-   git clone https://github.com/YOURREPO/eclaim.git
-   cd eclaim
+        git clone https://github.com/YOURREPO/eclaim.git
+        cd eclaim
 
-2. **Install Dependencies for Web App**:
+2. **Install Dependencies for Web App**: A node modules folder should be created in client folder
 
-    ```bash
-    npm install
-    cd server
+        npm install
+        cd server
 
-3. **Install Dependencies for Server**:
+3. **Install Dependencies for Server**: A node modules folder should be created in server folder
 
-    ```bash
-    cd server
-    npm install
+        cd server
+        npm install
 
 
 ## Ports
@@ -95,21 +96,18 @@ This is for Back-End Development where there are changes to server.js.
 
 2. **Run Front-End**: 
 
-    ```bash
-    cd client
-    npm run dev
+        cd client
+        npm run dev
 
 3. **Run Back-End**: 
 
-    ```bash
-    cd server
-    expo web
+        cd server
+        expo web
 
 4. **Alternatively, Run Both Together**:
 
-    ```bash
-    cd client
-    npm run dev
+        cd client
+        npm run dev
 
 5. **Open Website**:
 
@@ -126,9 +124,8 @@ This is usually for Front-End Development where there are changes only to files 
 
 2. **Run Front-End**: 
 
-    ```bash
-    cd client
-    expo web
+        cd client
+        expo web
 
 3. **Open Website**:
 
@@ -136,10 +133,47 @@ This is usually for Front-End Development where there are changes only to files 
 
 ## Contributing
 
-In order to contribute
-   
-## System Architecture
-![System Architecture](assets/System%20Architecture.png)
+This section will go through the steps taken to contribute to the code on GitHub and update the front and back end code in IIS(Internet Information Services)
+
+### Step 1: Contribute to GitHub
+
+1. **Open a Pull Request**:
+
+    - Go to your forked repository on GitHub. Click on the "Compare & pull request" button next to your latest commit.
+    - Review the changes in the pull request and add any necessary details or comments.  
+    <br>
+
+2. **Submit the Pull Request**:
+
+    - Click on the "Create pull request" button.
+    - Your pull request will now be submitted to the original repository.  
+    <br>
+
+3. **Handling Merge Conflicts**:
+    - If there are merge conflicts between your pull request and the original repository, resolve them in code editor or GitHub's online code editor
+
+### Step 2: Export and Locate Code
+
+1. **Export Web-Build**: Before updating the Front-End code on IIS, you need to create a production build of the web application. To do this, follow these steps:
+    - Open a terminal or command prompt in the Front-End directory of your project.
+    - Run the following command to create a production build:
+    
+            cd client
+            npx expo export:web 
+    - A Web-Build folder should be created if it does not exist. Otherwise, the folder will be updated.
+
+2. **Locate Back-End Files Changed**: Before updating the Back-End code on IIS, you need to locate the files that have been changed. To do this, follow these steps:
+    - Open up file explorer and locate and open the eclaim folder.
+    - Open the server folder,  `/eclaim/server`
+    - Based on what files had been changed in this folder, these will be the relevant files that need to be copied later on. This will typically be `server.js`
+
+### Step 3: Update Front-End and Bacl-End Code on IIS
+1. ****: Before updating the Front-End code on IIS, you need to create a production build of the web application. To do this, follow these steps:
+    - Open a terminal or command prompt in the Front-End directory of your project.
+    - Run the following command to create a production build:
+
+
+
 
 ### Frontend  
 asdasd
