@@ -26,7 +26,7 @@ export default function AdminHomeScreen({ navigation }) {
   async function fetchData() {
     try {
       const token = window.localStorage.getItem('token')
-      fetch(`http://10.0.1.28:5000/admin/${token}`)
+      fetch(`http://dw.engkong.com:5000/admin/${token}`)
       .then((res) => res.json())
       .then((data) => {
         if(data.message == "Token expired!") {
@@ -72,7 +72,7 @@ export default function AdminHomeScreen({ navigation }) {
     const email = selectedId
     const token = window.localStorage.getItem('token')
     try {
-      await fetch(`http://10.0.1.28:5000/admin/editUser/${email}/${token}`)
+      await fetch(`http://dw.engkong.com:5000/admin/editUser/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
