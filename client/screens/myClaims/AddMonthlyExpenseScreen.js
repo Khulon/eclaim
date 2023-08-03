@@ -23,7 +23,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
     useEffect(() => {
       const id = claim.current.id
       const token = window.localStorage.getItem('token')
-      fetch(`http://10.0.1.28:5000/getClaimants/${id}/${token}`)
+      fetch(`http://dw.engkong.com:5000/getClaimants/${id}/${token}`)
       .then(response => response.json())
       .then(data => {
         console.log(data);
@@ -45,7 +45,7 @@ export default function AddMonthlyExpenseScreen({ navigation, route }) {
   async function handleAddExpense() {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://10.0.1.28:5000/addMonthlyExpense', {
+    await fetch('http://dw.engkong.com:5000/addMonthlyExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})

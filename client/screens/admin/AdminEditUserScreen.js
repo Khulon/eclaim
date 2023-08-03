@@ -36,7 +36,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
 
   function deleteUser(userDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/deleteUser', {
+    fetch('http://dw.engkong.com:5000/admin/deleteUser', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(userDetails)})
@@ -57,7 +57,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
     console.log(userDepartments)
     console.log(userDetails)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/editUser/save', {
+    fetch('http://dw.engkong.com:5000/admin/editUser/save', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(userDetails)})
@@ -75,7 +75,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
 
   function lockUser(email) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/lockUser', {
+    fetch('http://dw.engkong.com:5000/admin/lockUser', {
         method: 'POST',
         headers: header,
         body: JSON.stringify({email: email})})
@@ -93,7 +93,7 @@ export default function AdminEditUserScreen({ navigation, route }) {
 
   function unlockUser(email) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/admin/unlockUser', {
+    fetch('http://dw.engkong.com:5000/admin/unlockUser', {
         method: 'POST',
         headers: header,
         body: JSON.stringify({email: email})})
