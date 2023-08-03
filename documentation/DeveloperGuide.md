@@ -167,12 +167,47 @@ This section will go through the steps taken to contribute to the code on GitHub
     - Open the server folder,  `/eclaim/server`
     - Based on what files had been changed in this folder, these will be the relevant files that need to be copied later on. This will typically be `server.js`
 
-### Step 3: Update Front-End and Bacl-End Code on IIS
-1. ****: Before updating the Front-End code on IIS, you need to create a production build of the web application. To do this, follow these steps:
-    - Open a terminal or command prompt in the Front-End directory of your project.
-    - Run the following command to create a production build:
+### Step 3: Update Front-End and Back-End Code on IIS
+1. **Connect to EngKong PC With Remote Desktop**:In order to update the Front-End and Back-End code on IIS, you need to access the EngKong PC using Remote Desktop Connection. Follow these steps to connect:
+    - Ensure you have the necessary credentials to access the EngKong PC via Remote Desktop.
+    - On your local machine, search for "Remote Desktop Connection" in the start menu and open the application.
+    - In the Remote Desktop Connection window, enter the IP address or the hostname of the EngKong PC in the "Computer" field. It should be `10.0.1.28`
 
+        ![Enter IP](assets/Remote%20Desktop%20IP.png)
+    - Click the "Connect" button to initiate the connection.
+    - When prompted, enter your credentials (username and password) to log in to the EngKong PC.
+    - Once connected, you will have remote access to the EngKong PC's desktop and can perform administrative tasks.
+        
+        ![Enter Password](assets/Remote%20Desktop%20Login.png)
 
+2. **Access IIS Manager**:
+
+    - Open File Explorer
+    - Navigate to `C:\inetpub\wwwroot`
+    - In this directory, there you should be able to locate folders: `eclaim` and `eclaim_server`
+        ![Folders](assets/Eclaim%20and%20Eclaim%20Server%20Folders.png)
+
+3. **Update Front-End Files**:
+    - From Step 2.1(Export Web Build), copy all files within web-build folder on your local computer
+    ![Copy Web Build](assets/Copy%20Web%20Build.png)
+    - Paste the files into the eclaim folder on the remote desktop
+    ![Copy Web Build](assets/Paste%20Web%20Build.png)
+
+4. **Update Back-End Files**:
+    - From Step 2.2(Locate Back-End Files Changed), copy all files changed within server folder on your local computer, typically `server.js`
+    ![Copy Web Build](assets/Copy%20Server.png)
+    - Paste the files into the eclaim_server folder on the remote desktop
+    ![Paste Web Build](assets/Paste%20Server.png)
+
+5. **Restart Server**:
+    - Find and open the Internet Information Services (IIS) Manager.
+    - Locate the `eclaim` and `eclaim_server` applications 
+    - Click `Restart` at the right side of the page 
+    ![ISS](assets/ISS.png)
+
+6. **View Changes**:
+    - On your local desktop, use a web browser with Javascript enabled to access `dw.engkong.com`
+    - If the steps have been followed without error, the changes made should be able to be seen
 
 
 ### Frontend  
