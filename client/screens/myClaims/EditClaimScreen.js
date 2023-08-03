@@ -42,7 +42,8 @@ export default function EditClaimScreen({ navigation, route}) {
       const user = window.localStorage.getItem('session');
       const token = window.localStorage.getItem('token');
       let [res1, res2, res3] = await Promise.all([
-      fetch(`http://dw.engkong.com:5000/getExpenses/${user}/${id}/${token}`)
+      //get expenses of the claim from database
+      fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -58,7 +59,8 @@ export default function EditClaimScreen({ navigation, route}) {
         }
         console.log(claim.current.total_amount)
       }),
-      fetch('http://dw.engkong.com:5000/getTravellingExpenseTypes')
+      //get all travelling expense types from database
+      fetch('http://10.0.1.28:5000/getTravellingExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -67,7 +69,8 @@ export default function EditClaimScreen({ navigation, route}) {
         }
         setTravellingExpenseTypes(data)
       }),
-      fetch('http://dw.engkong.com:5000/getMonthlyExpenseTypes')
+      //get all monthly expense types from database
+      fetch('http://10.0.1.28:5000/getMonthlyExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -97,13 +100,15 @@ export default function EditClaimScreen({ navigation, route}) {
      : navigation.navigate("AddMonthlyExpenseScreen", {props: claim, monthlyExpenseTypes: monthlyExpenseTypes}) 
   }
 
+  
   function handleEditExpense(item) {
     console.log(item)
     if(claim.current.form_type == 'Travelling') {
       navigation.navigate("EditTravelExpenseScreen", {expense: item, travellingExpenseTypes: travellingExpenseTypes, claimStatus: claim.current.status})
     } else {
       if (userDetails.email == claim.current.form_creator) {
-        fetch('http://dw.engkong.com:5000/checkExpense', {
+        //automatically check the item if user is already form creator
+        fetch('http://10.0.1.28:5000/checkExpense', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -135,9 +140,16 @@ export default function EditClaimScreen({ navigation, route}) {
     return false
   }
 
+  /**
+   * handleDeleteClaim Function
+   * 
+   * Delete claim and its expenses from database
+   * 
+   * @param {Object} claim - claim to be deleted
+   */
   function handleDeleteClaim (claim) {
     console.log(claim)
-    fetch('http://dw.engkong.com:5000/deleteClaim', {
+    fetch('http://10.0.1.28:5000/deleteClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -156,6 +168,14 @@ export default function EditClaimScreen({ navigation, route}) {
       })
   }
 
+  /**
+   * handleSubmit Function
+   * 
+   * Make a POST request for claim submission
+   * 
+   * @param {Object} claim - claim to be submitted
+   * @param {String} parsedDate - from and to dates of the claim
+   */
   function handleSubmit (claim) {
     var parsedDate = ''
     if(claim.current.form_type == 'Travelling') {
@@ -163,7 +183,7 @@ export default function EditClaimScreen({ navigation, route}) {
     } else {
       parsedDate = monthlyPeriod
     }
-    fetch('http://dw.engkong.com:5000/submitClaim', {
+    fetch('http://10.0.1.28:5000/submitClaim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

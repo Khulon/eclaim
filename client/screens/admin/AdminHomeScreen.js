@@ -23,10 +23,16 @@ export default function AdminHomeScreen({ navigation }) {
     fetchData()
   }, []);
 
+  /**
+   * fetchData Function
+   *
+   * Get all users, companies and departments from database
+   *
+   */
   async function fetchData() {
     try {
       const token = window.localStorage.getItem('token')
-      fetch(`http://dw.engkong.com:5000/admin/${token}`)
+      fetch(`http://10.0.1.28:5000/admin/${token}`)
       .then((res) => res.json())
       .then((data) => {
         if(data.message == "Token expired!") {
@@ -68,11 +74,19 @@ export default function AdminHomeScreen({ navigation }) {
     }
   }, [userDepartments, approvingDepartments]);
 
+  /**
+   * handleEditUser Function
+   *
+   * Get departments that user belongs to and the departments that he/she is approving
+   *
+   * @param {string} email - The email of the user that is selected
+   * @param {string} token - The token of the current user making the request
+   */
   async function handleEditUser (selectedId) {
     const email = selectedId
     const token = window.localStorage.getItem('token')
     try {
-      await fetch(`http://dw.engkong.com:5000/admin/editUser/${email}/${token}`)
+      await fetch(`http://10.0.1.28:5000/admin/editUser/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

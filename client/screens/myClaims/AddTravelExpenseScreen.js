@@ -17,9 +17,16 @@ export default function AddTravelExpenseScreen({ navigation, route }) {
   const [expense, setExpense] = useState({id: claim.current.id, claimee: user, type: null, otherType: null,
     amount: null, date: new Date(), description: null, place: null, customer_name: null, company: null, file_data:null, file_name:null});
 
+  /**
+   * handleAddExpense Function
+   * 
+   * Sends a POST request to the addTravellingExpense endpoint with the expense details.
+   * 
+   * @param {object} expense - The expense details.
+   */
   async function handleAddExpense() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://dw.engkong.com:5000/addTravellingExpense', {
+    await fetch('http://10.0.1.28:5000/addTravellingExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})

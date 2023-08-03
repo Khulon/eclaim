@@ -11,10 +11,18 @@ export default function TravellingExpenseForm({ route }) {
   const [claim, setClaim] = useState({creator: addClaim.creator, formId: addClaim.formId, expenseType: addClaim.expenseType, company: addClaim.company,
     country: null, exchangeRate:null, dateFrom:  new Date(), dateTo:  new Date()});
 
+
+  /**
+   * addTravellingClaim Function
+   *
+   * User adds a new travelling claim.
+   * 
+   * @param {object} claim - All necessary details for the new claim created.
+   */
   function addTravellingClaim (claim) {
     console.log(claim)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/addClaim', {
+    fetch('http://10.0.1.28:5000/addClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})

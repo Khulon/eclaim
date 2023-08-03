@@ -33,8 +33,8 @@ export default function ChangePasswordModal({ closeModal }) {
     const header = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
     const user = window.localStorage.getItem('session')
     const oldPassword = JSON.parse(window.localStorage.getItem('details')).password
-    
-    await fetch('http://dw.engkong.com:5000/changePassword', {
+    //sends a POST request to the server to change password of user account
+    await fetch('http://10.0.1.28:5000/changePassword', {
       method: 'POST',
       headers: header,
       body: JSON.stringify({user: user, oldPassword: oldPassword, newPassword: password})

@@ -10,8 +10,14 @@ export default function AdminSettingsScreen({ navigation}) {
   const [isEditing, setIsEditing] = useState(false)
   const [settings, setSettings] = useState(null);
 
+  /**
+   * getGST Function
+   *
+   * Get current gst rate stored in database.
+   *
+   */
   useEffect(() => {
-    fetch('http://dw.engkong.com:5000/getGST')
+    fetch('http://10.0.1.28:5000/getGST')
     .then(response => response.json())
     .then(data => {
       console.log(data)
@@ -28,8 +34,15 @@ export default function AdminSettingsScreen({ navigation}) {
     }
   }
 
+  /**
+   * updateSettings Function
+   * 
+   * Updates the gst rate stored in database.
+   * 
+   * @param {string} settings - gst rate
+   */
   function updateSettings() {
-    fetch('http://dw.engkong.com:5000/updateGST', {
+    fetch('http://10.0.1.28:5000/updateGST', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

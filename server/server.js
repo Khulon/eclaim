@@ -12,7 +12,7 @@ var tokenSecret = require('crypto').randomBytes(64).toString('hex')
 app.use(cors());
 app.use(express.json({limit: '100mb'}));
 
-
+//credentials to log into database
 var config = {
     user:'eclaim',
     password: 'Excm6745',
@@ -34,17 +34,18 @@ sql.connect(config, function (err) {
     console.log("Connected!");
 });
 
-var port = process.env.port || process.env.PORT;
+//port number that server is listening to
+var port = 5000 //process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
 
-
+//generating JWT token for user using email and password
 function generateAccessToken(details) {
   return jwt.sign(details, tokenSecret, { expiresIn: '3600s' });
 }
 
-
+//checks for admin's token
 async function authenticateAdmin(req, res, next) {
   const {token} = req.params
   if (token == null) return res.sendStatus(401)
@@ -95,19 +96,17 @@ app.post('/register', async (req, res) => {
 
 
 
-//Load all users on admin home page
+//Load all users, departments and companies on admin home page
 app.get('/admin/:token', authenticateAdmin, async (req, res) => {
   try {
     var request = new sql.Request();
-        
-    // query to the database and get the records
     const users = await request.query('SELECT DISTINCT E.email, name, company_prefix, processor, E.approver, supervisor, approver_name, '
     + 'processor_email, locked FROM Employees E LEFT JOIN Accounts ON E.email = Accounts.email JOIN BelongsToDepartments B ON E.email = B.email JOIN Approvers A ON A.department = B.department'
     + ' JOIN Processors P ON E.company_prefix = P.company WHERE approver_name IS NULL OR (E.email != approver_name)')
 
     const departments = await request.query('SELECT department_name FROM Departments')
     const companies = await request.query('SELECT prefix FROM Companies')
-        // send records as a response
+
     res.send({users: users.recordset, departments: departments.recordset, companies: companies.recordset});
   } catch(err) {
     console.log(err)
@@ -137,7 +136,7 @@ app.get('/admin/editUser/:email/:token', authenticateAdmin, async (req, res) => 
 });
 
 
-//Admin edits user details
+//Admin edits and updates user details
 app.post('/admin/editUser/save', async (req, res) => {
   let name = req.body.name;
   let oldEmail = req.body.oldEmail;
@@ -219,7 +218,7 @@ app.post('/admin/deleteUser', async (req, res) => {
 });
 
 
-//lock user account
+//Admin locks user account
 app.post('/admin/lockUser', async (req, res) => {
   let email = req.body.email;
   var request = new sql.Request();
@@ -232,7 +231,7 @@ app.post('/admin/lockUser', async (req, res) => {
   }
 })
 
-//unlock user account
+//Admin unlocks user account
 app.post('/admin/unlockUser', async (req, res) => {
   let email = req.body.email;
   var request = new sql.Request();
@@ -246,7 +245,7 @@ app.post('/admin/unlockUser', async (req, res) => {
 })
 
 
-//Admin adds user
+//Admin adds user 
 app.post('/admin/addUser', async (req, res) => {
   let name = req.body.name;
   let email = req.body.email;
@@ -270,8 +269,6 @@ app.post('/admin/addUser', async (req, res) => {
     request.input('isSupervisor', sql.VarChar, isSupervisor)
     request.input('profile', sql.VarChar, null)
     await request.query(query)
-
-    console.log(departments)
     
     for(var i = 0; i < departments.length; i++) {
       request.query("INSERT INTO BelongsToDepartments VALUES('"+email+"','"+departments[i]+"')")
@@ -294,7 +291,7 @@ app.post('/admin/addUser', async (req, res) => {
 
 
 
-//User to login
+//User login to app
 app.post('/login', async (req, res) => {
   try {
     
@@ -353,7 +350,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-
+//generate random form ID for claim
 const generateRandomID = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let id = '';
@@ -366,7 +363,7 @@ const generateRandomID = () => {
   return id;
 };
 
-
+//get all of the cost centres from database
 app.get('/getCostCentres', async (req, res) => {
   try {
     var request = new sql.Request();
@@ -378,7 +375,7 @@ app.get('/getCostCentres', async (req, res) => {
   }
 })
 
-
+//get all the people that a user can claim under for expense
 app.get('/getClaimants/:id/:token', async (req, res) => {
   
   const { id, token } = req.params;
@@ -394,7 +391,6 @@ app.get('/getClaimants/:id/:token', async (req, res) => {
     const getClaimants = await request.query("SELECT DISTINCT email FROM BelongsToDepartments WHERE department IN (SELECT department FROM BelongsToDepartments WHERE email = '"+formCreator+"')")
     //supervisor created the form
     if(supervisor == formCreator) {
-      console.log("Supervisor created form!")
       const password = await request.query("SELECT password FROM Accounts WHERE email = '"+supervisor+"'")
       //authenticated
       if(supervisor == decoded.email && decoded.password == password.recordset[0].password) {
@@ -422,7 +418,7 @@ app.get('/getClaimants/:id/:token', async (req, res) => {
 
 
 
-//User to add claim
+//User adds a new claim
 app.post('/addClaim', async (req, res) => {
   let formCreator = req.body.creator;
   let expenseType = req.body.expenseType;
@@ -553,7 +549,7 @@ app.post('/addClaim', async (req, res) => {
 });
 
 
-
+//User joins an existing claim
 app.post('/joinClaim', async (req, res) => {
   let formId = req.body.formId;
   let formCreator = req.body.creator; //user
@@ -622,7 +618,7 @@ app.post('/uploadImage', async (req, res) => {
 
 });
 
-
+//checks for correct user's token
 async function authenticateUser(req, res, next) {
   const {email, token} = req.params
   if (token == null) return res.sendStatus(401)
@@ -668,7 +664,7 @@ app.get('/myClaims/:email/:token', authenticateUser, async (req, res) => {
 
 });
 
-
+//grants access to those allowed to see the expenses
 async function expenseAuthentication (req, res, next) {
   const {id, token} = req.params
   if (token == null) return res.sendStatus(401)
@@ -708,7 +704,6 @@ async function expenseAuthentication (req, res, next) {
     if(status.recordset[0].status == 'Submitted') {
       //check for first approver
       if(firstApprover.recordset[0].approver_name == decoded.email) {
-        console.log("first approver")	
         return next()
       }
     } else if (status.recordset[0].status == 'Approved') {
@@ -740,7 +735,6 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
   var request = new sql.Request();
 
   try {
-    console.log(id, user)
     //Check who is form creator
     const query = "SELECT form_creator FROM Claims WHERE id = '"+id+"'";
     const form_creator = await request.query(query)
@@ -756,7 +750,6 @@ app.get('/getExpenses/:user/:id/:token', expenseAuthentication, async (req, res)
     } else {
       const queryString = "SELECT * FROM Expenses Ex JOIN Employees E ON Ex.claimee = E.email WHERE id = '"+id+"' ORDER BY item_number ASC";
       const result = await request.query(queryString);
-      console.log(result.recordset)
       res.send(result.recordset);
     }
     
@@ -899,6 +892,7 @@ app.post('/addMonthlyExpense', async (req, res) => {
           return res.send({error: "known", message: "Please enter a valid amount!"})
       } else {
         if(isSelected == true) {
+          //calculate tax base and gst amount
           tax_base = parseFloat(amount * (1 - gst/100)).toFixed(2);
           gst_amount = parseFloat(amount * gst / 100).toFixed(2);
         }
@@ -1227,7 +1221,6 @@ app.post('/editMonthlyExpense', async (req, res) => {
     } else {
       request.input('without_gst', sql.Money, parseFloat(amount));
     }
-    console.log(query)
     
     await request.query(query)
     res.send({message: "Expense updated!"})
@@ -1281,7 +1274,7 @@ app.post('/deleteClaim', async (req, res) => {
 });
 
 
-//Check expense
+//Supervisor checks expense after clicking to view it
 app.post('/checkExpense', async (req, res) => {
   let id = req.body.id;
   let claimee = req.body.claimee;
@@ -1406,7 +1399,7 @@ app.post('/submitClaim', async (req, res) => {
 
 
 
-//load management claims
+//load claims for management tab
 app.get('/management/:email/:token', authenticateUser, async (req, res) => {
   try {
   
@@ -1416,7 +1409,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
     const checkApprover = await request.query("SELECT COUNT(*) AS count FROM Approvers WHERE approver_name = '"+email+"'")
     const checkProcessor = await request.query("SELECT COUNT(*) AS count FROM Processors WHERE processor_email = '"+email+"'")
     //Approver
-    console.log(email)
+    
     if(checkApprover.recordset[0].count >= 1) {
       const approverClaims = await request.query("SELECT C.id, form_creator, total_amount, claimees, status, form_type, pay_period_from, pay_period_to, "
       + "period_from, period_to, cost_centre, next_recipient, country, exchange_rate, company FROM Claims C LEFT OUTER JOIN MonthlyGeneral M ON C.id = M.id LEFT OUTER JOIN TravellingGeneral T ON C.id = T.id" 
@@ -1444,7 +1437,7 @@ app.get('/management/:email/:token', authenticateUser, async (req, res) => {
 
 
 
-//Approve claim
+//Approver approves claim
 app.post('/approveClaim', async (req, res) => {
   try{
     let id = req.body.claim.id;
@@ -1623,7 +1616,7 @@ app.post('/approveClaim', async (req, res) => {
 });
 
 
-//Process claim
+//Processor processes claim
 app.post('/processClaim', async (req, res) => {
   try{
     let id = req.body.claim.id;
@@ -1726,7 +1719,7 @@ app.post('/processClaim', async (req, res) => {
 });
 
 
-//Approver reject claim
+//Approver rejects claim
 app.post('/approverRejectClaim', async (req, res) => {
   try {
     var request = new sql.Request();
@@ -1863,7 +1856,7 @@ app.post('/approverRejectClaim', async (req, res) => {
 })
 
 
-//Processor reject claim
+//Processor rejects claim
 app.post('/processorRejectClaim', async (req, res) => {
   try {
     var request = new sql.Request();
@@ -1960,9 +1953,10 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 })
 
+
+//gets history of claim from database
 app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
   const { id, status, token} = req.params;   
-  console.log(token)
   try {
     var request = new sql.Request();
 
@@ -2001,7 +1995,7 @@ app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res
 
 })
 
-
+//user changes password
 app.post('/changePassword', async (req, res) => {
   let newPassword = req.body.newPassword;
   let user = req.body.user;
@@ -2024,7 +2018,7 @@ app.post('/changePassword', async (req, res) => {
 
 })
 
-
+//get current gst rate from database
 app.get('/getGST', async (req, res) => {
   try {
     var request = new sql.Request();
@@ -2038,6 +2032,7 @@ app.get('/getGST', async (req, res) => {
 
 })
 
+//update gst rate in database
 app.post('/updateGST', async (req, res) => {
   try {
     let rate = req.body.gst;

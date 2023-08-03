@@ -34,9 +34,16 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
     place: expenseDetails.place, customer_name: expenseDetails.customer_name, company: expenseDetails.company_name,
      file_data: utf8String, file_name: expenseDetails.file_name});
 
+  /**
+   * updateExpense Function
+   * 
+   * Sends a POST request to the server to update the expense details.
+   * 
+   * @param {object} expense - The expense details to be updated.
+   */
   function updateExpense(expense) {
     const header = {'Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/editTravellingExpense', {
+    fetch('http://10.0.1.28:5000/editTravellingExpense', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(expense)})
@@ -52,9 +59,16 @@ export default function EditTravelExpenseScreen({ navigation, route }) {
           })
   }
 
+  /**
+   * deleteExpense Function
+   * 
+   * Sends a POST request to the server to delete the expense.
+   * 
+   * @param {object} expense - The expense details to be deleted.
+   */
   function deleteExpense(expense) {
     const header = {'Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/deleteExpense', {
+    fetch('http://10.0.1.28:5000/deleteExpense', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(expense)})
