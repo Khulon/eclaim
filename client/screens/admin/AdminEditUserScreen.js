@@ -34,9 +34,16 @@ export default function AdminEditUserScreen({ navigation, route }) {
     setUserDetails({...userDetails, department: userDepartments, approvingDepartments: approvingDepartments});
   }, [userDepartments, approvingDepartments]);
 
+  /**
+   * deleteUser Function
+   *
+   * Admin deletes a user.
+   *
+   * @param {object} userDetails - Details of the user to be deleted.
+   */
   function deleteUser(userDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/admin/deleteUser', {
+    fetch('http://10.0.1.28:5000/admin/deleteUser', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(userDetails)})
@@ -53,11 +60,18 @@ export default function AdminEditUserScreen({ navigation, route }) {
       
   }
 
+  /**
+   * updateUser Function
+   *
+   * Update the setting details of a user.
+   *
+   * @param {object} userDetails - New setting details for the user to be updated.
+   */
   function updateUser(userDetails) {
     console.log(userDepartments)
     console.log(userDetails)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/admin/editUser/save', {
+    fetch('http://10.0.1.28:5000/admin/editUser/save', {
         method: 'POST',
         headers: header,
         body: JSON.stringify(userDetails)})
@@ -73,9 +87,16 @@ export default function AdminEditUserScreen({ navigation, route }) {
           })
   }
 
+  /**
+   * lockUser Function
+   *
+   * Admin locks a user for employees who have left the company.
+   *
+   * @param {object} email - Email of the employee whose account has to be locked.
+   */
   function lockUser(email) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/admin/lockUser', {
+    fetch('http://10.0.1.28:5000/admin/lockUser', {
         method: 'POST',
         headers: header,
         body: JSON.stringify({email: email})})
@@ -91,9 +112,16 @@ export default function AdminEditUserScreen({ navigation, route }) {
           })
   }
 
+  /**
+   * unlockUser Function
+   *
+   * Admin unlocks a user account.
+   *
+   * @param {object} email - Email of the user account to be unlocked.
+   */
   function unlockUser(email) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/admin/unlockUser', {
+    fetch('http://10.0.1.28:5000/admin/unlockUser', {
         method: 'POST',
         headers: header,
         body: JSON.stringify({email: email})})

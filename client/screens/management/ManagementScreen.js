@@ -25,11 +25,19 @@ export default function ManagementScreen({ navigation }) {
     fetchData()
   }, []); 
  
+  /**
+   * fetchData Function
+   *
+   * Fetch all the claims for management tab.
+   *
+   * @param {string} email - email of user
+   * @param {string} token - token to verify user
+   */
   async function fetchData() {
     const email = userDetails.email
     const token = window.localStorage.getItem('token');
     try {
-      await fetch(`http://dw.engkong.com:5000/management/${email}/${token}`)
+      await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         if(data.message == "Token expired!") {
@@ -128,7 +136,7 @@ export default function ManagementScreen({ navigation }) {
       </View>
       <View style={{width:'105%', height:'100%', position:'absolute', alignItems:'center', flexDirection:'row-reverse' }}>
         <View style={{width:"10%", height:'80%'}}/>
-        <View style={{width:'110px', height:'80%', flexDirection:'row', backgroundColor:backgroundColor,}}>
+        <View style={{width:'130px', height:'80%', flexDirection:'row', backgroundColor:backgroundColor,}}>
           <View style={{ alignItems:'flex-end', justifyContent:'space-between', height:'100%', width:'100%'}}>
             <Text style={{textAlign:'right', fontWeight:'500', fontSize: "15px", color:status=='In Progress' ? "#7B7B7B" : status=='Submitted' ? "#D18225" : status == 'Pending Next Approver' ? "#D18225" : status=='Approved' ? "green" : status=='Rejected' ? '#B82626' : '#4BA7C5'}}>{status}</Text>
             <Text style={{fontWeight:'600', color:"#444444", fontSize: "16px"}} >ID: {claimId}</Text>

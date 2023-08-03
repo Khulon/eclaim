@@ -11,12 +11,18 @@ export default function AddClaimScreen({ navigation }) {
   const [claim, setClaim] = useState({creator: window.localStorage.getItem('session'), formId: null, expenseType: null, company: null});
   const claimCompanies = [{key: '0', value: 'EKCA'},{key: '1', value: 'EKH'},{key: '2', value: 'Reefertec'}, {key: '3', value: 'SmartZ'}, {key: '4', value: 'PCL'}]
 
-
+  /**
+   * handleAddClaim Function
+   *
+   * Adds a new claim with the necessary details
+   *
+   * @param {object} claim - General details for the new claim created
+   */
   async function handleAddClaim() {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     switch(isExistingClaim) {
       case 'Yes':
-        fetch('http://dw.engkong.com:5000/joinClaim', {
+        fetch('http://10.0.1.28:5000/joinClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})

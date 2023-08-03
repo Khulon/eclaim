@@ -31,10 +31,17 @@ export default function EditMonthlyExpenseScreen({ navigation, route }) {
     place: expenseDetails.place, customer: expenseDetails.customer_name, company: expenseDetails.company_name, isSelected: expenseDetails.amount_without_gst == null ? true: false,
     amount: expenseDetails.total_amount.toFixed(2), description: expenseDetails.description, file_data: utf8String, file_name: expenseDetails.file_name});
 
+  /**
+   * updateExpense Function
+   * 
+   * Updates the monthly expense by sending a POST request to the editMonthlyExpense endpoint with the updated expense details.
+   * 
+   * @param {object} expense - The updated expense details.
+   */
   function updateExpense(expense) {
     console.log(expense)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/editMonthlyExpense', {
+    fetch('http://10.0.1.28:5000/editMonthlyExpense', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify(expense)})
@@ -53,9 +60,16 @@ export default function EditMonthlyExpenseScreen({ navigation, route }) {
       });
   }; 
 
+/**
+   * deleteExpense Function
+   * 
+   * Deletes the monthly expense by sending a POST request to the deleteExpense endpoint with the expense details.
+   * 
+   * @param {object} expense - The expense details.
+   */
 function deleteExpense(expense) {
   const header = {'Content-Type': 'application/json' };
-  fetch('http://dw.engkong.com:5000/deleteExpense', {
+  fetch('http://10.0.1.28:5000/deleteExpense', {
       method: 'POST',
       headers: header,
       body: JSON.stringify(expense)})

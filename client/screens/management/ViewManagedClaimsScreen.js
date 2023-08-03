@@ -40,13 +40,23 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
     
   }, [isFocused]); 
 
+  /**
+   * fetchData Function
+   * 
+   * Fetches all expenses for the claim and claim history from database.
+   * 
+   * @param {string} id - claim id
+   * @param {string} user - form creator of claim
+   * @param {string} status - current claim status
+   * @param {string} token - jwt token to verify user
+   */
   async function fetchData() {
     try {
       const id = claim.id;
       const user = claim.form_creator;
       const status = claim.status;
       const token  = window.localStorage.getItem('token');
-      await fetch(`http://dw.engkong.com:5000/getExpenses/${user}/${id}/${token}`)
+      await fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -72,7 +82,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         console.log(newTable)
       });
 
-      fetch(`http://dw.engkong.com:5000/getHistory/${id}/${status}/${token}`)
+      fetch(`http://10.0.1.28:5000/getHistory/${id}/${status}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -146,8 +156,18 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
 
   const user = window.localStorage.getItem('session')
 
+
+  /**
+   * approveClaim Function
+   * 
+   * Sends a POST request to server to approve claim.
+   * 
+   * @param {object} claim - claim object with its details
+   * @param {string} parsedDate - parsed date of claim
+   * @param {string} user - user who is approving the claim
+   */
   function approveClaim(claim) {
-    fetch('http://dw.engkong.com:5000/approveClaim', {
+    fetch('http://10.0.1.28:5000/approveClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -167,8 +187,17 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       })
   }
 
+  /**
+   * processClaim Function
+   * 
+   * Sends a POST request to server to process claim.
+   * 
+   * @param {object} claim - claim object with its details
+   * @param {string} parsedDate - parsed date of claim
+   * @param {string} user - user who is processing the claim
+   */
   function processClaim(claim) {
-    fetch('http://dw.engkong.com:5000/processClaim', {
+    fetch('http://10.0.1.28:5000/processClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -188,8 +217,18 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       })
   }
 
+  /**
+   * approverReject Function
+   *
+   * Sends a POST request to server for approver to reject claim.
+   * 
+   * @param {object} claim - claim object with its details
+   * @param {string} description - description of why claim is rejected
+   * @param {string} parsedDate - parsed date of claim
+   * @param {string} user - user who is rejecting the claim
+   */
   function approverReject(claim, description) {
-    fetch('http://dw.engkong.com:5000/approverRejectClaim', {
+    fetch('http://10.0.1.28:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -209,8 +248,19 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       })
   }
 
+
+  /**
+   * processorReject Function
+   * 
+   * Sends a POST request to server for processor to reject claim.
+   * 
+   * @param {object} claim - claim object with its details
+   * @param {string} description - description of why claim is rejected
+   * @param {string} parsedDate - parsed date of claim
+   * @param {string} user - user who is rejecting the claim
+   */
   function processorReject(claim, description) {
-    fetch('http://dw.engkong.com:5000/processorRejectClaim', {
+    fetch('http://10.0.1.28:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

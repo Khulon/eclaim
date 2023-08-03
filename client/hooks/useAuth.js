@@ -22,7 +22,7 @@ export const AuthProvider = ({children}) => {
    */
   async function loginUser (loginDetails) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://dw.engkong.com:5000/login', {
+    await fetch('http://10.0.1.28:5000/login', {
       method: 'POST', 
       headers: header,
       body: JSON.stringify(loginDetails)})
@@ -52,7 +52,7 @@ export const AuthProvider = ({children}) => {
   /**
    * logoutUser Function
    *
-   * Logs out the user by clearing the user session and reloading the page.
+   * Logs out the user by clearing the window localStorage and reloading the page.
    */
   async function logoutUser() {
     try {
@@ -75,7 +75,7 @@ export const AuthProvider = ({children}) => {
    */
   const createUser = async (loginDetails) => {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    await fetch('http://dw.engkong.com:5000/register', {
+    await fetch('http://10.0.1.28:5000/register', {
       method: 'POST',	
       headers: header,
       body: JSON.stringify(loginDetails)})

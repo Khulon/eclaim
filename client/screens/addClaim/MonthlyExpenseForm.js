@@ -17,7 +17,13 @@ export default function MonthlyExpenseForm({route}) {
 
   useEffect(() => {
     try {
-      fetch('http://dw.engkong.com:5000/getCostCentres')
+      /**
+       * getCostCentres function
+       *
+       * Gets all of the cost centres from the database
+       *
+       */
+      fetch('http://10.0.1.28:5000/getCostCentres')
       .then(response => response.json())
       .then(data => {
         console.log(data);
@@ -32,10 +38,17 @@ export default function MonthlyExpenseForm({route}) {
     }
   }, []);
 
+  /**
+   * addMonthlyClaim Function
+   *
+   * User adds a new monthly claim.
+   *
+   * @param {object} claim - All the necessary details for the new claim created.
+   */
   function addMonthlyClaim (claim) {
     console.log(claim.payPeriodFrom, claim.payPeriodTo)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://dw.engkong.com:5000/addClaim', {
+    fetch('http://10.0.1.28:5000/addClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})

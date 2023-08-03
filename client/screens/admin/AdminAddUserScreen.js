@@ -16,6 +16,13 @@ export default function AdminAddUserScreen({ navigation, route}) {
     setNewUser({...newUser, department: userDepartments, approving: approvingDepartments});
   }, [userDepartments, approvingDepartments]);
 
+  /**
+   * addUser Function
+   *
+   * Admin adds a new user.
+   *
+   * @param {object} newUser - All of the necessary details to add the new user
+   */
   function addUser (){
     if (newUser.isApprover == "Yes" && newUser.isSupervisor == "Yes") {
       alert ("user cannot be an approver and supervisor for the same department!")
@@ -24,7 +31,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
       const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
       console.log(userDepartments);
       console.log(newUser);
-      fetch('http://dw.engkong.com:5000/admin/addUser', {
+      fetch('http://10.0.1.28:5000/admin/addUser', {
         method: 'POST', 
         headers: header,
         body: JSON.stringify(newUser)})
