@@ -35,7 +35,7 @@ sql.connect(config, function (err) {
 });
 
 //port number that server is listening to
-var port = 5000 //process.env.port || process.env.PORT;
+var port = process.env.port || process.env.PORT;
 app.listen(port, () => {
 	console.log(port)
 })
