@@ -17,8 +17,6 @@ This eclaim application developed for Eng Kong is a cross-platform web applicati
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [Future Improvements](#future-improvements)
-- [Troubleshooting](#troubleshooting)
-- [Changelog](#changelog)
 - [Appendix](#appendix)
 
 
