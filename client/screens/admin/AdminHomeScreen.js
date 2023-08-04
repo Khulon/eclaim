@@ -118,6 +118,7 @@ export default function AdminHomeScreen({ navigation }) {
   }
 
   const contains = ({name,email}, query) => {
+    name = name.toLowerCase()
     if (name.includes(query) || email.includes(query)) {
       return true
     }
