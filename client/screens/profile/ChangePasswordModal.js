@@ -1,8 +1,7 @@
 import { StyleSheet, Text, View, TextInput, ScrollView} from 'react-native';
 import React, { useState, useRef} from 'react';
-import BackButton from '../../components/BackButton';
 import DefaultButton from '../../components/DefaultButton';
-
+import CloseButton from '../../components/CloseButton'
 
 export default function ChangePasswordModal({ closeModal }) {
 
@@ -140,7 +139,7 @@ export default function ChangePasswordModal({ closeModal }) {
       <View style={styles.defaultPage}>
 
         <View style={styles.topBar}>
-          <BackButton onPress={closeModal} hideText={true}/>
+          <CloseButton onPress={closeModal} hideText={true} />
         </View>
 
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} style={{width:'100%',height:'0px'}} showsVerticalScrollIndicator={false}>
