@@ -22,7 +22,7 @@ export default function TravellingExpenseForm({ route }) {
   function addTravellingClaim (claim) {
     console.log(claim)
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
-    fetch('http://10.0.1.28:5000/addClaim', {
+    fetch('http://dw.engkong.com:5000/addClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})

@@ -22,7 +22,7 @@ export default function AddClaimScreen({ navigation }) {
     const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
     switch(isExistingClaim) {
       case 'Yes':
-        fetch('http://10.0.1.28:5000/joinClaim', {
+        fetch('http://dw.engkong.com:5000/joinClaim', {
           method: 'POST',
           headers: header,
           body: JSON.stringify(claim)})
