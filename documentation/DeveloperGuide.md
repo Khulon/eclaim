@@ -144,36 +144,40 @@ In this section, we'll cover how to use Eclaim Web App. Provide code examples an
 
 This is for Back-End Development where there are changes to server.js.
 
-1. **Change All Headers in Front-End**:
-   Since all the headers in the front-end are configured to `dw.engkong.com`, which is the private EngKong IP address, they need to be changed back to `localhost`.
+1. **Change All Paths in Front-End**:
+   Since all the paths in the front-end are configured to `dw.engkong.com`, which is the private EngKong IP address, they need to be changed back to `localhost` for testing on local host.
 
    - Open Visual Studio Code (VSC).
    - Navigate to the `menu` typically located on the left.
    - Select `Search` from the menu then select the `Right Chevron Icon`, or use the shortcut `Ctrl + Shift + H` (Windows) or `Cmd + Shift + H` (Mac).
    - In the "Find" field, type `dw.engkong.com:5000`.
    - In the "Replace" field, type `localhost:5000`.
+   - Cancel those replacements in the Developer Guide file.
    - Click on the "Replace All" button to replace all occurrences.
 
         ![Find and Replace](assets/Find%20and%20Replace.png)
 
-   This will update all the headers in the front-end code to use `localhost` instead of `dw.engkong.com`.
+   This will update all the paths in the front-end code to use `localhost` instead of `dw.engkong.com`.
 
-2. **Run Front-End**: 
+2. **Change port number in Back-end**
+    Change port number that server listens to from `process.env.port || process.env.PORT` to `5000`.
+
+3. **Run Front-End**: 
 
         cd client
         npm run dev
 
-3. **Run Back-End**: 
+4. **Run Back-End**: 
 
         cd server
         expo web
 
-4. **Alternatively, Run Both Together**:
+5. **Alternatively, Run Both Together**:
 
         cd client
         npm run dev
 
-5. **Open Website**:
+6. **Open Website**:
 
     Open a web browser and navigate to the following link: [http://localhost:19006/](http://localhost:19006/).
 
@@ -184,7 +188,7 @@ This is for Back-End Development where there are changes to server.js.
 This is usually for Front-End Development where there are changes only to files in client. The client fetches from the server hosted by EngKong (`dw.engkong.com:5000`)
 
 1. **Headers in Front-End**:
-   Ensure that all the headers in the front-end are configured to `dw.engkong.com:5000` and not `localhost:5000`.
+   Ensure that all the paths in the front-end are configured to `dw.engkong.com:5000` and not `localhost:5000`.
 
 2. **Run Front-End**: 
 
