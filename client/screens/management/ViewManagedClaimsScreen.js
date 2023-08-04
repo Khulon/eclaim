@@ -281,20 +281,33 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
   }
 
   function handleDownloadPdfClaim (data) {
-    
-    const zip = new JSZip();
+    try {
+      console.log(data)
+      const zip = new JSZip();
+      var count = 0;
+      
+      for(var i = 0; i < data.length; i++) {
+        if(data[i].receipt != null) {
+          const uint8Array = new Uint8Array(data[i].receipt.data);
+          // Convert the Uint8Array to a UTF-8 string using TextDecoder
+          const utf8String = new TextDecoder().decode(uint8Array);
+          zip.file(data[i].file_name, utf8String, {base64: true});
+          count++;
+        }
+      }
 
-    for(var i = 0; i < data.length; i++) {
-      const uint8Array = new Uint8Array(data[i].receipt.data);
-      // Convert the Uint8Array to a UTF-8 string using TextDecoder
-      const utf8String = new TextDecoder().decode(uint8Array);
-      zip.file(data[i].file_name, utf8String, {base64: true});
+      if(count == 0) {
+        throw new Error("No receipts to download!")
+      }
+      
+      zip.generateAsync({type: 'blob'}).then(function(content) {
+        console.log(content)
+        FileSaver.saveAs(content, 'Claim ' + claim.id + '.zip');
+      })
+    } catch (error) {
+      console.log(error)
+      alert(error.message)
     }
-    
-    zip.generateAsync({type: 'blob'}).then(function(content) {
-      console.log(content)
-      FileSaver.saveAs(content, 'Claim ' + claim.id + '.zip');
-    })
     
   }
 
