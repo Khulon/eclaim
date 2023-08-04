@@ -17,6 +17,7 @@ This eclaim application developed for Eng Kong is a cross-platform web applicati
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
 - [Changelog](#changelog)
+- [Appendix](#appendix)
 
 
 ## System Architecture
@@ -271,5 +272,28 @@ This section will go through the steps taken to contribute to the code on GitHub
     - If the steps have been followed without error, the changes made should be able to be seen
 
 
+## Appendix  
 
+### Target user  
+* Employees of Eng Kong who are mostly office or blue collared workers.
+
+### Product Scope  
+* App digitalises current claim handling process but Finance department still has to do internal processing of claims
+
+### Target user Profile
+* User can understand basic English
+* Supervisor finds it troublesome to submit claims on behalf of employees
+* User is familiar with using mobile phones and desktop computers for work
+* User finds whole process of claim handling time-consuming
+
+### Value proposition  
+Our eclaim web app is a one-stop, cross-platform application that digitalises and speeds up the claiming process of Eng Kong by making use of email notification, claim joining, receipt uploading and data conversion features. This makes it so much easier for users at every step of the claiming process, be it for claimants, approvers or processors.
+
+
+### Non-Functional Requirements
+* Should work on any mainstream OS
+* Should be able to hold up to 1000 claims without a noticeable sluggishness in performance for typical usage.
+* Notes on project scope: The application does not replace the internal processing of the claims by Finance department.
+* The system should respond within 3 seconds.
+* Internet connection is required and currently users can only use it within the local private network.
 
