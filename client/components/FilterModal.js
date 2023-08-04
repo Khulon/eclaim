@@ -4,6 +4,15 @@ import BackButton from './BackButton';
 import DatePicker from "react-datepicker";
 import DefaultButton from './DefaultButton';
 
+/**
+ * FilterModal Component
+ *
+ * A modal component for filtering data with date inputs.
+ *
+ * @param {function} closeModal - The callback function to be called when the modal is closed.
+ * @param {function} applyFilter - The callback function to be called when the "Apply" button is pressed. It receives two parameters: `startDate` (Date), which is the selected start date, and `endDate` (Date), which is the selected end date.
+ * @param {object} filterDate - An object containing the `startDate` (Date) and `endDate` (Date) to pre-fill the date inputs. If no pre-selected dates are provided, the current date is used.
+ */
 export default function FilterModal({ closeModal, applyFilter, filterDate }) {
 
     const [startDate, setStartDate ] = useState(new Date())
