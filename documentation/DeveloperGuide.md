@@ -25,6 +25,34 @@ This eclaim application developed for Eng Kong is a cross-platform web applicati
 ## Frontend  
 The frontend of our application is developed using __React Native__, providing a web app interface for our users. This client-side component is responsible for rendering the user interface and handling user interactions. It communicates with the Express.js backend through __HTTP requests__ to fetch and send data.
 
+### Stack Logic
+
+![Stack Logc Diagram](assets/Stack%20Logic%20Diagram.png)
+The above diagram illustrates how the navigation logic is handled. Within each stack, there are multiple screens that it contains. For example, Authentication Stack contains Login, Registration and Start Screen. These screens can be found in the screens folder.
+
+### Highlighted Packages Used
+- __"@react-navigation/native & stack":__ Utilised stack navigator for navigation through pages 
+- __"react-native-dropdown-select-list":__ For all dropdown select lists
+- __"react-native-multiple-select":__ For all multiple select dropdown lists
+- __"expo-image-picker":__ For image picker
+- __"react-datepicker":__ For all fields with date inputs
+- __"lodash.filter":__ For running fast filter search functions
+- __"xlsx":__ For exporting of data to Excel
+- __"react-native-document-picker":__ For all fields with document as input
+- __"react-file-viewer":__ For viewing of files in web viewer
+- __"jszip":__ For compilations of multiple files into a zip
+
+### Custom Components Created
+- __BackButton:__ Default button to use to navigate backwards in the navigation stack
+- __DefaultButton:__ Default button used with standardised styles
+- __LogoutButton:__ Default button used to logout
+- __CloseButton:__ Default button used to close a modal
+- __ConfirmationButton:__ Default alert with custom confirmation buttons 
+- __BottomNavigation:__ Bottom navigator
+- __FilePicker:__ Component to handle file picking, viewing and downloading
+- __LoadingPage:__ Default loading screen with activity indicator
+- __Tooltip:__  Default tooltip used by wrapping icons
+
 
 ## Backend  
 Our backend is built on __Node.js with Express.js__ as the web application framework. It serves as the server-side component of our system. The Express.js backend exposes various __API endpoints__ that the frontend can interact with. The backend handles HTTP requests from the frontend, processes data, and __interacts with the Microsoft SQL Server__ database to get and update data. The backend is the __bridge__ between the frontend and the database, ensuring seamless communication and data management.
