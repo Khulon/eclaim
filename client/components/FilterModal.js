@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, ScrollView} from 'react-native';
 import React, { useState, useEffect} from 'react';
-import BackButton from './BackButton';
 import DatePicker from "react-datepicker";
 import DefaultButton from './DefaultButton';
+import CloseButton from './CloseButton';
 
 /**
  * FilterModal Component
@@ -35,7 +35,7 @@ export default function FilterModal({ closeModal, applyFilter, filterDate }) {
             <View style={styles.defaultPage}>
                 {console.log(startDate, endDate)}
                 <View style={styles.topBar}>
-                <BackButton onPress={closeModal} hideText={true}/>
+                <CloseButton onPress={closeModal} hideText={true} />
                 </View>
 
                 <View style={styles.headerBar}>
