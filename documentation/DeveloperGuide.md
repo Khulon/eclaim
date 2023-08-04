@@ -16,7 +16,6 @@ This eclaim application developed for Eng Kong is a cross-platform web applicati
     - [Usage](#usage)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
-- [Future Improvements](#future-improvements)
 - [Appendix](#appendix)
 
 
@@ -127,7 +126,7 @@ Before starting with the usage, there are important ports that needs to be adres
     - Mapped to `dw.engkong.com:8080`  
     <br>
 
-2. **`localhost:5000`** This is the port used on IIS to host the back-end
+2. **`10.0.1.28:5000`** This is the port used on IIS to host the back-end
     - Mapped to `dw.engkong.com:5000`  
         <br>
 
