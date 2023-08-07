@@ -1291,7 +1291,7 @@ app.post('/checkExpense', async (req, res) => {
 });
 
 
-const sendEmailWithRetry = async (transporter, mailOptions, delay, maxRetries) => {
+const sendEmailWithRetry = async (transporter, mailOptions, delay, maxRetries) => { 
   return new Promise((resolve, reject) => {
     let retryCount = 0;
 
