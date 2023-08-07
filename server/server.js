@@ -1632,7 +1632,7 @@ app.post('/approveClaim', async (req, res) => {
     const [approverInfo, confirmation, sendToCreator] = await Promise.all([
       sendEmailWithRetry(transporter, mailOptions, 15000, 5),
       sendEmailWithRetry(transporter, confirmationMail, 15000, 5),
-      sendEmailWithRetry(transporter, confirmationDetails, 15000, 5)
+      sendEmailWithRetry(transporter, confirmationDetails, 15000,  5)
       
     ]);
 
