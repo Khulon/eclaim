@@ -3,6 +3,16 @@ import { StyleSheet, Text, View, TouchableOpacity, Modal, ScrollView } from 'rea
 import FileViewer from 'react-file-viewer';
 import CloseButton from './CloseButton'
 
+/**
+ * FilterModal Component
+ *
+ * A modal component for filtering data with date inputs.
+ *
+ * @param {function} closeModal - The callback function to be called when the modal is closed.
+ * @param {function} applyFilter - The callback function to be called when the "Apply" button is pressed. It receives two parameters: `startDate` (Date), which is the selected start date, and `endDate` (Date), which is the selected end date.
+ * @param {object} filterDate - An object containing the `startDate` (Date) and `endDate` (Date) to pre-fill the date inputs. If no pre-selected dates are provided, the current date is used.
+ **/
+
 export default function FilePicker({ file_data, file_name, onChangeFile, editable }) {
   const [fileName, setFileName] = useState(file_name);
   const [fileData, setFileData] = useState(file_data);

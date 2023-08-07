@@ -183,7 +183,9 @@ export default function EditClaimScreen({ navigation, route}) {
     } else {
       parsedDate = monthlyPeriod
     }
-    fetch('http://10.0.1.28:5000/submitClaim', {
+    alert('Sending Email Notification... Please wait.')
+    setIsLoading(true)
+    fetch('http://dw.engkong.com:5000/submitClaim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -194,12 +196,14 @@ export default function EditClaimScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == "Claim submitted!") {
-          alert('Claim submitted successfully!')
+          alert(data.messsage)
+          setIsLoading(false)
           window.location.reload(false)
         } else if (data.error == "known") {
           alert(data.message)
         } else {
           alert('Claim could not be submitted!')
+          setIsLoading(false)
         }
       })
   }
