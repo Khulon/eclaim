@@ -30,7 +30,7 @@ export default function MyClaimsScreen({ navigation }) {
     const token = window.localStorage.getItem('token');
     try {
       //get all claims that user is involved in from the database
-      await fetch(`http://dw.engkong.com:5000/myClaims/${email}/${token}`)
+      await fetch(`http://10.0.1.28:5000/myClaims/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         if(data.message == "Token expired!") {
