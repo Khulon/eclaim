@@ -1290,6 +1290,32 @@ app.post('/checkExpense', async (req, res) => {
   }
 });
 
+// Create a transporter
+const transporter = nodemailer.createTransport({
+  host: "email.engkong.com", // hostname
+  tls: {
+      rejectUnauthorized: false
+  }, 
+  auth: {
+    user: 'eclaim@engkong.net',
+    pass: 'eclaim12345%'
+  },
+});
+
+const sendEmailWithDelay = async (transporter, mailOptions, delay) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(info);
+        }
+      });
+    }, delay);
+  });
+};
+
 
 //Form creator submits claim
 app.post('/submitClaim', async (req, res) => {
@@ -1353,18 +1379,6 @@ app.post('/submitClaim', async (req, res) => {
       const htmlToSend = template(approverReplacements);
       const conf = template(confirmationReplacements);
 
-      // Create a transporter
-      const transporter = nodemailer.createTransport({
-        host: "email.engkong.com", // hostname
-        tls: {
-            rejectUnauthorized: false
-        }, 
-        auth: {
-          user: 'eclaim@engkong.net',
-          pass: 'eclaim12345%'
-        } 
-      });
-
       // Define the email message
       const mailOptions = {
         from: 'eclaim@engkong.com',
@@ -1373,9 +1387,6 @@ app.post('/submitClaim', async (req, res) => {
         html: htmlToSend,
         
       };
-      // Send the email
-      const approverInfo = transporter.sendMail(mailOptions);
-      console.log('Email sent:', (await approverInfo).response);
 
       const confirmationMail = {
         from: 'eclaim@engkong.com',
@@ -1383,9 +1394,15 @@ app.post('/submitClaim', async (req, res) => {
         subject: 'Claim submission confirmation email',
         html: conf,
       }
-      const confirmation = transporter.sendMail(confirmationMail);
-      console.log('Email sent:', (await confirmation).response);
       
+      const [approverInfo, confirmation] = await Promise.all([
+        sendEmailWithDelay(transporter, mailOptions, 10000),
+        sendEmailWithDelay(transporter, confirmationMail, 10000)
+      ]);
+
+      console.log('Email sent:', (approverInfo).response);
+      console.log('Email sent:', (confirmation).response);
+
       res.send({message: "Claim submitted!"})
       
     } else {
@@ -1564,18 +1581,6 @@ app.post('/approveClaim', async (req, res) => {
     const conf = template(confirmationReplacements);
     const toFormCreator = template(confirmationContent)
 
-    // Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: "email.engkong.com", // hostname
-      tls: {
-          rejectUnauthorized: false
-      }, 
-      auth: {
-        user: 'eclaim@engkong.net',
-        pass: 'eclaim12345%'
-      } 
-    });
-
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
@@ -1584,18 +1589,13 @@ app.post('/approveClaim', async (req, res) => {
       html: htmlToSend,
       
     };
-    // Send the email
-    const approverInfo = transporter.sendMail(mailOptions);
-    console.log('Email sent to recipient:', (await approverInfo).response);
-
+    
     const confirmationMail = {
       from: 'eclaim@engkong.com',
       to: approver,
       subject: confirmationSubject, 
       html: conf,
     }
-    const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent back to approver:', (await confirmation).response);
 
     const confirmationDetails = {
       from: 'eclaim@engkong.com',
@@ -1604,8 +1604,16 @@ app.post('/approveClaim', async (req, res) => {
       html: toFormCreator,
     }
     
-    const sendToCreator = transporter.sendMail(confirmationDetails);
-    console.log('Email sent to form creator:', (await sendToCreator).response);
+    const [approverInfo, confirmation, sendToCreator] = await Promise.all([
+      sendEmailWithDelay(transporter, mailOptions, 10000),
+      sendEmailWithDelay(transporter, confirmationMail, 10000),
+      sendEmailWithDelay(transporter, confirmationDetails, 10000)
+      
+    ]);
+
+    console.log('Email sent to recipient:', (approverInfo).response);
+    console.log('Email sent back to approver:', (confirmation).response);
+    console.log('Email sent to form creator:', (sendToCreator).response);
 
     res.send({message: "Success!"})
   } catch(err) {
@@ -1678,18 +1686,6 @@ app.post('/processClaim', async (req, res) => {
     const htmlToSend = template(creatorReplacements);
     const conf = template(confirmationReplacements);
 
-    // Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: "email.engkong.com", // hostname
-      tls: {
-          rejectUnauthorized: false
-      }, 
-      auth: {
-        user: 'eclaim@engkong.net',
-        pass: 'eclaim12345%'
-      } 
-    });
-
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
@@ -1698,18 +1694,21 @@ app.post('/processClaim', async (req, res) => {
       html: htmlToSend,
       
     };
-    // Send the email
-    const info = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await info).response);
-
+    
     const confirmationMail = {
       from: 'eclaim@engkong.com',
       to: processor, 
       subject: 'You have processed a claim',
       html: conf,
     }
-    const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
+
+    // Send the email
+    const [approverInfo, confirmation] = await Promise.all([
+      sendEmailWithDelay(transporter, mailOptions, 10000),
+      sendEmailWithDelay(transporter, confirmationMail, 10000)
+    ]);
+    console.log('Email sent:', (approverInfo).response);
+    console.log('Email sent:', (confirmation).response);
     res.send({message: "Success!"})
   } catch(err) {
     console.log(err)

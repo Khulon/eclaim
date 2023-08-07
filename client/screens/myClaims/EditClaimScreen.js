@@ -43,7 +43,7 @@ export default function EditClaimScreen({ navigation, route}) {
       const token = window.localStorage.getItem('token');
       let [res1, res2, res3] = await Promise.all([
       //get expenses of the claim from database
-      fetch(`http://dw.engkong.com:5000/getExpenses/${user}/${id}/${token}`)
+      fetch(`http://10.0.1.28:5000/getExpenses/${user}/${id}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -60,7 +60,7 @@ export default function EditClaimScreen({ navigation, route}) {
         console.log(claim.current.total_amount)
       }),
       //get all travelling expense types from database
-      fetch('http://dw.engkong.com:5000/getTravellingExpenseTypes')
+      fetch('http://10.0.1.28:5000/getTravellingExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -70,7 +70,7 @@ export default function EditClaimScreen({ navigation, route}) {
         setTravellingExpenseTypes(data)
       }),
       //get all monthly expense types from database
-      fetch('http://dw.engkong.com:5000/getMonthlyExpenseTypes')
+      fetch('http://10.0.1.28:5000/getMonthlyExpenseTypes')
       .then(response => response.json())
       .then(data => {
         console.log(data)
@@ -108,7 +108,7 @@ export default function EditClaimScreen({ navigation, route}) {
     } else {
       if (userDetails.email == claim.current.form_creator) {
         //automatically check the item if user is already form creator
-        fetch('http://dw.engkong.com:5000/checkExpense', {
+        fetch('http://10.0.1.28:5000/checkExpense', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -149,7 +149,7 @@ export default function EditClaimScreen({ navigation, route}) {
    */
   function handleDeleteClaim (claim) {
     console.log(claim)
-    fetch('http://dw.engkong.com:5000/deleteClaim', {
+    fetch('http://10.0.1.28:5000/deleteClaim', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -183,7 +183,7 @@ export default function EditClaimScreen({ navigation, route}) {
     } else {
       parsedDate = monthlyPeriod
     }
-    fetch('http://dw.engkong.com:5000/submitClaim', {
+    fetch('http://10.0.1.28:5000/submitClaim', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

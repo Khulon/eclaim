@@ -31,7 +31,7 @@ export default function AdminAddUserScreen({ navigation, route}) {
       const header = { 'Accept': 'application/json','Content-Type': 'application/json' };
       console.log(userDepartments);
       console.log(newUser);
-      fetch('http://dw.engkong.com:5000/admin/addUser', {
+      fetch('http://10.0.1.28:5000/admin/addUser', {
         method: 'POST', 
         headers: header,
         body: JSON.stringify(newUser)})

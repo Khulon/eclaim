@@ -37,7 +37,7 @@ export default function ManagementScreen({ navigation }) {
     const email = userDetails.email
     const token = window.localStorage.getItem('token');
     try {
-      await fetch(`http://dw.engkong.com:5000/management/${email}/${token}`)
+      await fetch(`http://10.0.1.28:5000/management/${email}/${token}`)
       .then((response) => response.json())
       .then((data) => {
         if(data.message == "Token expired!") {

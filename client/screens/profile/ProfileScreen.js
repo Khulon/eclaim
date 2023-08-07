@@ -35,7 +35,7 @@ export default function ProfileScreen({ navigation }) {
      * @param {string} email - email of the user
      * @param {string} image - image uri of the profile photo
      */
-    fetch('http://dw.engkong.com:5000/uploadImage', {
+    fetch('http://10.0.1.28:5000/uploadImage', {
       method: 'POST',
       headers: { 'Accept': 'application/json','Content-Type': 'application/json' },
       body: JSON.stringify({email: userDetails.email, image: result.uri})
