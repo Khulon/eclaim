@@ -1290,29 +1290,28 @@ app.post('/checkExpense', async (req, res) => {
   }
 });
 
-// Create a transporter
-const transporter = nodemailer.createTransport({
-  host: "email.engkong.com", // hostname
-  tls: {
-      rejectUnauthorized: false
-  }, 
-  auth: {
-    user: 'eclaim@engkong.net',
-    pass: 'eclaim12345%'
-  },
-});
 
-const sendEmailWithDelay = async (transporter, mailOptions, delay) => {
+const sendEmailWithRetry = async (transporter, mailOptions, delay, maxRetries) => {
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    let retryCount = 0;
+
+    const sendEmail = () => {
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          reject(error);
+          if (retryCount < maxRetries) {
+            retryCount++;
+            console.log(`Error sending email. Retrying attempt ${retryCount}/${maxRetries}...`);
+            setTimeout(sendEmail, delay);
+          } else {
+            reject(error);
+          }
         } else {
           resolve(info);
         }
       });
-    }, delay);
+    };
+
+    sendEmail();
   });
 };
 
@@ -1394,14 +1393,28 @@ app.post('/submitClaim', async (req, res) => {
         subject: 'Claim submission confirmation email',
         html: conf,
       }
+
+      // Create a transporter
+      const transporter = nodemailer.createTransport({
+        host: "email.engkong.com", // hostname
+        tls: {
+            rejectUnauthorized: false
+        }, 
+        auth: {
+          user: 'eclaim@engkong.net',
+          pass: 'eclaim12345%'
+        },
+      });
       
       const [approverInfo, confirmation] = await Promise.all([
-        sendEmailWithDelay(transporter, mailOptions, 10000),
-        sendEmailWithDelay(transporter, confirmationMail, 10000)
+        sendEmailWithRetry(transporter, mailOptions, 15000, 5),
+        sendEmailWithRetry(transporter, confirmationMail, 15000, 5)
       ]);
 
       console.log('Email sent:', (approverInfo).response);
       console.log('Email sent:', (confirmation).response);
+
+      transporter.close();
 
       res.send({message: "Claim submitted!"})
       
@@ -1603,11 +1616,23 @@ app.post('/approveClaim', async (req, res) => {
       subject: confirmationSubject, 
       html: toFormCreator,
     }
+
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "email.engkong.com", // hostname
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      auth: {
+        user: 'eclaim@engkong.net',
+        pass: 'eclaim12345%'
+      },
+    });
     
     const [approverInfo, confirmation, sendToCreator] = await Promise.all([
-      sendEmailWithDelay(transporter, mailOptions, 10000),
-      sendEmailWithDelay(transporter, confirmationMail, 10000),
-      sendEmailWithDelay(transporter, confirmationDetails, 10000)
+      sendEmailWithRetry(transporter, mailOptions, 15000, 5),
+      sendEmailWithRetry(transporter, confirmationMail, 15000, 5),
+      sendEmailWithRetry(transporter, confirmationDetails, 15000,  5)
       
     ]);
 
@@ -1615,7 +1640,9 @@ app.post('/approveClaim', async (req, res) => {
     console.log('Email sent back to approver:', (confirmation).response);
     console.log('Email sent to form creator:', (sendToCreator).response);
 
-    res.send({message: "Success!"})
+    transporter.close();
+
+    res.send({message: "Claim approved!"})
   } catch(err) {
     console.log(err)
     res.send({message: err.message});
@@ -1702,14 +1729,27 @@ app.post('/processClaim', async (req, res) => {
       html: conf,
     }
 
+    // Create a transporter
+    const transporter = nodemailer.createTransport({
+      host: "email.engkong.com", // hostname
+      tls: {
+          rejectUnauthorized: false
+      }, 
+      auth: {
+        user: 'eclaim@engkong.net',
+        pass: 'eclaim12345%'
+      },
+    });
+
     // Send the email
     const [approverInfo, confirmation] = await Promise.all([
-      sendEmailWithDelay(transporter, mailOptions, 10000),
-      sendEmailWithDelay(transporter, confirmationMail, 10000)
+      sendEmailWithRetry(transporter, mailOptions, 15000, 5),
+      sendEmailWithRetry(transporter, confirmationMail, 15000, 5)
     ]);
     console.log('Email sent:', (approverInfo).response);
     console.log('Email sent:', (confirmation).response);
-    res.send({message: "Success!"})
+    transporter.close()
+    res.send({message: "Claim processed!"})
   } catch(err) {
     console.log(err)
     res.send({message: err.message});
@@ -1813,6 +1853,22 @@ app.post('/approverRejectClaim', async (req, res) => {
     const htmlToSend = template(replacements);
     const conf = template(confirmationReplacements);
 
+    // Define the email message
+    const mailOptions = {
+      from: 'eclaim@engkong.com',
+      to: recipient,
+      subject: subject,
+      html: htmlToSend,
+      
+    };
+
+    const confirmationMail = {
+      from: 'eclaim@engkong.com',
+      to: approver, 
+      subject: 'You have rejected a claim',
+      html: conf,
+    }
+    
     // Create a transporter
     const transporter = nodemailer.createTransport({
       host: "email.engkong.com", // hostname
@@ -1822,31 +1878,21 @@ app.post('/approverRejectClaim', async (req, res) => {
       auth: {
         user: 'eclaim@engkong.net',
         pass: 'eclaim12345%'
-      } 
+      },
     });
 
-    // Define the email message
-    const mailOptions = {
-      from: 'eclaim@engkong.com',
-      to: recipient,
-      subject: subject,
-      html: htmlToSend,
-      
-    };
-    // Send the email
-    const info = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await info).response);
+    const [info, confirmation] = await Promise.all([
+      sendEmailWithRetry(transporter, mailOptions, 15000, 5),
+      sendEmailWithRetry(transporter, confirmationMail, 15000, 5)
+    ]);
 
-    const confirmationMail = {
-      from: 'eclaim@engkong.com',
-      to: approver, 
-      subject: 'You have rejected a claim',
-      html: conf,
-    }
-    const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
+    transporter.close();
 
-    res.send({message: "Success!"})
+    console.log('Email sent:', info.response);
+    console.log('Email sent:', confirmation.response);
+
+
+    res.send({message: "Claim rejected!"})
   } catch(err) {
     console.log(err)
     res.send({message: err.message});
@@ -1912,6 +1958,22 @@ app.post('/processorRejectClaim', async (req, res) => {
     const htmlToSend = template(replacements);
     const conf = template(confirmationReplacements);
 
+    // Define the email message
+    const mailOptions = {
+      from: 'eclaim@engkong.com',
+      to: approver,  
+      subject: 'A claim approved by you has been rejected',
+      html: htmlToSend,
+      
+    };
+
+    const confirmationMail = {
+      from: 'eclaim@engkong.com',
+      to: processor, 
+      subject: 'You have rejected a claim',
+      html: conf,
+    }
+
     // Create a transporter
     const transporter = nodemailer.createTransport({
       host: "email.engkong.com", // hostname
@@ -1921,30 +1983,23 @@ app.post('/processorRejectClaim', async (req, res) => {
       auth: {
         user: 'eclaim@engkong.net',
         pass: 'eclaim12345%'
-      } 
+      },
     });
 
-    // Define the email message
-    const mailOptions = {
-      from: 'eclaim@engkong.com',
-      to: approver,  
-      subject: 'A claim approved by you has been rejected',
-      html: htmlToSend,
-      
-    };
-    // Send the email
-    const info = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await info).response);
 
-    const confirmationMail = {
-      from: 'eclaim@engkong.com',
-      to: processor, 
-      subject: 'You have rejected a claim',
-      html: conf,
-    }
-    const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
-    res.send({message: "Success!"})
+    const [info, confirmation] = await Promise.all([
+      sendEmailWithRetry(transporter, mailOptions, 15000, 5),
+      sendEmailWithRetry(transporter, confirmationMail, 15000, 5)
+    ]);
+
+    transporter.close()
+
+    console.log('Email sent:', (info).response);
+    console.log('Email sent:', (confirmation).response);
+
+    
+    res.send({message: "Claim rejected!"})
+
   } catch(err) {
     console.log(err)
     res.send({message: err.message});
@@ -1955,7 +2010,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 //gets history of claim from database
 app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
-  const { id, status, token} = req.params;   
+  const { id, status} = req.params;   
   try {
     var request = new sql.Request();
 

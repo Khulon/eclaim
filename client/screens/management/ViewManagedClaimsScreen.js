@@ -179,7 +179,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        if(data.message == 'Success!') {
+        if(data.message == "Claim approved!") {
           alert(data.message)
           setIsLoading(false)
           window.location.reload(false)
@@ -212,7 +212,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        if(data.message == 'Success!') {
+        if(data.message == 'Claim processed!') {
           alert(data.message)
           setIsLoading(false)
           window.location.reload(false)
@@ -246,8 +246,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        if(data.message == 'Success!') {
-          alert('Claim rejected!')
+        if(data.message == 'Claim rejected!') {
+          alert(data.message)
           setIsLoading(false)
           window.location.reload(false)
         } else {
@@ -281,7 +281,7 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        if(data.message == 'Success!') {
+        if(data.message == 'Claim rejected!') {
           alert(data.message)
           setIsLoading(false)
           window.location.reload(false)
