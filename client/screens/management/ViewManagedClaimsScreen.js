@@ -167,6 +167,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
    * @param {string} user - user who is approving the claim
    */
   function approveClaim(claim) {
+    alert('Sending Email Notification... Please wait.')
+    setIsLoading(true)
     fetch('http://dw.engkong.com:5000/approveClaim', {
       method: 'POST',
       headers: {
@@ -178,11 +180,12 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == 'Success!') {
-          alert('Claim approved!')
+          alert(data.message)
+          setIsLoading(false)
           window.location.reload(false)
         } else {
-          console.log(data.message)
-          alert('Claim could not be approved!')
+          alert(data.message)
+          setIsLoading(false)
         }
       })
   }
@@ -197,6 +200,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
    * @param {string} user - user who is processing the claim
    */
   function processClaim(claim) {
+    alert('Sending Email Notification... Please wait.')
+    setIsLoading(true)
     fetch('http://dw.engkong.com:5000/processClaim', {
       method: 'POST',
       headers: {
@@ -208,11 +213,12 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == 'Success!') {
-          alert('Claim processed!')
+          alert(data.message)
+          setIsLoading(false)
           window.location.reload(false)
         } else {
-          console.log(data.message)
-          alert('Claim could not be processed!')
+          alert(data.message)
+          setIsLoading(false)
         }
       })
   }
@@ -228,6 +234,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
    * @param {string} user - user who is rejecting the claim
    */
   function approverReject(claim, description) {
+    alert('Sending Email Notification... Please wait.')
+    setIsLoading(true)
     fetch('http://dw.engkong.com:5000/approverRejectClaim', {
       method: 'POST',
       headers: {
@@ -240,10 +248,11 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
         console.log(data)
         if(data.message == 'Success!') {
           alert('Claim rejected!')
+          setIsLoading(false)
           window.location.reload(false)
         } else {
-          console.log(data.message)
-          alert('Claim could not be rejected!')
+          alert(data.message)
+          setIsLoading(false)
         }
       })
   }
@@ -260,6 +269,8 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
    * @param {string} user - user who is rejecting the claim
    */
   function processorReject(claim, description) {
+    alert('Sending Email Notification... Please wait.')
+    setIsLoading(true)
     fetch('http://dw.engkong.com:5000/processorRejectClaim', {
       method: 'POST',
       headers: {
@@ -271,11 +282,12 @@ export default function ViewManagedClaimsScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == 'Success!') {
-          alert('Claim rejected!')
+          alert(data.message)
+          setIsLoading(false)
           window.location.reload(false)
         } else {
-          console.log(data.message)
-          alert('Claim could not be rejected!')
+          alert(data.message)
+          setIsLoading(false)
         }
       })
   }

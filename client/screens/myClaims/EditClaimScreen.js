@@ -202,6 +202,7 @@ export default function EditClaimScreen({ navigation, route}) {
           window.location.reload(false)
         } else if (data.error == "known") {
           alert(data.message)
+          setIsLoading(false)
         } else {
           alert('Claim could not be submitted!')
           setIsLoading(false)
