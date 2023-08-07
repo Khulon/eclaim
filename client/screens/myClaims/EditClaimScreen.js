@@ -196,11 +196,12 @@ export default function EditClaimScreen({ navigation, route}) {
       .then(data => {
         console.log(data)
         if(data.message == "Claim submitted!") {
-          alert(data.messsage)
+          alert(data.message)
           setIsLoading(false)
           window.location.reload(false)
         } else if (data.error == "known") {
           alert(data.message)
+          setIsLoading(false)
         } else {
           alert('Claim could not be submitted!')
           setIsLoading(false)
