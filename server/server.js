@@ -1813,18 +1813,6 @@ app.post('/approverRejectClaim', async (req, res) => {
     const htmlToSend = template(replacements);
     const conf = template(confirmationReplacements);
 
-    // Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: "email.engkong.com", // hostname
-      tls: {
-          rejectUnauthorized: false
-      }, 
-      auth: {
-        user: 'eclaim@engkong.net',
-        pass: 'eclaim12345%'
-      } 
-    });
-
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
@@ -1833,9 +1821,6 @@ app.post('/approverRejectClaim', async (req, res) => {
       html: htmlToSend,
       
     };
-    // Send the email
-    const info = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await info).response);
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
@@ -1843,8 +1828,15 @@ app.post('/approverRejectClaim', async (req, res) => {
       subject: 'You have rejected a claim',
       html: conf,
     }
-    const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
+    
+
+    const [info, confirmation] = await Promise.all([
+      sendEmailWithDelay(transporter, mailOptions, 10000),
+      sendEmailWithDelay(transporter, confirmationMail, 10000)
+    ]);
+
+    console.log('Email sent:', info.response);
+    console.log('Email sent:', confirmation.response);
 
     res.send({message: "Success!"})
   } catch(err) {
@@ -1912,18 +1904,6 @@ app.post('/processorRejectClaim', async (req, res) => {
     const htmlToSend = template(replacements);
     const conf = template(confirmationReplacements);
 
-    // Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: "email.engkong.com", // hostname
-      tls: {
-          rejectUnauthorized: false
-      }, 
-      auth: {
-        user: 'eclaim@engkong.net',
-        pass: 'eclaim12345%'
-      } 
-    });
-
     // Define the email message
     const mailOptions = {
       from: 'eclaim@engkong.com',
@@ -1932,9 +1912,6 @@ app.post('/processorRejectClaim', async (req, res) => {
       html: htmlToSend,
       
     };
-    // Send the email
-    const info = transporter.sendMail(mailOptions);
-    console.log('Email sent:', (await info).response);
 
     const confirmationMail = {
       from: 'eclaim@engkong.com',
@@ -1942,9 +1919,17 @@ app.post('/processorRejectClaim', async (req, res) => {
       subject: 'You have rejected a claim',
       html: conf,
     }
-    const confirmation = transporter.sendMail(confirmationMail);
-    console.log('Email sent:', (await confirmation).response);
+    const [info, confirmation] = await Promise.all([
+      sendEmailWithDelay(transporter, mailOptions, 10000),
+      sendEmailWithDelay(transporter, confirmationMail, 10000)
+    ]);
+
+    console.log('Email sent:', (info).response);
+    console.log('Email sent:', (confirmation).response);
+
+    
     res.send({message: "Success!"})
+
   } catch(err) {
     console.log(err)
     res.send({message: err.message});
@@ -1955,7 +1940,7 @@ app.post('/processorRejectClaim', async (req, res) => {
 
 //gets history of claim from database
 app.get('/getHistory/:id/:status/:token', expenseAuthentication, async (req, res) => {
-  const { id, status, token} = req.params;   
+  const { id, status} = req.params;   
   try {
     var request = new sql.Request();
 
