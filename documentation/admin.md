@@ -3,6 +3,11 @@
 ## Description
 The admin account is used to manage user account information for all users of the application. The admin account username and password are created directly in the Microsoft SQL database. Upon login and successful authentication, the admin is directed to the admin page to manage user accounts.
 
+## Roles
+- Supervisor: Refers to the supervisor of a department, usually the person who either collates expenses for his employees to submit on their behalf for group monthly claim, or creates a group monthly claim for his employees to join and add their own expenses
+- Approver: Refers to HOD and above, who approves claims from Supervisors or individual employees. Take note that there can be multiple levels of approval.
+- Processor: Finance personnel who processes the claims of the company that they are attached to.
+
 ## Admin Account Setup
 Insert into **'SystemAdmins'** table the username and password in **ECLAIM** database. These are the credentials of the admin account.
 
